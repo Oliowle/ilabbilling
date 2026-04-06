@@ -1,0 +1,2577 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DENTAL OS - Zahntechnisches Labor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .mono {
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+        .tooth-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            min-width: 38px;
+        }
+        .tooth-status-btn {
+            width: 24px;
+            height: 18px;
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 3px;
+            cursor: pointer;
+            color: #94a3b8;
+            background: transparent;
+            border: none;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        .tooth-status-btn:hover {
+            background: #f1f5f9;
+        }
+        .tooth-status-btn.active-I {
+            background: #0d9488;
+            color: white;
+        }
+        .tooth-status-btn.active-G {
+            background: #78716c;
+            color: white;
+        }
+        .tooth-status-btn.active-V {
+            background: #7c3aed;
+            color: white;
+        }
+        .tooth-status-btn.active-S {
+            background: #f59e0b;
+            color: white;
+        }
+        .tooth-num {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            border-radius: 8px;
+            border: 1.5px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-top: 2px;
+            user-select: none;
+        }
+        .tooth-num:hover {
+            border-color: #93c5fd;
+        }
+        .tooth-num.selected {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        .tooth-num.has-work {
+            background: #1d4ed8;
+            color: white;
+            border-color: #1d4ed8;
+        }
+        .kuerzel-card {
+            @apply p-3 rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-blue-400 hover:shadow-md transition-all;
+        }
+        .kuerzel-card.active {
+            @apply border-blue-500 bg-blue-50 shadow-md;
+        }
+        .position-row {
+            @apply p-3 border-b border-slate-100 transition-colors cursor-pointer;
+        }
+        .position-row:hover {
+            background: #f8fafc;
+        }
+        .position-row.active-row {
+            background: #eff6ff;
+            border-left: 3px solid #3b82f6;
+        }
+        .pos-actions {
+            display: none;
+            animation: fadeSlideDown 0.2s ease-out;
+        }
+        .pos-actions.visible {
+            display: block;
+        }
+        @keyframes fadeSlideDown {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pos-action-btn {
+            @apply flex items-center gap-2 w-full px-3 py-2 text-xs rounded-lg transition-colors text-left;
+        }
+        .pos-action-btn:hover {
+            background: #e2e8f0;
+        }
+        .reason-box {
+            @apply mt-2 p-3 rounded-lg text-xs leading-relaxed;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .korrektur-log-entry {
+            @apply p-2 rounded-lg text-xs border-l-2;
+        }
+        .toast {
+            @apply fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-3 rounded-lg shadow-lg text-sm z-50 animate-pulse;
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .slide-out {
+            animation: slideOut 0.3s ease-in;
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="flex h-screen">
+        <!-- LEFT SIDEBAR -->
+        <div class="w-60 bg-white border-r border-slate-200 flex flex-col">
+            <!-- Logo -->
+            <div class="p-6 border-b border-slate-200">
+                <div class="flex items-baseline gap-1">
+                    <span class="text-2xl font-bold text-blue-600">DENTAL</span>
+                    <span class="text-2xl font-bold text-slate-700">OS</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-2">Zahntechnisches Labor Krieger</p>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 p-4 space-y-1">
+                <a href="#" data-page="dashboard" onclick="navigateTo('dashboard'); return false;" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-chart-line w-5"></i>
+                    <span class="text-sm font-medium">Dashboard</span>
+                </a>
+                <a href="#" data-page="kva" onclick="navigateTo('kva'); return false;" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg bg-blue-100 text-blue-700 transition-colors">
+                    <i class="fas fa-file-invoice w-5"></i>
+                    <span class="text-sm font-medium">Neuer KVA</span>
+                </a>
+                <a href="#" data-page="alle-kvas" onclick="navigateTo('alle-kvas'); return false;" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-list w-5"></i>
+                    <span class="text-sm font-medium">Alle KVAs</span>
+                </a>
+                <a href="#" data-page="zahnaerzte" onclick="navigateTo('zahnaerzte'); return false;" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-hospital-user w-5"></i>
+                    <span class="text-sm font-medium">Zahnärzte</span>
+                </a>
+                <a href="#" data-page="leistungen" onclick="navigateTo('leistungen'); return false;" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-tools w-5"></i>
+                    <span class="text-sm font-medium">Leistungen</span>
+                </a>
+                <a href="#" data-page="statistik" onclick="navigateTo('statistik'); return false;" class="nav-link flex items-center gap-3 px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
+                    <i class="fas fa-chart-pie w-5"></i>
+                    <span class="text-sm font-medium">Statistik</span>
+                </a>
+            </nav>
+
+            <!-- Bottom Stats -->
+            <div class="p-4 border-t border-slate-200 space-y-2 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Kürzel:</span>
+                    <span class="font-semibold text-slate-900" id="stat-kuerzel">19</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Positionen:</span>
+                    <span class="font-semibold text-slate-900" id="stat-positionen">87</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Korrekturen:</span>
+                    <span class="font-semibold text-slate-900" id="stat-korrekturen">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 flex flex-col">
+            <!-- HEADER -->
+            <div class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6">
+                <div class="flex items-center gap-6">
+                    <div id="header-buttons" class="flex gap-2">
+                        <button class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium">
+                            <i class="fas fa-file-invoice mr-2"></i>Kostenvoranschlag
+                        </button>
+                        <button class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors">
+                            <i class="fas fa-receipt mr-2"></i>Rechnung
+                        </button>
+                    </div>
+                    <div id="kva-nr-display" class="text-sm text-slate-600">
+                        KVA-Nr: <span class="font-mono font-semibold text-slate-900">---</span>
+                    </div>
+                </div>
+                <div id="header-actions" class="flex gap-3">
+                    <button id="btn-reset" class="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors" onclick="resetKVA()">
+                        <i class="fas fa-redo mr-2"></i>Zurücksetzen
+                    </button>
+                    <button id="btn-save" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors" onclick="saveKVA()">
+                        <i class="fas fa-save mr-2"></i>KVA Speichern
+                    </button>
+                </div>
+            </div>
+
+            <!-- PAGE CONTAINER -->
+            <div class="flex-1 overflow-hidden">
+                <!-- PAGE: DASHBOARD -->
+                <div id="page-dashboard" class="hidden h-full overflow-y-auto p-6">
+                    <div class="max-w-7xl mx-auto">
+                        <!-- Dashboard content will be generated by renderDashboard() -->
+                    </div>
+                </div>
+
+                <!-- PAGE: KVA EDITOR -->
+                <div id="page-kva" class="h-full overflow-hidden flex gap-6 p-6">
+                <!-- LEFT CONTENT PANEL -->
+                <div class="flex-1 flex flex-col gap-6 overflow-y-auto">
+                    <!-- BASISDATEN CARD -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Basisdaten</h3>
+                        <div class="grid grid-cols-12 gap-4">
+                            <!-- Praxis (4 cols) -->
+                            <div class="col-span-4">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Praxis</label>
+                                <select id="select-praxis" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">-- Wählen --</option>
+                                </select>
+                            </div>
+                            <!-- Patient (3 cols) -->
+                            <div class="col-span-3">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Patient</label>
+                                <input id="input-patient" type="text" placeholder="Name" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <!-- Versicherung (2 cols) -->
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Versicherung</label>
+                                <select id="select-versicherung" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="privat">Privat</option>
+                                    <option value="kasse">Kasse</option>
+                                </select>
+                            </div>
+                            <!-- Gesichtsbogen (3 cols) -->
+                            <div class="col-span-3">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Gesichtsbogen</label>
+                                <select id="select-gesichtsbogen" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="ohne">Ohne</option>
+                                    <option value="mit">Mit</option>
+                                </select>
+                            </div>
+                            <!-- Arbeitsart (12 cols) -->
+                            <div class="col-span-12">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Arbeitsart / Beschreibung</label>
+                                <input id="input-arbeitsart" type="text" placeholder="z.B. Versorgung Oberkiefer Frontzähne" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ZAHNSCHEMA CARD -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-slate-900">Visueller Arbeitsstatus</h3>
+                            <div class="flex items-center gap-4 text-xs font-medium">
+                                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-teal-600 inline-block"></span> IMPLANTAT</span>
+                                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-stone-500 inline-block"></span> GERÜST</span>
+                                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-violet-600 inline-block"></span> VERBLENDUNG</span>
+                                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> STUMPF</span>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <!-- Oberkiefer -->
+                            <div class="flex justify-center gap-0.5">
+                                <div class="flex gap-0.5" id="teeth-upper-left">
+                                    <!-- 18-11 -->
+                                </div>
+                                <div class="flex items-end px-1">
+                                    <div class="w-px h-16 bg-slate-300"></div>
+                                </div>
+                                <div class="flex gap-0.5" id="teeth-upper-right">
+                                    <!-- 21-28 -->
+                                </div>
+                            </div>
+                            <!-- Unterkiefer -->
+                            <div class="flex justify-center gap-0.5">
+                                <div class="flex gap-0.5" id="teeth-lower-left">
+                                    <!-- 48-41 -->
+                                </div>
+                                <div class="flex items-start px-1">
+                                    <div class="w-px h-16 bg-slate-300"></div>
+                                </div>
+                                <div class="flex gap-0.5" id="teeth-lower-right">
+                                    <!-- 31-38 -->
+                                </div>
+                            </div>
+                            <div class="pt-2 border-t border-slate-200">
+                                <p class="text-sm text-slate-600">
+                                    <span id="teeth-count">0</span> Zähne ausgewählt
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KÜRZEL GRID CARD -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Kürzel</h3>
+                        <div class="grid grid-cols-6 gap-3" id="kuerzel-grid">
+                            <!-- Will be generated -->
+                        </div>
+                    </div>
+
+                    <!-- MANUAL POSITION ADD -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Position manuell hinzufügen</h3>
+                        <div class="flex gap-3">
+                            <div class="flex-1">
+                                <select id="select-manual-pos" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">-- Position wählen --</option>
+                                </select>
+                            </div>
+                            <div class="w-20">
+                                <input id="input-manual-qty" type="number" value="1" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <button onclick="addManualPosition()" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-plus mr-2"></i>Hinzufügen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT CALCULATION PANEL -->
+                <div class="w-[380px] bg-white rounded-2xl border border-slate-200 flex flex-col">
+                    <!-- Header -->
+                    <div class="p-6 border-b border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-900">Berechnung</h3>
+                        <p class="text-xs text-slate-600 mt-1" id="calc-type">Privat / BEB</p>
+                    </div>
+
+                    <!-- Positions List -->
+                    <div class="flex-1 overflow-y-auto" id="positions-list">
+                        <div class="p-6 text-center text-slate-500 text-sm">
+                            <p><i class="fas fa-inbox w-6 h-6 mx-auto mb-2 opacity-50"></i></p>
+                            <p>Kein Kürzel ausgewählt</p>
+                            <p class="text-xs mt-1">Wählen Sie ein Kürzel, um Positionen zu sehen</p>
+                        </div>
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="p-6 border-t border-slate-200 space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-600">Leistungen netto:</span>
+                            <span class="mono font-semibold text-slate-900" id="total-leistung">0,00 €</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-600">Material netto:</span>
+                            <span class="mono font-semibold text-slate-900" id="total-material">0,00 €</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm bg-slate-50 p-2 rounded-lg">
+                            <span class="text-slate-600">MwSt (7%/19%):</span>
+                            <span class="mono font-semibold text-slate-900" id="total-mwst">0,00 €</span>
+                        </div>
+                        <div class="flex justify-between items-center text-base border-t border-slate-200 pt-3">
+                            <span class="font-semibold text-slate-900">Gesamt:</span>
+                            <span class="mono font-bold text-blue-600 text-lg" id="total-gesamt">0,00 €</span>
+                        </div>
+                        <!-- TABS: Korrektur-Log / Lernregeln -->
+                        <div class="pt-3 border-t border-slate-200">
+                            <div class="flex gap-1 mb-2">
+                                <button id="tab-log-btn" onclick="switchLogTab('log')" class="flex-1 text-xs font-semibold px-2 py-1.5 rounded-lg bg-slate-100 text-slate-700 transition-colors">
+                                    <i class="fas fa-history mr-1"></i>Korrektur-Log <span id="korrektur-count" class="text-slate-400">(0)</span>
+                                </button>
+                                <button id="tab-learn-btn" onclick="switchLogTab('learn')" class="flex-1 text-xs font-semibold px-2 py-1.5 rounded-lg text-slate-500 hover:bg-slate-50 transition-colors">
+                                    <i class="fas fa-brain mr-1"></i>Lernregeln <span id="lernregeln-count" class="text-slate-400">(0)</span>
+                                </button>
+                            </div>
+                            <div id="tab-log" class="space-y-1 max-h-32 overflow-y-auto">
+                                <div id="korrektur-log">
+                                    <p class="text-xs text-slate-400 text-center py-2">Noch keine Korrekturen</p>
+                                </div>
+                            </div>
+                            <div id="tab-learn" class="space-y-1 max-h-32 overflow-y-auto hidden">
+                                <div id="lernregeln-log">
+                                    <p class="text-xs text-slate-400 text-center py-2">Noch keine Lernregeln</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 pt-3">
+                            <button onclick="exportKorrekturen()" class="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-100 transition-colors">
+                                <i class="fas fa-download mr-2"></i>Korrekturen exportieren
+                            </button>
+                            <button onclick="saveKVA()" class="flex-1 px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-check mr-2"></i>KVA speichern
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- PAGE: ALLE KVAs -->
+                <div id="page-alle-kvas" class="hidden h-full overflow-y-auto p-6">
+                    <div class="max-w-7xl">
+                        <div class="flex items-center justify-between mb-6">
+                            <h1 class="text-2xl font-bold text-slate-900">Alle KVAs</h1>
+                            <button onclick="navigateTo('kva')" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-plus mr-2"></i>Neuer KVA
+                            </button>
+                        </div>
+
+                        <!-- SEARCH BAR -->
+                        <div class="mb-6">
+                            <input type="text" id="alle-kvas-search" placeholder="Nach KVA-Nr, Praxis oder Patient suchen..." class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <!-- KVAs GRID -->
+                        <div class="grid grid-cols-2 gap-4" id="alle-kvas-grid">
+                            <p class="col-span-2 text-slate-600 text-center py-12">Noch keine KVAs erstellt</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAGE: ZAHNÄRZTE -->
+                <div id="page-zahnaerzte" class="hidden h-full overflow-y-auto p-6">
+                    <div class="max-w-7xl">
+                        <h1 class="text-2xl font-bold text-slate-900 mb-6">Zahnärzte</h1>
+
+                        <!-- PRAXEN GRID -->
+                        <div class="grid grid-cols-3 gap-4" id="zahnaerzte-grid">
+                            <!-- Will be generated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAGE: LEISTUNGEN -->
+                <div id="page-leistungen" class="hidden h-full overflow-y-auto p-6">
+                    <div class="max-w-6xl">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-slate-900 mb-4">Leistungen & Preislisten</h1>
+                            <p class="text-sm text-slate-600">Verwalten Sie Leistungen und ihre 5 Preislisten</p>
+                        </div>
+
+                        <!-- SEARCH & FILTER BAR -->
+                        <input type="hidden" id="leistungen-filter-category" value="alle">
+                        <div class="mb-6 space-y-3">
+                            <div>
+                                <input type="text" id="leistungen-search" placeholder="Nach Position-Nr oder Bezeichnung suchen..." class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="flex gap-3 flex-wrap">
+                                <div class="flex gap-1">
+                                    <button onclick="setLeistungenFilter('alle')" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">Alle</button>
+                                    <button onclick="setLeistungenFilter('leistung')" class="px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors">Leistung</button>
+                                    <button onclick="setLeistungenFilter('material')" class="px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors">Material</button>
+                                </div>
+                                <select id="leistungen-sort" onchange="renderLeistungen()" class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="nr">Nach Nr</option>
+                                    <option value="bez">Nach Bezeichnung</option>
+                                    <option value="kat">Nach Kategorie</option>
+                                    <option value="preis">Nach Preis</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- RESULTS COUNT -->
+                        <div class="mb-4">
+                            <p class="text-sm text-slate-600">Zeige <span id="leistungen-count">87</span> Positionen</p>
+                        </div>
+
+                        <!-- LEISTUNGEN LIST -->
+                        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden" id="leistungen-tbody">
+                            <!-- Will be generated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAGE: STATISTIK -->
+                <div id="page-statistik" class="hidden h-full overflow-y-auto p-6">
+                    <div class="max-w-7xl">
+                        <h1 class="text-2xl font-bold text-slate-900 mb-6">Statistik</h1>
+
+                        <!-- SUMMARY STATS -->
+                        <div class="grid grid-cols-3 gap-4 mb-8">
+                            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                                <div class="text-sm font-medium text-slate-600 mb-2">Gesamt KVAs</div>
+                                <div class="text-3xl font-bold text-blue-600" id="stat-total-kvas">0</div>
+                            </div>
+                            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                                <div class="text-sm font-medium text-slate-600 mb-2">Korrekturen</div>
+                                <div class="text-3xl font-bold text-orange-600" id="stat-total-korrektionen">0</div>
+                            </div>
+                            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                                <div class="text-sm font-medium text-slate-600 mb-2">Lernregeln</div>
+                                <div class="text-3xl font-bold text-amber-600" id="stat-total-lernregeln">0</div>
+                            </div>
+                        </div>
+
+                        <!-- BREAKDOWN BY KÜRZEL -->
+                        <div class="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
+                            <h2 class="text-lg font-semibold text-slate-900 mb-4">Nach Kürzel</h2>
+                            <div id="stat-kuerzel-breakdown" class="space-y-2">
+                                <p class="text-slate-600 text-center py-8">Noch keine KVAs erstellt</p>
+                            </div>
+                        </div>
+
+                        <!-- BREAKDOWN BY PRAXIS -->
+                        <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                            <h2 class="text-lg font-semibold text-slate-900 mb-4">Nach Praxis</h2>
+                            <div id="stat-praxis-breakdown" class="space-y-2">
+                                <p class="text-slate-600 text-center py-8">Noch keine KVAs erstellt</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ GLOBAL STATE ============
+        let state = {
+            praxis: '',
+            patient: '',
+            versicherung: 'privat',
+            gesichtsbogen: 'ohne',
+            arbeitsart: '',
+            selectedTeeth: new Set(),
+            selectedKuerzel: null,
+            positions: [],
+            korrektionen: [],
+            lernregeln: [],
+            allKVAs: []
+        };
+
+        // ============ CORE DATA ============
+        const POSITIONEN = [
+            {nr:"0001", bez:"Eingang/Ausgang Desinfektion", preise:[4.83, 5.07, 5.31, 4.59, 4.83], kat:"leistung"},
+            {nr:"0010", bez:"Modell aus Hartgips", preise:[10.79, 11.33, 11.87, 10.25, 10.79], kat:"material"},
+            {nr:"0011", bez:"Superhartgipsmodell", preise:[15.73, 16.52, 17.30, 14.94, 15.73], kat:"material"},
+            {nr:"0012", bez:"Kontrollmodell", preise:[11.0, 11.55, 12.10, 10.45, 11.0], kat:"material"},
+            {nr:"0014", bez:"Sägemodell", preise:[19.88, 20.87, 21.87, 18.89, 19.88], kat:"leistung"},
+            {nr:"0015", bez:"Stumpf herausnehmbar mit Pins", preise:[18.0, 18.90, 19.80, 17.10, 18.0], kat:"leistung"},
+            {nr:"0016", bez:"Split-Cast Sockel an Modell", preise:[9.38, 9.85, 10.32, 8.91, 9.38], kat:"leistung"},
+            {nr:"0021", bez:"Modell dublieren", preise:[16.5, 17.33, 18.15, 15.68, 16.5], kat:"leistung"},
+            {nr:"0030", bez:"Implantat Modell", preise:[17.0, 17.85, 18.70, 16.15, 17.0], kat:"material"},
+            {nr:"0051", bez:"Stumpf säg. unter Mik., vorb. inkl. Pin", preise:[25.0, 26.25, 27.50, 23.75, 25.0], kat:"leistung"},
+            {nr:"0056", bez:"Stumpf aus feuerfester Masse", preise:[21.35, 22.42, 23.49, 20.28, 21.35], kat:"leistung"},
+            {nr:"0070", bez:"Zahnfleischmaske, abnehmbar", preise:[25.0, 26.25, 27.50, 23.75, 25.0], kat:"leistung"},
+            {nr:"0100", bez:"Modellpaar herstellen u. sockeln", preise:[12.0, 12.60, 13.20, 11.40, 12.0], kat:"leistung"},
+            {nr:"0110", bez:"Dublieren eines Einzelstumpfes", preise:[10.11, 10.62, 11.12, 9.60, 10.11], kat:"leistung"},
+            {nr:"0115", bez:"Unterkiefer-Protrusionsschiene Modell", preise:[15.0, 15.75, 16.50, 14.25, 15.0], kat:"leistung"},
+            {nr:"0120", bez:"Mittelwertartikulator", preise:[12.42, 13.04, 13.66, 11.80, 12.42], kat:"leistung"},
+            {nr:"0125", bez:"UKPS Artikulator-Montage", preise:[15.0, 15.75, 16.50, 14.25, 15.0], kat:"leistung"},
+            {nr:"0200", bez:"Modellmontage in Mittelwertartikulator", preise:[12.42, 13.04, 13.66, 11.80, 12.42], kat:"leistung"},
+            {nr:"0201", bez:"Montage nach Gesichtsbogen", preise:[15.69, 16.47, 17.26, 14.91, 15.69], kat:"leistung"},
+            {nr:"0202", bez:"Montage eines Gegenkiefermodelles", preise:[10.79, 11.33, 11.87, 10.25, 10.79], kat:"material"},
+            {nr:"0207", bez:"Virtueller Artikulator", preise:[25.84, 27.13, 28.42, 24.55, 25.84], kat:"leistung"},
+            {nr:"0250", bez:"Einstellen u. Auswerten e. Registrates", preise:[23.0, 24.15, 25.30, 21.85, 23.0], kat:"leistung"},
+            {nr:"0301", bez:"Selektives Einschleifen Modellpaar", preise:[4.5, 4.73, 4.95, 4.28, 4.5], kat:"leistung"},
+            {nr:"0401", bez:"Gerüst anpassen / Brückenglied", preise:[22.0, 23.10, 24.20, 20.90, 22.0], kat:"leistung"},
+            {nr:"0500", bez:"Zahnfarbenbestimmung", preise:[19.0, 19.95, 20.90, 18.05, 19.0], kat:"leistung"},
+            {nr:"0501", bez:"Foto - und Modell Funktionsanalyse", preise:[60.0, 63.0, 66.0, 57.0, 60.0], kat:"leistung"},
+            {nr:"0600", bez:"Wax-up diagnostisch, je Zahn", preise:[20.0, 21.0, 22.0, 19.0, 20.0], kat:"leistung"},
+            {nr:"0611", bez:"Mock-up Schiene", preise:[106.74, 112.08, 117.41, 101.40, 106.74], kat:"leistung"},
+            {nr:"0752", bez:"Individueller Löffel für Imp.", preise:[29.66, 31.14, 32.63, 28.18, 29.66], kat:"leistung"},
+            {nr:"0804", bez:"Formteil für provisorische Versorgung", preise:[34.0, 35.70, 37.40, 32.30, 34.0], kat:"leistung"},
+            {nr:"0805", bez:"Langzeitprovisorium Kst./ CAD-CAM", preise:[93.26, 97.92, 102.59, 88.60, 93.26], kat:"leistung"},
+            {nr:"0850", bez:"Adjustierte Aufbissschiene", preise:[269.0, 282.45, 295.90, 255.55, 269.0], kat:"leistung"},
+            {nr:"0851", bez:"Aufbiss", preise:[25.0, 26.25, 27.50, 23.75, 25.0], kat:"leistung"},
+            {nr:"0854", bez:"Sportschutzschiene", preise:[85.0, 89.25, 93.50, 80.75, 85.0], kat:"leistung"},
+            {nr:"0857", bez:"Miniplastschiene", preise:[79.0, 82.95, 86.90, 75.05, 79.0], kat:"leistung"},
+            {nr:"0858", bez:"Jig-Aufbau", preise:[40.0, 42.0, 44.0, 38.0, 40.0], kat:"leistung"},
+            {nr:"1000", bez:"Aufwand bei Suprakonstruktion", preise:[110.0, 115.50, 121.0, 104.50, 110.0], kat:"leistung"},
+            {nr:"1003", bez:"UKPS Gerüst-Herstellung", preise:[120.0, 126.0, 132.0, 114.0, 120.0], kat:"leistung"},
+            {nr:"1010", bez:"Klebeverbindung Titan/Lisi/Zirkon", preise:[84.0, 88.20, 92.40, 79.80, 84.0], kat:"leistung"},
+            {nr:"1011", bez:"Modellimplantat repositionieren", preise:[11.8, 12.39, 12.98, 11.21, 11.8], kat:"leistung"},
+            {nr:"1016", bez:"Individuelles Titanabutment", preise:[55.0, 57.75, 60.50, 52.25, 55.0], kat:"leistung"},
+            {nr:"1017", bez:"Individuelles E.Max-Abutment", preise:[60.0, 63.0, 66.0, 57.0, 60.0], kat:"leistung"},
+            {nr:"3000", bez:"Krone/Brückenglied gefräst aus Zirkon", preise:[110.0, 115.50, 121.0, 104.50, 110.0], kat:"leistung"},
+            {nr:"3002", bez:"Zirkonkr./Br.-Glied vollanatomisch", preise:[160.0, 168.0, 176.0, 152.0, 160.0], kat:"leistung"},
+            {nr:"3003", bez:"Zirkongerüst auf Implantat", preise:[162.92, 171.07, 179.21, 154.77, 162.92], kat:"leistung"},
+            {nr:"4010", bez:"Aufbissbehelf adjustiert (BEL)", preise:[0, 0, 0, 0, 0], kat:"leistung"},
+            {nr:"5001", bez:"Krone/Kappe/Schale Lithium disilicate", preise:[123.0, 129.15, 135.30, 116.85, 123.0], kat:"leistung"},
+            {nr:"5002", bez:"Krone aus Presskeramik", preise:[160.0, 168.0, 176.0, 152.0, 160.0], kat:"leistung"},
+            {nr:"5003", bez:"Teilkrone/Onlay Presskeramik", preise:[197.0, 206.85, 216.70, 187.15, 197.0], kat:"leistung"},
+            {nr:"5010", bez:"UKPS Kunststoff-Verarbeitung", preise:[45.0, 47.25, 49.50, 42.75, 45.0], kat:"leistung"},
+            {nr:"5100", bez:"UKPS Schiene Oberteil", preise:[95.0, 99.75, 104.50, 90.25, 95.0], kat:"leistung"},
+            {nr:"5110", bez:"UKPS Schiene Unterteil", preise:[95.0, 99.75, 104.50, 90.25, 95.0], kat:"leistung"},
+            {nr:"5200", bez:"Inlay aus Presskeramik, e.max", preise:[113.0, 118.65, 124.30, 107.35, 113.0], kat:"leistung"},
+            {nr:"5302", bez:"Keramische Schulter", preise:[18.0, 18.90, 19.80, 17.10, 18.0], kat:"leistung"},
+            {nr:"5500", bez:"Mehrflächige Verblendung Keramik", preise:[125.0, 131.25, 137.50, 118.75, 125.0], kat:"leistung"},
+            {nr:"5502", bez:"Wurzelpontic aus Keramik", preise:[45.0, 47.25, 49.50, 42.75, 45.0], kat:"leistung"},
+            {nr:"5504", bez:"Indiv. charakt. Keramik", preise:[35.0, 36.75, 38.50, 33.25, 35.0], kat:"leistung"},
+            {nr:"5505", bez:"Krone e.max auf Implantat", preise:[195.0, 204.75, 214.50, 185.25, 195.0], kat:"leistung"},
+            {nr:"5509", bez:"Individuelle Oberflächenstruktur", preise:[18.0, 18.90, 19.80, 17.10, 18.0], kat:"leistung"},
+            {nr:"5601", bez:"Frontzahn n. gnatholog. Kriterien", preise:[56.0, 58.80, 61.60, 53.20, 56.0], kat:"leistung"},
+            {nr:"5602", bez:"Kaufläche n. gnatholog. Kriterien", preise:[27.0, 28.35, 29.70, 25.65, 27.0], kat:"leistung"},
+            {nr:"5603", bez:"Arbeiten unter Stereomikroskop, je Zahn", preise:[35.0, 36.75, 38.50, 33.25, 35.0], kat:"leistung"},
+            {nr:"5604", bez:"Aufpassen auf Zweitmodell, je Krone", preise:[10.5, 11.03, 11.55, 9.98, 10.5], kat:"leistung"},
+            {nr:"5606", bez:"Individualität / Maltechnik", preise:[40.0, 42.0, 44.0, 38.0, 40.0], kat:"leistung"},
+            {nr:"5800", bez:"Galvanokäppchen", preise:[65.0, 68.25, 71.50, 61.75, 65.0], kat:"leistung"},
+            {nr:"7100", bez:"Aufbiss einschleifen (BEL)", preise:[0, 0, 0, 0, 0], kat:"leistung"},
+            {nr:"8000", bez:"Versand, je Versandgang", preise:[23.0, 24.15, 25.30, 21.85, 23.0], kat:"material"},
+            {nr:"9022", bez:"Digitale Artikulation", preise:[18.0, 18.90, 19.80, 17.10, 18.0], kat:"leistung"},
+            {nr:"9024", bez:"Modell Implantat 3d Print", preise:[33.71, 35.40, 37.08, 32.03, 33.71], kat:"material"},
+            {nr:"9025", bez:"Modell 3d Print", preise:[23.0, 24.15, 25.30, 21.85, 23.0], kat:"material"},
+            {nr:"9027", bez:"Digitalen Stumpf designen/drucken", preise:[20.22, 21.23, 22.24, 19.21, 20.22], kat:"leistung"},
+            {nr:"9030", bez:"Kontrollmodell 3d Print", preise:[19.0, 19.95, 20.90, 18.05, 19.0], kat:"material"},
+            {nr:"9032", bez:"Digitale Axiographie-Integration", preise:[37.0, 38.85, 40.70, 35.15, 37.0], kat:"leistung"},
+            {nr:"9100", bez:"Kiefergelenkanalyse", preise:[85.0, 89.25, 93.50, 80.75, 85.0], kat:"leistung"},
+            {nr:"9330", bez:"Versandkosten (BEL)", preise:[0, 0, 0, 0, 0], kat:"leistung"},
+            {nr:"9335", bez:"UKPS Versandkosten", preise:[15.0, 15.75, 16.50, 14.25, 15.0], kat:"material"},
+            {nr:"E001", bez:"e-max Presspellet, je Teil", preise:[25.0, 26.25, 27.50, 23.75, 25.0], kat:"material"},
+            {nr:"E005", bez:"Amber Mill", preise:[30.0, 31.50, 33.0, 28.50, 30.0], kat:"material"},
+            {nr:"E060", bez:"Einbettmasse, Pressmaterial", preise:[15.0, 15.75, 16.50, 14.25, 15.0], kat:"material"},
+            {nr:"I200", bez:"Camlog Abformpfosten", preise:[60.0, 63.0, 66.0, 57.0, 60.0], kat:"material"},
+            {nr:"I201", bez:"Modellanalog", preise:[30.0, 31.50, 33.0, 28.50, 30.0], kat:"material"},
+            {nr:"I221", bez:"Modellanalog Titanbasis", preise:[35.0, 36.75, 38.50, 33.25, 35.0], kat:"material"},
+            {nr:"I614", bez:"Klebebasis Titan", preise:[87.0, 91.35, 95.70, 82.65, 87.0], kat:"material"},
+            {nr:"I802", bez:"3D Scan-Body", preise:[85.0, 89.25, 93.50, 80.75, 85.0], kat:"material"},
+            {nr:"S405", bez:"PMMA Blank", preise:[39.0, 40.95, 42.90, 37.05, 39.0], kat:"material"},
+            {nr:"Z100", bez:"Zirkonrohling, je Einheit", preise:[48.0, 50.40, 52.80, 45.60, 48.0], kat:"material"},
+            {nr:"020", bez:"Sonderkunststoff", preise:[15.0, 15.75, 16.50, 14.25, 15.0], kat:"material"},
+        ];
+
+        const KUERZEL = [
+            {code:"ZK", bez:"Vollanatomische Zirkonkrone", desc:"Vollanatomisch, gefräst, individuell charakterisiert"},
+            {code:"ZKV", bez:"Zirkonkrone mit Verblendung", desc:"Zirkon mit keramischer Verblendung"},
+            {code:"ZBR", bez:"Zirkon-Brücke", desc:"Brücke vollanatomisch aus Zirkon"},
+            {code:"SCH", bez:"Aufbissschiene", desc:"Adjustierte Aufbissschiene"},
+            {code:"SKM", bez:"Suprakonstruktion", desc:"Zirkonkrone auf Implantat"},
+            {code:"PK", bez:"Presskeramik", desc:"Teilkrone/Onlay Presskeramik"},
+            {code:"EMX", bez:"E.Max Krone", desc:"Lithiumdisilikat Krone"},
+            {code:"VEN", bez:"Veneer", desc:"Keramikschale Lithiumdisilikat"},
+            {code:"INL", bez:"Inlay", desc:"Inlay aus Presskeramik"},
+            {code:"LZP", bez:"Langzeitprovisorium", desc:"Langzeitprovisorium CAD-CAM"},
+            {code:"SCHS", bez:"Schnarcherschiene", desc:"UKPS Anti-Schnarch-Schiene"},
+            {code:"MOCK", bez:"Mock-Up", desc:"Mock-Up Schiene"},
+            {code:"WAX", bez:"Wax-Up", desc:"Diagnostisches Wax-Up"},
+            {code:"SMIL", bez:"Smile Design", desc:"Smile Design + Flowable Injection"},
+            {code:"GB", bez:"Gesichtsbogen", desc:"Nur Gesichtsbogen-Abrechnung"},
+            {code:"MKON", bez:"Münchner Konzept", desc:"Münchner Konzept Schiene"},
+            {code:"MINI", bez:"Miniplastschiene", desc:"Tiefzieh-Miniplastschiene"},
+            {code:"JIGS", bez:"Jig", desc:"Jig-Schiene Bisslage"},
+            {code:"EMXI", bez:"E.Max Implantat", desc:"E.Max auf Implantat + Klebebasis"},
+        ];
+
+        const KUERZEL_MAP = {
+            "ZK": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0051",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"3002",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"Z100",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"9027",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "ZKV": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0051",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"3000",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5500",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5601",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5509",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E060",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E001",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"Z100",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"9027",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "ZBR": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0051",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"3002",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"Z100",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0401",pf:1,m:1,f:"pro_glied",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"9027",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "SCH": [
+                {nr:"0001",pf:1,m:1,f:"fix",b:null},
+                {nr:"0850",pf:1,m:1,f:"fix",b:null},
+                {nr:"0851",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"4010",pf:1,m:1,f:"fix",b:"kasse"},
+                {nr:"0250",pf:1,m:1,f:"fix",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gesichtsbogen"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "SCHK": [
+                {nr:"0021",pf:1,m:1,f:"fix",b:null},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"4010",pf:1,m:1,f:"fix",b:null},
+                {nr:"7100",pf:1,m:1,f:"fix",b:null},
+                {nr:"9330",pf:1,m:1,f:"fix",b:null},
+            ],
+            "SCHS": [
+                {nr:"0125",pf:1,m:1,f:"fix",b:null},
+                {nr:"1003",pf:1,m:1,f:"fix",b:null},
+                {nr:"5010",pf:1,m:1,f:"fix",b:null},
+                {nr:"5100",pf:1,m:1,f:"fix",b:null},
+                {nr:"5110",pf:1,m:1,f:"fix",b:null},
+                {nr:"5200",pf:1,m:1,f:"fix",b:null},
+                {nr:"9335",pf:1,m:1,f:"fix",b:null},
+            ],
+            "SCHSK": [
+                {nr:"0001",pf:1,m:1,f:"fix",b:null},
+                {nr:"0115",pf:1,m:1,f:"fix",b:null},
+                {nr:"5010",pf:1,m:1,f:"fix",b:null},
+                {nr:"5100",pf:1,m:1,f:"fix",b:null},
+                {nr:"5110",pf:1,m:1,f:"fix",b:null},
+                {nr:"5200",pf:1,m:1,f:"fix",b:null},
+                {nr:"7100",pf:1,m:1,f:"fix",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9330",pf:1,m:1,f:"fix",b:null},
+            ],
+            "SKM": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0030",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"1000",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"1010",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"1011",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"3003",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"I201",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"I614",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9024",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "PK": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0051",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"5003",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E001",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E060",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "EMX": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0051",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"5001",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E001",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"9027",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "EMXI": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0030",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"5505",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"1010",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"1011",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"I201",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"I614",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E001",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9024",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "VEN": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0051",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"5001",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E001",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E060",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "INL": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0051",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"5200",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E001",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"E060",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"9027",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "LZP": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"0805",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "MOCK": [
+                {nr:"0001",pf:1,m:1,f:"fix",b:null},
+                {nr:"0600",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0611",pf:1,m:1,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "WAX": [
+                {nr:"0001",pf:1,m:1,f:"fix",b:null},
+                {nr:"0600",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"9025",pf:1,m:1,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "SMIL": [
+                {nr:"0001",pf:1,m:1,f:"fix",b:null},
+                {nr:"0600",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0804",pf:1,m:1,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "GB": [
+                {nr:"0201",pf:1,m:1,f:"fix",b:null},
+                {nr:"0202",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "MKON": [
+                {nr:"0001",pf:1,m:1,f:"fix",b:null},
+                {nr:"0850",pf:1,m:1,f:"fix",b:null},
+                {nr:"020",pf:1,m:1,f:"fix",b:null},
+                {nr:"0250",pf:1,m:1,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "MINI": [
+                {nr:"0857",pf:1,m:1,f:"fix",b:null},
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "JIGS": [
+                {nr:"0858",pf:1,m:1,f:"fix",b:null},
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+        };
+
+        const PRAXEN = [
+            {name:"Paul Seemann", code:"SEE", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Dr. Gabriele Schmidt", code:"GSC", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Dr. Lex", code:"LEX", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"MVZ Phönixsee", code:"PHX", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Röder u. Kollegen", code:"ROE", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Dr. Neuffer", code:"NEU", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Dr. Wojahn", code:"WOJ", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Dr. Krauß", code:"KRA", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Das Hugo", code:"HUG", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Helm Dent", code:"HEL", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Zahnärzte am Königsplatz", code:"KOE", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Clinic Drohomyretska", code:"DRO", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Smile Atelier", code:"SMI", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Dr. Kersting", code:"KER", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Omar Gazaev", code:"GAZ", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Martmöller u. Kollegen", code:"MAR", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Dauner", code:"DAU", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Heuß", code:"HEU", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Papajewski", code:"PAP", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Pühler", code:"PUE", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Zahnheilkunde am Markt", code:"ZAH", preisliste:0, telefon:"", email:"", notizen:""},
+            {name:"Schulz-Clauß-Lorenz", code:"SCL", preisliste:0, telefon:"", email:"", notizen:""},
+        ];
+
+        // ============ HELPERS - PREISLISTEN ============
+        function getPreis(posNr, praxisCode) {
+            const pos = POSITIONEN.find(p => p.nr === posNr);
+            if (!pos) return 0;
+
+            const praxis = PRAXEN.find(p => p.code === praxisCode);
+            const preislisteIdx = praxis ? (praxis.preisliste || 0) : 0;
+
+            return pos.preise[preislisteIdx] || pos.preise[0];
+        }
+
+        // ============ RESOLVE LOGIC ============
+        function resolve(code, zaehne, kasse, gb, praxisCode) {
+            const originalCode = code;
+            // Internal routing
+            if (kasse && code === "SCH") code = "SCHK";
+            if (kasse && code === "SCHS") code = "SCHSK";
+
+            const mapping = KUERZEL_MAP[code];
+            if (!mapping) return [];
+
+            const result = [];
+            for (const entry of mapping) {
+                if (entry.pf !== 1) continue;
+
+                const b = entry.b;
+                if (b === "gesichtsbogen" && !gb) continue;
+                if (b === "kein_gesichtsbogen" && gb) continue;
+                if (b === "privat" && kasse) continue;
+                if (b === "kasse" && !kasse) continue;
+                if (b === "kein_gb_privat" && (gb || kasse)) continue;
+
+                const pos = POSITIONEN.find(p => p.nr === entry.nr);
+                if (!pos) continue;
+
+                let menge = entry.m;
+                let mengenInfo = `Fixmenge: ${entry.m}`;
+                if (entry.f === "pro_zahn" || entry.f === "pro_glied") {
+                    menge *= zaehne;
+                    mengenInfo = `${entry.m} × ${zaehne} Zähne (${entry.f})`;
+                }
+
+                // Build reasoning
+                const reasons = [];
+                reasons.push(`Kürzel "${originalCode}"${code !== originalCode ? ` → intern "${code}" (Kasse-Routing)` : ''}`);
+                reasons.push(`Pflichtposition im Mapping`);
+                if (b) {
+                    const bedLabels = {
+                        gesichtsbogen: 'Nur mit Gesichtsbogen',
+                        kein_gesichtsbogen: 'Nur ohne Gesichtsbogen',
+                        privat: 'Nur bei Privatversicherung',
+                        kasse: 'Nur bei Kassenversicherung',
+                        kein_gb_privat: 'Privat ohne Gesichtsbogen'
+                    };
+                    reasons.push(`Bedingung: ${bedLabels[b] || b}`);
+                }
+                reasons.push(`Menge: ${mengenInfo}`);
+
+                result.push({
+                    nummer: pos.nr,
+                    bezeichnung: pos.bez,
+                    menge: menge,
+                    einzelpreis: getPreis(entry.nr, praxisCode),
+                    kategorie: pos.kat,
+                    source: "auto",
+                    korrigiert: false,
+                    entfernt: false,
+                    reason: reasons,
+                    bedingung: b,
+                    formel: entry.f,
+                    basismenge: entry.m
+                });
+            }
+            return result;
+        }
+
+        // ============ HELPERS ============
+        function formatCurrency(value) {
+            return (value || 0).toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+        }
+
+        function formatNumber(value) {
+            return (value || 0).toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function generateKVAId() {
+            return Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast slide-in';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('slide-in');
+                toast.classList.add('slide-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // ============ PAGE NAVIGATION ============
+        function navigateTo(page) {
+            // Hide all pages
+            document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
+            // Show selected page
+            const pageEl = document.getElementById(`page-${page}`);
+            if (pageEl) {
+                pageEl.classList.remove('hidden');
+            }
+
+            // Update sidebar active state
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('bg-blue-100', 'text-blue-700');
+                link.classList.add('text-slate-700', 'hover:bg-slate-100');
+            });
+            const activeLink = document.querySelector(`[data-page="${page}"]`);
+            if (activeLink) {
+                activeLink.classList.remove('text-slate-700', 'hover:bg-slate-100');
+                activeLink.classList.add('bg-blue-100', 'text-blue-700');
+            }
+
+            // Hide/show header buttons based on page
+            const headerButtons = document.getElementById('header-buttons');
+            const headerActions = document.getElementById('header-actions');
+            if (page === 'kva') {
+                headerButtons.style.display = 'flex';
+                headerActions.style.display = 'flex';
+            } else {
+                headerButtons.style.display = 'none';
+                headerActions.style.display = 'none';
+            }
+
+            // Render page-specific content
+            if (page === 'dashboard') {
+                renderDashboard();
+            } else if (page === 'alle-kvas') {
+                renderAlleKVAs();
+            } else if (page === 'zahnaerzte') {
+                renderZahnaerzte();
+            } else if (page === 'leistungen') {
+                renderLeistungen();
+            } else if (page === 'statistik') {
+                renderStatistik();
+            }
+        }
+
+        function getDashboardStats() {
+            const total = state.allKVAs.length;
+            const korrekt = state.allKVAs.filter(k => k.status === 'korrekt').length;
+            const korrigiert = state.allKVAs.filter(k => k.status === 'korrigiert').length;
+            const stark = state.allKVAs.filter(k => k.status === 'stark_korrigiert').length;
+            const trefferquote = total > 0 ? Math.round(korrekt / total * 100) : 0;
+
+            // Aggregate all corrections
+            const allKorrektionen = state.allKVAs.flatMap(k => k.korrektionen || []);
+
+            // Error types
+            const errorTypes = {};
+            allKorrektionen.forEach(k => {
+                errorTypes[k.action] = (errorTypes[k.action] || 0) + 1;
+            });
+
+            // Problem positions
+            const posCorrectionCount = {};
+            allKorrektionen.forEach(k => {
+                if (k.posNr) {
+                    if (!posCorrectionCount[k.posNr]) posCorrectionCount[k.posNr] = {count: 0, actions: {}, bez: k.posBez || k.posNr};
+                    posCorrectionCount[k.posNr].count++;
+                    posCorrectionCount[k.posNr].actions[k.action] = (posCorrectionCount[k.posNr].actions[k.action] || 0) + 1;
+                }
+            });
+
+            // By kürzel
+            const byKuerzel = {};
+            state.allKVAs.forEach(k => {
+                if (!byKuerzel[k.kuerzel]) byKuerzel[k.kuerzel] = {total: 0, korrekt: 0};
+                byKuerzel[k.kuerzel].total++;
+                if (k.status === 'korrekt') byKuerzel[k.kuerzel].korrekt++;
+            });
+
+            // By praxis
+            const byPraxis = {};
+            state.allKVAs.forEach(k => {
+                if (!byPraxis[k.praxis]) byPraxis[k.praxis] = {total: 0, korrekt: 0, issues: []};
+                byPraxis[k.praxis].total++;
+                if (k.status === 'korrekt') byPraxis[k.praxis].korrekt++;
+            });
+
+            // Revenue
+            const totalRevenue = state.allKVAs.reduce((s, k) => s + (k.gesamtbetrag || 0), 0);
+
+            return { total, korrekt, korrigiert, stark, trefferquote, errorTypes, posCorrectionCount, byKuerzel, byPraxis, totalRevenue, allKorrektionen };
+        }
+
+        function renderDashboard() {
+            const stats = getDashboardStats();
+            const dashDiv = document.getElementById('page-dashboard');
+
+            // Error type labels
+            const errorLabels = {
+                'removed': 'Position entfernt',
+                'qty_changed': 'Menge geändert',
+                'kat_changed': 'Kategorie geändert',
+                'added': 'Position hinzugefügt'
+            };
+
+            // Trefferquote progress bar color
+            let progressBarColor = 'bg-blue-600';
+            if (stats.trefferquote < 50) progressBarColor = 'bg-red-500';
+            else if (stats.trefferquote < 75) progressBarColor = 'bg-amber-500';
+
+            // Top problem positions (Fehler-Hotspots)
+            const topPositions = Object.entries(stats.posCorrectionCount)
+                .sort((a, b) => b[1].count - a[1].count)
+                .slice(0, 5);
+            const totalCorrections = stats.allKorrektionen || 0;
+
+            // Recent KVAs for table
+            const recentKVAs = state.allKVAs.slice(-8).reverse();
+
+            // Kürzel performance for chart
+            const kuerzels = Object.entries(stats.byKuerzel)
+                .map(([k, v]) => ({
+                    kuerzel: k,
+                    total: v.total,
+                    korrekt: v.korrekt,
+                    accuracy: v.total > 0 ? Math.round(v.korrekt / v.total * 100) : 0
+                }))
+                .sort((a, b) => b.total - a.total)
+                .slice(0, 6);
+
+            // Corrections count
+            const openCorrections = stats.korrigiert + stats.stark;
+
+            // Average corrections per KVA
+            const avgRevisions = stats.total > 0 ? (stats.allKorrektionen / stats.total).toFixed(1) : '0.0';
+
+            // Qualitätsindex
+            let qualIndex = 'Kritisch';
+            let qualColor = 'text-red-600';
+            if (stats.trefferquote >= 85) { qualIndex = 'Stabil'; qualColor = 'text-emerald-600'; }
+            else if (stats.trefferquote >= 70) { qualIndex = 'Gut'; qualColor = 'text-blue-600'; }
+            else if (stats.trefferquote >= 50) { qualIndex = 'Ausbaufähig'; qualColor = 'text-amber-600'; }
+
+            dashDiv.innerHTML = `<div class="max-w-[1600px] mx-auto w-full">
+
+                <!-- HEADER BAR -->
+                <div class="flex justify-between items-center mb-8">
+                    <div class="relative">
+                        <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" placeholder="Suche nach Patienten, Ärzten oder KVA-Nr..." class="pl-10 pr-4 py-2.5 bg-white border border-slate-200 focus:bg-white focus:border-blue-500 rounded-lg text-sm w-80 transition-all" id="dashboard-search">
+                    </div>
+                    <div class="flex items-center gap-4">
+                        ${openCorrections > 0 ? `
+                        <div class="flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-full border border-amber-100">
+                            <i class="fas fa-triangle-exclamation text-[10px]"></i>
+                            <span class="text-xs font-medium">${openCorrections} Korrekturen offen</span>
+                        </div>` : ''}
+                        <div class="h-8 w-px bg-slate-200"></div>
+                        <button onclick="navigateTo('kva')" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 text-sm">
+                            <i class="fas fa-plus"></i> Neuer KVA
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI CARDS (5 Karten) -->
+                <div class="grid grid-cols-5 gap-4 mb-8">
+                    <!-- Trefferquote -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Trefferquote</div>
+                        <div class="text-3xl font-bold text-slate-900">${stats.trefferquote}%</div>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-4">
+                            <div class="${progressBarColor} h-1.5 rounded-full transition-all" style="width: ${stats.trefferquote}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Eingänge -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
+                        <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-3">Eingänge</div>
+                        <div class="text-3xl font-bold text-slate-900">${stats.total}</div>
+                        <div class="text-[11px] text-slate-400 mt-3 italic">Gesamt erfasst</div>
+                    </div>
+
+                    <!-- Fehlerfrei (1. Versuch) -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+                        <div class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-3">Fehlerfrei (1. Versuch)</div>
+                        <div class="text-3xl font-bold text-slate-900">${stats.korrekt}</div>
+                        <div class="text-[11px] text-slate-400 mt-3">Qualitätsindex: <span class="${qualColor} font-bold">${qualIndex}</span></div>
+                    </div>
+
+                    <!-- Korrektur-Status -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+                        <div class="text-xs font-bold text-amber-600 uppercase tracking-wider mb-3">Korrektur-Status</div>
+                        <div class="text-3xl font-bold text-slate-900">${openCorrections}</div>
+                        <div class="text-[11px] text-slate-400 mt-3">&Oslash; ${avgRevisions} Revisionen pro Fall</div>
+                    </div>
+
+                    <!-- Ø Bearbeitungszeit / Umsatz -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Umsatz gesamt</div>
+                        <div class="text-3xl font-bold text-slate-900">${formatCurrency(stats.totalRevenue)}</div>
+                        <div class="text-[11px] text-slate-400 mt-3 flex items-center gap-1">
+                            <i class="fas fa-chart-line text-blue-400"></i> &Oslash; ${formatCurrency(stats.total > 0 ? stats.totalRevenue / stats.total : 0)} pro KVA
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN GRID: 8 + 4 columns -->
+                <div class="grid grid-cols-12 gap-6">
+
+                    <!-- LEFT COLUMN (8 cols) -->
+                    <div class="col-span-8 space-y-6">
+
+                        <!-- Aktuelle Laborvorgänge (Tabelle) -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="p-6 border-b border-slate-50 flex justify-between items-center">
+                                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="fas fa-list-check text-blue-500"></i>
+                                    Aktuelle Laborvorgänge
+                                </h3>
+                                <button onclick="navigateTo('alle-kvas')" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Alle anzeigen <i class="fas fa-arrow-right ml-1"></i></button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-50/50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Patient / ID</th>
+                                            <th class="px-6 py-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Praxis</th>
+                                            <th class="px-6 py-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">Positionen</th>
+                                            <th class="px-6 py-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Kürzel</th>
+                                            <th class="px-6 py-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${recentKVAs.length === 0 ? `
+                                        <tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">Noch keine KVAs erstellt</td></tr>
+                                        ` : recentKVAs.map(kva => {
+                                            const praxisName = PRAXEN.find(p => p.code === kva.praxis)?.name || kva.praxis;
+                                            const posCount = kva.positionen ? kva.positionen.length : 0;
+                                            let statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Korrekt</span>';
+                                            if (kva.status === 'korrigiert') statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Korrigiert</span>';
+                                            else if (kva.status === 'stark_korrigiert') statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Stark korrigiert</span>';
+                                            const kvaIdx = state.allKVAs.indexOf(kva);
+                                            return `
+                                            <tr class="hover:bg-slate-50/80 transition-colors cursor-pointer" onclick="loadKVA(${kvaIdx})">
+                                                <td class="px-6 py-4">
+                                                    <div class="text-sm font-bold text-slate-900">${kva.patient || '—'}</div>
+                                                    <div class="text-xs text-slate-400 italic">#${kva.id}</div>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-slate-600">${praxisName}</td>
+                                                <td class="px-6 py-4 text-sm text-center font-medium">${posCount}</td>
+                                                <td class="px-6 py-4 text-sm font-medium text-blue-600">${kva.kuerzel}</td>
+                                                <td class="px-6 py-4 text-right">${statusBadge}</td>
+                                            </tr>`;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Trefferquote nach Kürzel (Balkendiagramm) -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-bold text-slate-800 italic uppercase tracking-tight text-sm">Trefferquote nach Kürzel</h3>
+                                <div class="flex gap-4">
+                                    <span class="flex items-center gap-1.5 text-xs font-medium text-slate-400"><span class="w-2.5 h-2.5 bg-blue-200 rounded-sm"></span> KVAs gesamt</span>
+                                    <span class="flex items-center gap-1.5 text-xs font-medium text-slate-400"><span class="w-2.5 h-2.5 bg-emerald-400 rounded-sm"></span> Korrekt</span>
+                                </div>
+                            </div>
+                            ${kuerzels.length === 0 ? '<p class="text-slate-400 text-center py-8">Keine KVAs erfasst</p>' : `
+                            <div class="flex items-end justify-between gap-4 h-40 px-2">
+                                ${kuerzels.map(k => {
+                                    const maxTotal = Math.max(...kuerzels.map(x => x.total));
+                                    const totalH = maxTotal > 0 ? Math.round(k.total / maxTotal * 100) : 0;
+                                    const korrektH = maxTotal > 0 ? Math.round(k.korrekt / maxTotal * 100) : 0;
+                                    return `
+                                    <div class="flex-1 flex flex-col items-center gap-2 group">
+                                        <div class="w-full flex items-end justify-center gap-1 h-full">
+                                            <div class="w-4 bg-blue-200 rounded-t-sm" style="height: ${totalH}%"></div>
+                                            <div class="w-4 bg-blue-600 rounded-t-sm" style="height: ${korrektH}%"></div>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-slate-400">${k.kuerzel}</span>
+                                        <span class="text-[9px] text-slate-400">${k.accuracy}%</span>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                            `}
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT COLUMN (4 cols) -->
+                    <div class="col-span-4 space-y-6">
+
+                        <!-- Lernregeln -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 relative overflow-hidden">
+                            <div class="flex items-center gap-2 mb-6">
+                                <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-800 italic uppercase tracking-wide text-sm">Lernregeln</h3>
+                                <span class="ml-auto text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">${state.lernregeln.length}</span>
+                            </div>
+                            ${state.lernregeln.length === 0 ? '<p class="text-slate-400 text-center py-4 text-sm">Keine offenen Lernregeln</p>' : `
+                            <div class="space-y-4">
+                                ${state.lernregeln.slice(-3).reverse().map(lr => {
+                                    return `
+                                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                        <p class="text-[13px] font-semibold text-slate-900 italic">${lr.typ || 'Lernregel'}</p>
+                                        <p class="text-[11px] text-slate-500 mt-1 line-clamp-2">${lr.text || lr.notiz || '(keine Beschreibung)'}</p>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                            `}
+                        </div>
+
+                        <!-- Fehler-Hotspots -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                            <h3 class="font-bold text-slate-800 italic uppercase tracking-wide text-sm mb-6">Fehler-Hotspots (Pos.)</h3>
+                            ${topPositions.length === 0 ? '<p class="text-slate-400 text-center py-4 text-sm">Keine Fehler gefunden</p>' : `
+                            <div class="space-y-5">
+                                ${topPositions.slice(0, 4).map(([posNr, posData]) => {
+                                    const errPercent = totalCorrections > 0 ? Math.round(posData.count / totalCorrections * 100) : 0;
+                                    let barColor = 'bg-amber-500';
+                                    if (errPercent >= 10) barColor = 'bg-red-500';
+                                    let fontColor = 'text-amber-500';
+                                    if (errPercent >= 10) fontColor = 'text-red-500';
+                                    return `
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1.5">
+                                            <span class="font-bold text-slate-700">${posNr} - ${posData.bez}</span>
+                                            <span class="${fontColor} font-bold">${errPercent}%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-100 rounded-full h-1.5">
+                                            <div class="${barColor} h-1.5 rounded-full" style="width: ${Math.max(errPercent, 3)}%"></div>
+                                        </div>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                            `}
+                        </div>
+
+                        <!-- Trefferquote nach Praxis -->
+                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                            <h3 class="font-bold text-slate-800 italic uppercase tracking-wide text-sm mb-6">Trefferquote nach Praxis</h3>
+                            ${Object.keys(stats.byPraxis).length === 0 ? '<p class="text-slate-400 text-center py-4 text-sm">Keine KVAs erfasst</p>' : `
+                            <div class="space-y-4">
+                                ${Object.entries(stats.byPraxis)
+                                    .map(([code, v]) => ({
+                                        name: PRAXEN.find(p => p.code === code)?.name || code,
+                                        total: v.total,
+                                        korrekt: v.korrekt,
+                                        accuracy: v.total > 0 ? Math.round(v.korrekt / v.total * 100) : 0
+                                    }))
+                                    .sort((a, b) => b.total - a.total)
+                                    .slice(0, 5)
+                                    .map(p => {
+                                        let color = 'bg-emerald-500';
+                                        if (p.accuracy < 50) color = 'bg-red-500';
+                                        else if (p.accuracy < 75) color = 'bg-amber-500';
+                                        return `
+                                        <div>
+                                            <div class="flex justify-between text-xs mb-1.5">
+                                                <span class="font-bold text-slate-700">${p.name}</span>
+                                                <span class="font-bold text-slate-600">${p.accuracy}%</span>
+                                            </div>
+                                            <div class="w-full bg-slate-100 rounded-full h-1.5">
+                                                <div class="${color} h-1.5 rounded-full" style="width: ${p.accuracy}%"></div>
+                                            </div>
+                                        </div>`;
+                                    }).join('')}
+                            </div>
+                            `}
+                        </div>
+
+                        <!-- Infrastruktur (Dark Card) -->
+                        <div class="bg-slate-900 rounded-2xl p-6 text-white overflow-hidden relative">
+                            <div class="relative z-10">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Infrastruktur</p>
+                                <h4 class="text-lg font-bold mb-4">Labor Cloud-Status</h4>
+                                <div class="grid grid-cols-2 gap-2 mb-4">
+                                    <div class="p-2 bg-white/5 rounded border border-white/10">
+                                        <p class="text-[9px] text-slate-400 uppercase">Positionen</p>
+                                        <p class="text-xs font-bold text-emerald-400">${POSITIONEN.length} aktiv</p>
+                                    </div>
+                                    <div class="p-2 bg-white/5 rounded border border-white/10">
+                                        <p class="text-[9px] text-slate-400 uppercase">Kürzel</p>
+                                        <p class="text-xs font-bold text-emerald-400">${KUERZEL.length} definiert</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 mb-4">
+                                    <div class="p-2 bg-white/5 rounded border border-white/10">
+                                        <p class="text-[9px] text-slate-400 uppercase">Praxen</p>
+                                        <p class="text-xs font-bold text-emerald-400">${PRAXEN.length} verbunden</p>
+                                    </div>
+                                    <div class="p-2 bg-white/5 rounded border border-white/10">
+                                        <p class="text-[9px] text-slate-400 uppercase">Lernregeln</p>
+                                        <p class="text-xs font-bold text-blue-400">${state.lernregeln.length} offen</p>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 italic">Dental OS v1.0 | Standalone</div>
+                            </div>
+                            <i class="fas fa-shield-halved absolute bottom-[-10px] right-[-10px] text-6xl text-white/5 opacity-20"></i>
+                        </div>
+
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderAlleKVAs() {
+            const search = document.getElementById('alle-kvas-search')?.value?.toLowerCase() || '';
+            let filtered = state.allKVAs;
+            if (search) {
+                filtered = state.allKVAs.filter(kva => {
+                    const praxisName = PRAXEN.find(p => p.code === kva.praxis)?.name || kva.praxis;
+                    return kva.id.toLowerCase().includes(search) ||
+                           kva.patient.toLowerCase().includes(search) ||
+                           praxisName.toLowerCase().includes(search);
+                });
+            }
+
+            const grid = document.getElementById('alle-kvas-grid');
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p class="col-span-2 text-slate-600 text-center py-12">Keine KVAs gefunden</p>';
+            } else {
+                grid.innerHTML = filtered.map((kva, idx) => {
+                    const praxisName = PRAXEN.find(p => p.code === kva.praxis)?.name || kva.praxis;
+                    const totalBetrag = kva.gesamtbetrag ? formatCurrency(kva.gesamtbetrag) : '---';
+                    const kvaIdx = state.allKVAs.indexOf(kva);
+                    return `
+                        <div class="bg-white rounded-2xl border border-slate-200 p-6 hover:border-blue-400 hover:shadow-md cursor-pointer transition-all" onclick="loadKVA(${kvaIdx})">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <div class="mono text-sm font-semibold text-blue-600">${kva.id}</div>
+                                    <div class="text-xs text-slate-500 mt-1">${new Date(kva.timestamp).toLocaleString('de-DE')}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-semibold text-slate-900">${kva.kuerzel}</div>
+                                    <div class="text-xs text-slate-600">${kva.zaehne.length} Zähne</div>
+                                </div>
+                            </div>
+                            <div class="space-y-2 text-sm">
+                                <div><span class="text-slate-600">Praxis:</span> <span class="font-medium">${praxisName}</span></div>
+                                <div><span class="text-slate-600">Patient:</span> <span class="font-medium">${kva.patient || '—'}</span></div>
+                                <div class="pt-2 border-t border-slate-200 font-semibold text-blue-600">${totalBetrag}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderZahnaerzte() {
+            const grid = document.getElementById('zahnaerzte-grid');
+            grid.innerHTML = PRAXEN.map((praxis, idx) => {
+                const kvasCount = state.allKVAs.filter(kva => kva.praxis === praxis.code).length;
+                return `
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="text-lg font-semibold text-slate-900">${praxis.name}</h3>
+                                <span class="inline-block mono text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded mt-1">${praxis.code}</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 border-t border-slate-200 pt-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Preisliste (1-5)</label>
+                                <select id="praxis-pl-${idx}" value="${praxis.preisliste}" onchange="updatePraxisPreisliste(${idx}, this.value)"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="0">Preisliste 1 (Standard)</option>
+                                    <option value="1">Preisliste 2</option>
+                                    <option value="2">Preisliste 3</option>
+                                    <option value="3">Preisliste 4</option>
+                                    <option value="4">Preisliste 5</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Telefon</label>
+                                <input type="text" id="praxis-tel-${idx}" value="${praxis.telefon || ''}" onchange="updatePraxisField(${idx}, 'telefon', this.value)"
+                                    placeholder="z.B. +49 123 456789"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
+                                <input type="email" id="praxis-email-${idx}" value="${praxis.email || ''}" onchange="updatePraxisField(${idx}, 'email', this.value)"
+                                    placeholder="info@praxis.de"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Notizen</label>
+                                <textarea id="praxis-notizen-${idx}" onchange="updatePraxisField(${idx}, 'notizen', this.value)"
+                                    placeholder="Besonderheiten, Anmerkungen..."
+                                    rows="2"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none">${praxis.notizen || ''}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-200 pt-3 text-sm">
+                            <span class="text-slate-600">KVAs erstellt: </span>
+                            <span class="font-semibold text-slate-900">${kvasCount}</span>
+                        </div>
+
+                        <button onclick="navigateToKVAPraxis('${praxis.code}')" class="w-full px-4 py-2 rounded-lg bg-blue-100 text-blue-700 text-sm font-medium hover:bg-blue-200 transition-colors">
+                            <i class="fas fa-plus mr-1"></i>Neuer KVA für diese Praxis
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updatePraxisField(idx, field, value) {
+            const praxis = PRAXEN[idx];
+            if (!praxis) return;
+            praxis[field] = value;
+            showToast(`${praxis.name} aktualisiert`);
+        }
+
+        function updatePraxisPreisliste(idx, value) {
+            const praxis = PRAXEN[idx];
+            if (!praxis) return;
+            praxis.preisliste = parseInt(value);
+            showToast(`${praxis.name}: Preisliste ${parseInt(value) + 1} ausgewählt`);
+        }
+
+        function navigateToKVAPraxis(praxisCode) {
+            document.getElementById('select-praxis').value = praxisCode;
+            navigateTo('kva');
+            showToast(`Praxis: ${praxisCode} ausgewählt`);
+        }
+
+        let activeLeistungIdx = null;
+
+        function renderLeistungen() {
+            const search = document.getElementById('leistungen-search')?.value?.toLowerCase() || '';
+            const filterCategory = document.getElementById('leistungen-filter-category')?.value || 'alle';
+            const sortBy = document.getElementById('leistungen-sort')?.value || 'nr';
+
+            let filtered = POSITIONEN;
+
+            // Apply search filter
+            if (search) {
+                filtered = filtered.filter(pos => {
+                    return pos.nr.toLowerCase().includes(search) || pos.bez.toLowerCase().includes(search);
+                });
+            }
+
+            // Apply category filter
+            if (filterCategory === 'leistung') {
+                filtered = filtered.filter(pos => pos.kat === 'leistung');
+            } else if (filterCategory === 'material') {
+                filtered = filtered.filter(pos => pos.kat === 'material');
+            }
+
+            // Apply sort
+            if (sortBy === 'bez') {
+                filtered.sort((a, b) => a.bez.localeCompare(b.bez, 'de'));
+            } else if (sortBy === 'kat') {
+                filtered.sort((a, b) => a.kat.localeCompare(b.kat, 'de'));
+            } else if (sortBy === 'preis') {
+                filtered.sort((a, b) => a.preise[0] - b.preise[0]);
+            }
+            // Default: sortBy === 'nr' (no change needed, already in order)
+
+            document.getElementById('leistungen-count').textContent = filtered.length;
+
+            const container = document.getElementById('leistungen-tbody');
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-slate-500 text-sm">Keine Positionen gefunden</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map((pos, displayIdx) => {
+                const realIdx = POSITIONEN.indexOf(pos);
+                const isActive = activeLeistungIdx === realIdx;
+                const categoryColor = pos.kat === 'leistung' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800';
+                const categoryLabel = pos.kat === 'leistung' ? 'Leistung' : 'Material';
+                const katValue = pos.kat === 'leistung' ? 'leistung' : 'material';
+
+                return `
+                    <div class="border-b border-slate-100 ${isActive ? 'bg-blue-50' : 'hover:bg-slate-50'} transition-colors">
+                        <div class="flex items-center gap-4 p-4 cursor-pointer" onclick="toggleLeistungEdit(${realIdx})">
+                            <div class="flex-1 min-w-0">
+                                <div class="mono text-xs text-slate-400 font-semibold">${pos.nr}</div>
+                                <div class="text-sm font-medium text-slate-900">${pos.bez}</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="text-right">
+                                    <div class="text-xs text-slate-500">PL1:</div>
+                                    <div class="text-sm font-semibold text-slate-900">${formatCurrency(pos.preise[0])}</div>
+                                </div>
+                                <span class="inline-block px-2 py-1 rounded text-xs font-medium ${categoryColor}">${categoryLabel}</span>
+                                <i class="fas fa-chevron-down text-slate-400 w-4 transition-transform ${isActive ? 'rotate-180' : ''}"></i>
+                            </div>
+                        </div>
+
+                        ${isActive ? `
+                        <div class="bg-blue-50 border-t border-slate-200 p-4 space-y-4">
+                            <div class="grid grid-cols-12 gap-3">
+                                <div class="col-span-7">
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Bezeichnung</label>
+                                    <input type="text" id="leistung-bez-${realIdx}" value="${pos.bez}"
+                                        class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div class="col-span-5">
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">Kategorie</label>
+                                    <select id="leistung-kat-${realIdx}" value="${katValue}"
+                                        class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="leistung">Leistung</option>
+                                        <option value="material">Material</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-5 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">PL1</label>
+                                    <input type="number" id="leistung-pl1-${realIdx}" value="${pos.preise[0]}" step="0.01"
+                                        class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">PL2</label>
+                                    <input type="number" id="leistung-pl2-${realIdx}" value="${pos.preise[1]}" step="0.01"
+                                        class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">PL3</label>
+                                    <input type="number" id="leistung-pl3-${realIdx}" value="${pos.preise[2]}" step="0.01"
+                                        class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">PL4</label>
+                                    <input type="number" id="leistung-pl4-${realIdx}" value="${pos.preise[3]}" step="0.01"
+                                        class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-700 mb-1">PL5</label>
+                                    <input type="number" id="leistung-pl5-${realIdx}" value="${pos.preise[4]}" step="0.01"
+                                        class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2 pt-2">
+                                <button onclick="saveLeistung(${realIdx})" class="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700">
+                                    <i class="fas fa-save mr-1"></i>Speichern
+                                </button>
+                                <button onclick="cancelLeistungEdit()" class="flex-1 px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-100">
+                                    Abbrechen
+                                </button>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleLeistungEdit(idx) {
+            if (activeLeistungIdx === idx) {
+                activeLeistungIdx = null;
+            } else {
+                activeLeistungIdx = idx;
+            }
+            renderLeistungen();
+        }
+
+        function cancelLeistungEdit() {
+            activeLeistungIdx = null;
+            renderLeistungen();
+        }
+
+        function saveLeistung(idx) {
+            const pos = POSITIONEN[idx];
+            if (!pos) return;
+
+            const bez = document.getElementById(`leistung-bez-${idx}`)?.value || pos.bez;
+            const kat = document.getElementById(`leistung-kat-${idx}`)?.value || pos.kat;
+            const pl1 = parseFloat(document.getElementById(`leistung-pl1-${idx}`)?.value) || pos.preise[0];
+            const pl2 = parseFloat(document.getElementById(`leistung-pl2-${idx}`)?.value) || pos.preise[1];
+            const pl3 = parseFloat(document.getElementById(`leistung-pl3-${idx}`)?.value) || pos.preise[2];
+            const pl4 = parseFloat(document.getElementById(`leistung-pl4-${idx}`)?.value) || pos.preise[3];
+            const pl5 = parseFloat(document.getElementById(`leistung-pl5-${idx}`)?.value) || pos.preise[4];
+
+            pos.bez = bez;
+            pos.kat = kat;
+            pos.preise = [pl1, pl2, pl3, pl4, pl5];
+
+            activeLeistungIdx = null;
+            renderLeistungen();
+            showToast(`${pos.nr} gespeichert`);
+        }
+
+        function setLeistungenFilter(category) {
+            const buttons = document.querySelectorAll('#page-leistungen button');
+            buttons.forEach((btn, idx) => {
+                if (idx < 3) {
+                    const cat = ['alle', 'leistung', 'material'][idx];
+                    if (cat === category) {
+                        btn.classList.add('bg-slate-100', 'text-slate-700');
+                        btn.classList.remove('border', 'border-slate-300', 'hover:bg-slate-50');
+                    } else {
+                        btn.classList.remove('bg-slate-100', 'text-slate-700');
+                        btn.classList.add('border', 'border-slate-300', 'hover:bg-slate-50');
+                    }
+                }
+            });
+            document.getElementById('leistungen-filter-category').value = category;
+            renderLeistungen();
+        }
+
+        function renderStatistik() {
+            const totalKVAs = state.allKVAs.length;
+            const totalKorrektionen = state.allKVAs.reduce((sum, kva) => sum + (kva.korrektionen?.length || 0), 0);
+            const totalLernregeln = state.lernregeln.length;
+
+            document.getElementById('stat-total-kvas').textContent = totalKVAs;
+            document.getElementById('stat-total-korrektionen').textContent = totalKorrektionen;
+            document.getElementById('stat-total-lernregeln').textContent = totalLernregeln;
+
+            // Breakdown by Kürzel
+            const kuerzelBreakdown = {};
+            state.allKVAs.forEach(kva => {
+                kuerzelBreakdown[kva.kuerzel] = (kuerzelBreakdown[kva.kuerzel] || 0) + 1;
+            });
+            const kuerzelEl = document.getElementById('stat-kuerzel-breakdown');
+            if (Object.keys(kuerzelBreakdown).length === 0) {
+                kuerzelEl.innerHTML = '<p class="text-slate-600 text-center py-8">Noch keine KVAs erstellt</p>';
+            } else {
+                kuerzelEl.innerHTML = Object.entries(kuerzelBreakdown)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([code, count]) => {
+                        const percent = ((count / totalKVAs) * 100).toFixed(1);
+                        return `
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <span class="font-semibold text-slate-900">${code}</span>
+                                    <span class="text-slate-600 ml-2">${count} KVA${count !== 1 ? 's' : ''}</span>
+                                </div>
+                                <div class="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-600 rounded-full" style="width: ${percent}%"></div>
+                                </div>
+                                <span class="text-slate-600 text-sm ml-2">${percent}%</span>
+                            </div>
+                        `;
+                    }).join('');
+            }
+
+            // Breakdown by Praxis
+            const praxisBreakdown = {};
+            state.allKVAs.forEach(kva => {
+                praxisBreakdown[kva.praxis] = (praxisBreakdown[kva.praxis] || 0) + 1;
+            });
+            const praxisEl = document.getElementById('stat-praxis-breakdown');
+            if (Object.keys(praxisBreakdown).length === 0) {
+                praxisEl.innerHTML = '<p class="text-slate-600 text-center py-8">Noch keine KVAs erstellt</p>';
+            } else {
+                praxisEl.innerHTML = Object.entries(praxisBreakdown)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([code, count]) => {
+                        const praxisName = PRAXEN.find(p => p.code === code)?.name || code;
+                        const percent = ((count / totalKVAs) * 100).toFixed(1);
+                        return `
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <span class="font-semibold text-slate-900">${praxisName}</span>
+                                    <span class="text-slate-600 ml-2">${count} KVA${count !== 1 ? 's' : ''}</span>
+                                </div>
+                                <div class="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-emerald-600 rounded-full" style="width: ${percent}%"></div>
+                                </div>
+                                <span class="text-slate-600 text-sm ml-2">${percent}%</span>
+                            </div>
+                        `;
+                    }).join('');
+            }
+        }
+
+        function loadKVA(idx) {
+            if (idx < 0 || idx >= state.allKVAs.length) return;
+
+            const kva = state.allKVAs[idx];
+
+            // Clear current state
+            state.selectedTeeth.clear();
+            state.selectedKuerzel = null;
+            state.positions = [];
+            state.korrektionen = [];
+            activePositionIdx = null;
+
+            // Restore KVA data
+            document.getElementById('select-praxis').value = kva.praxis;
+            document.getElementById('input-patient').value = kva.patient;
+            document.getElementById('select-versicherung').value = kva.versicherung;
+            document.getElementById('select-gesichtsbogen').value = kva.gesichtsbogen;
+            document.getElementById('input-arbeitsart').value = kva.arbeitsart;
+
+            // Restore teeth
+            kva.zaehne.forEach(tooth => {
+                state.selectedTeeth.add(tooth);
+                const numBtn = document.getElementById(`tooth-num-${tooth}`);
+                if (numBtn) numBtn.classList.add('selected');
+            });
+            updateTeethCount();
+
+            // Restore kürzel
+            state.selectedKuerzel = kva.kuerzel;
+            document.querySelectorAll('.kuerzel-card').forEach(c => c.classList.remove('active'));
+            const kuerzelCard = Array.from(document.querySelectorAll('.kuerzel-card')).find(c => c.textContent.includes(kva.kuerzel));
+            if (kuerzelCard) kuerzelCard.classList.add('active');
+
+            // Restore positions
+            state.positions = kva.positions.map(p => ({...p, source: p.source || 'auto', korrigiert: p.korrigiert || false, entfernt: false}));
+
+            // Update display
+            document.getElementById('kva-nr-display').innerHTML = `KVA-Nr: <span class="font-mono font-semibold text-slate-900">${kva.id}</span>`;
+            renderPositions();
+            updateKorrekturLog();
+            showToast(`KVA ${kva.id} geladen`);
+
+            // Navigate to KVA page
+            navigateTo('kva');
+        }
+
+        // ============ INITIALIZATION ============
+        function init() {
+            // Praxis dropdown
+            const praxisSelect = document.getElementById('select-praxis');
+            PRAXEN.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.code;
+                opt.textContent = p.name;
+                praxisSelect.appendChild(opt);
+            });
+
+            // Manual position dropdown
+            const manualPos = document.getElementById('select-manual-pos');
+            POSITIONEN.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.nr;
+                opt.textContent = `${p.nr} - ${p.bez}`;
+                manualPos.appendChild(opt);
+            });
+
+            // Teeth schema
+            generateTeethSchema();
+
+            // Kürzel grid
+            generateKuerzelGrid();
+
+            // Event listeners
+            document.getElementById('select-versicherung').addEventListener('change', updateCalcType);
+            document.getElementById('select-gesichtsbogen').addEventListener('change', renderPositions);
+
+            // Search listeners
+            document.getElementById('alle-kvas-search')?.addEventListener('keyup', renderAlleKVAs);
+            document.getElementById('leistungen-search')?.addEventListener('keyup', renderLeistungen);
+            document.getElementById('leistungen-sort')?.addEventListener('change', renderLeistungen);
+
+            // Navigate to dashboard on start
+            navigateTo('dashboard');
+        }
+
+        // Track per-tooth status: { 14: { I: true, G: false, V: false, S: true }, ... }
+        const toothStatus = {};
+
+        function generateTeethSchema() {
+            const toothNumbers = {
+                'upper-left': [18, 17, 16, 15, 14, 13, 12, 11],
+                'upper-right': [21, 22, 23, 24, 25, 26, 27, 28],
+                'lower-left': [48, 47, 46, 45, 44, 43, 42, 41],
+                'lower-right': [31, 32, 33, 34, 35, 36, 37, 38]
+            };
+
+            const statusTypes = ['I', 'G', 'V', 'S'];
+
+            for (const [id, nums] of Object.entries(toothNumbers)) {
+                const container = document.getElementById(`teeth-${id}`);
+                nums.forEach(num => {
+                    toothStatus[num] = { I: false, G: false, V: false, S: false };
+
+                    const col = document.createElement('div');
+                    col.className = 'tooth-col';
+
+                    // Status buttons (I, G, V, S)
+                    statusTypes.forEach(type => {
+                        const sb = document.createElement('div');
+                        sb.className = 'tooth-status-btn';
+                        sb.textContent = type;
+                        sb.dataset.tooth = num;
+                        sb.dataset.type = type;
+                        sb.onclick = (e) => {
+                            e.stopPropagation();
+                            toggleToothStatus(num, type, sb);
+                        };
+                        col.appendChild(sb);
+                    });
+
+                    // Tooth number button
+                    const numBtn = document.createElement('div');
+                    numBtn.className = 'tooth-num';
+                    numBtn.textContent = num;
+                    numBtn.id = `tooth-num-${num}`;
+                    numBtn.onclick = () => toggleTooth(num);
+                    col.appendChild(numBtn);
+
+                    container.appendChild(col);
+                });
+            }
+        }
+
+        function toggleToothStatus(num, type, btn) {
+            toothStatus[num][type] = !toothStatus[num][type];
+            if (toothStatus[num][type]) {
+                btn.classList.add(`active-${type}`);
+            } else {
+                btn.classList.remove(`active-${type}`);
+            }
+            // Auto-select tooth if any status is active
+            const hasAnyStatus = Object.values(toothStatus[num]).some(v => v);
+            const numBtn = document.getElementById(`tooth-num-${num}`);
+            if (hasAnyStatus && !state.selectedTeeth.has(num)) {
+                state.selectedTeeth.add(num);
+                numBtn.classList.add('selected');
+                updateTeethCount();
+                renderPositions();
+            }
+        }
+
+        function toggleTooth(num) {
+            const numBtn = document.getElementById(`tooth-num-${num}`);
+            if (state.selectedTeeth.has(num)) {
+                state.selectedTeeth.delete(num);
+                numBtn.classList.remove('selected', 'has-work');
+                // Clear all status indicators
+                ['I','G','V','S'].forEach(type => {
+                    toothStatus[num][type] = false;
+                    const sb = document.querySelector(`.tooth-status-btn[data-tooth="${num}"][data-type="${type}"]`);
+                    if (sb) sb.classList.remove(`active-${type}`);
+                });
+            } else {
+                state.selectedTeeth.add(num);
+                numBtn.classList.add('selected');
+            }
+            updateTeethCount();
+            renderPositions();
+        }
+
+        function updateTeethCount() {
+            document.getElementById('teeth-count').textContent = state.selectedTeeth.size;
+        }
+
+        function generateKuerzelGrid() {
+            const grid = document.getElementById('kuerzel-grid');
+            KUERZEL.forEach(k => {
+                const card = document.createElement('div');
+                card.className = 'kuerzel-card';
+                card.innerHTML = `
+                    <div class="font-semibold text-sm text-slate-900">${k.code}</div>
+                    <div class="text-xs text-slate-600">${k.bez}</div>
+                `;
+                card.onclick = () => selectKuerzel(k.code, card);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectKuerzel(code, element) {
+            // Remove previous active
+            document.querySelectorAll('.kuerzel-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+
+            // Check if teeth required
+            const teethRequired = ['ZK', 'ZKV', 'ZBR', 'SKM', 'PK', 'EMX', 'EMXI', 'VEN', 'INL', 'LZP'];
+            if (teethRequired.includes(code) && state.selectedTeeth.size === 0) {
+                showToast('Mindestens einen Zahn auswählen');
+                return;
+            }
+
+            state.selectedKuerzel = code;
+            renderPositions();
+        }
+
+        function updateCalcType() {
+            state.versicherung = document.getElementById('select-versicherung').value;
+            const kasse = state.versicherung === 'kasse';
+            const label = kasse ? 'Kasse / BEL' : 'Privat / BEB';
+            document.getElementById('calc-type').textContent = label;
+            if (state.selectedKuerzel) renderPositions();
+        }
+
+        let activePositionIdx = null;
+
+        function renderPositions() {
+            if (!state.selectedKuerzel) {
+                document.getElementById('positions-list').innerHTML = `
+                    <div class="p-6 text-center text-slate-500 text-sm">
+                        <p><i class="fas fa-inbox w-6 h-6 mx-auto mb-2 opacity-50"></i></p>
+                        <p>Kein Kürzel ausgewählt</p>
+                        <p class="text-xs mt-1">Wählen Sie ein Kürzel, um Positionen zu sehen</p>
+                    </div>
+                `;
+                updateTotals();
+                return;
+            }
+
+            const kasse = state.versicherung === 'kasse';
+            const gb = document.getElementById('select-gesichtsbogen').value === 'mit';
+            const zaehne = Math.max(state.selectedTeeth.size, 1);
+            const praxisCode = document.getElementById('select-praxis').value;
+
+            // Only re-resolve if no manual edits yet
+            if (state.korrektionen.length === 0) {
+                state.positions = resolve(state.selectedKuerzel, zaehne, kasse, gb, praxisCode);
+            }
+
+            const list = document.getElementById('positions-list');
+            if (state.positions.length === 0) {
+                list.innerHTML = '<div class="p-6 text-center text-slate-500 text-sm">Keine Positionen</div>';
+            } else {
+                list.innerHTML = state.positions.filter(p => !p.entfernt).map((pos, displayIdx) => {
+                    const realIdx = state.positions.indexOf(pos);
+                    const categoryColor = pos.kategorie === 'leistung' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800';
+                    const categoryLabel = pos.kategorie === 'leistung' ? 'Leistung' : 'Material';
+                    const total = pos.menge * pos.einzelpreis;
+                    const isActive = activePositionIdx === realIdx;
+                    const korrigiertBadge = pos.korrigiert ? '<span class="text-xs px-1.5 py-0.5 rounded bg-orange-100 text-orange-700">Korrigiert</span>' : '';
+                    const manualBadge = pos.source === 'manual' ? '<span class="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700">Manuell</span>' : '';
+
+                    const katToggleLabel = pos.kategorie === 'leistung' ? 'Material' : 'Leistung';
+                    const katToggleIcon = pos.kategorie === 'leistung' ? 'fa-boxes-stacked' : 'fa-hand-holding-medical';
+
+                    return `
+                        <div class="position-row ${isActive ? 'active-row' : ''}" onclick="togglePositionActions(${realIdx})">
+                            <div class="flex justify-between items-start gap-3">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <span class="mono text-xs text-slate-400">${pos.nummer}</span>
+                                        ${korrigiertBadge}${manualBadge}
+                                    </div>
+                                    <div class="text-sm font-medium text-slate-900 truncate">${pos.bezeichnung}</div>
+                                    <div class="flex gap-2 mt-1">
+                                        <span class="text-xs px-2 py-0.5 rounded ${categoryColor}">${categoryLabel}</span>
+                                    </div>
+                                </div>
+                                <div class="text-right flex-shrink-0">
+                                    <div class="text-xs text-slate-500">${pos.menge} × ${formatNumber(pos.einzelpreis)}</div>
+                                    <div class="text-sm font-semibold text-slate-900">${formatCurrency(total)}</div>
+                                </div>
+                            </div>
+
+                            <!-- INLINE ACTION PANEL -->
+                            <div class="pos-actions ${isActive ? 'visible' : ''}" id="pos-actions-${realIdx}" onclick="event.stopPropagation()">
+                                <div class="mt-3 pt-3 border-t border-slate-200 space-y-1.5">
+
+                                    <!-- ROW 1: Direkte Aktionen -->
+                                    <div class="flex gap-1.5">
+                                        <button onclick="toggleKategorie(${realIdx})" class="pos-action-btn flex-1 text-violet-700 bg-violet-50 rounded-lg justify-center" title="Kategorie wechseln">
+                                            <i class="fas ${katToggleIcon} w-3.5"></i>
+                                            <span>→ ${katToggleLabel}</span>
+                                        </button>
+                                        <div class="flex items-center gap-1.5 bg-slate-50 rounded-lg px-2">
+                                            <button onclick="adjustQty(${realIdx}, -1)" class="w-6 h-6 rounded bg-slate-200 hover:bg-slate-300 text-xs font-bold">−</button>
+                                            <span class="mono text-sm font-semibold w-6 text-center" id="qty-display-${realIdx}">${pos.menge}</span>
+                                            <button onclick="adjustQty(${realIdx}, 1)" class="w-6 h-6 rounded bg-slate-200 hover:bg-slate-300 text-xs font-bold">+</button>
+                                        </div>
+                                        <button onclick="removePosition(${realIdx})" class="pos-action-btn text-red-600 bg-red-50 rounded-lg justify-center w-10" title="Entfernen">
+                                            <i class="fas fa-trash w-3.5"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- ROW 2: Warum? -->
+                                    <button class="pos-action-btn text-emerald-700 bg-emerald-50 rounded-lg" onclick="showReason(${realIdx})">
+                                        <i class="fas fa-circle-question w-3.5"></i>
+                                        <span>Warum diese Position?</span>
+                                    </button>
+                                    <div id="reason-box-${realIdx}" class="reason-box hidden"></div>
+
+                                    <!-- ROW 3: Lernnotiz -->
+                                    <div class="bg-amber-50 rounded-lg p-2">
+                                        <div class="flex items-center gap-1.5 mb-1.5">
+                                            <i class="fas fa-brain text-amber-600 text-[10px]"></i>
+                                            <span class="text-[10px] font-semibold text-amber-700 uppercase tracking-wide">Lernnotiz</span>
+                                        </div>
+                                        <textarea id="learn-input-${realIdx}" rows="2"
+                                            placeholder="z.B. Diese Position ist Leistung, nicht Material. Oder: Bei Kasse stattdessen 4010 verwenden..."
+                                            class="w-full px-2 py-1.5 text-xs border border-amber-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-400 bg-white resize-none">${pos.lernnotiz || ''}</textarea>
+                                        <div class="flex gap-1.5 mt-1.5">
+                                            <select id="learn-type-${realIdx}" class="flex-1 text-[10px] px-2 py-1 border border-amber-200 rounded bg-white text-slate-700">
+                                                <option value="kategorie">Kategorie falsch</option>
+                                                <option value="menge">Menge falsch</option>
+                                                <option value="nicht_noetig">Position nicht nötig</option>
+                                                <option value="fehlt">Andere Position fehlt</option>
+                                                <option value="bedingung">Bedingung ändern</option>
+                                                <option value="praxis_spezifisch">Praxis-spezifisch</option>
+                                                <option value="sonstiges">Sonstiges</option>
+                                            </select>
+                                            <button onclick="saveLernregel(${realIdx})" class="px-3 py-1 bg-amber-500 text-white text-[10px] font-semibold rounded-lg hover:bg-amber-600 flex items-center gap-1">
+                                                <i class="fas fa-lightbulb"></i> Regel speichern
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            updateTotals();
+            updateKorrekturLog();
+        }
+
+        function togglePositionActions(idx) {
+            if (activePositionIdx === idx) {
+                activePositionIdx = null;
+            } else {
+                activePositionIdx = idx;
+            }
+            renderPositions();
+        }
+
+        function showReason(idx) {
+            const box = document.getElementById(`reason-box-${idx}`);
+            if (!box) return;
+            const pos = state.positions[idx];
+            if (box.classList.contains('hidden')) {
+                if (pos.source === 'manual') {
+                    box.innerHTML = `<i class="fas fa-hand mr-1"></i> <strong>Manuell hinzugefügt</strong> — Diese Position wurde von dir direkt eingefügt.`;
+                } else if (pos.reason && pos.reason.length > 0) {
+                    box.innerHTML = `<i class="fas fa-robot mr-1"></i> <strong>Automatisch gewählt:</strong><br>` +
+                        pos.reason.map(r => `• ${r}`).join('<br>');
+                } else {
+                    box.innerHTML = 'Keine Begründung verfügbar.';
+                }
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        function adjustQty(idx, delta) {
+            const pos = state.positions[idx];
+            const oldQty = pos.menge;
+            const newQty = Math.max(1, pos.menge + delta);
+            if (newQty === oldQty) return;
+
+            pos.menge = newQty;
+            pos.korrigiert = true;
+
+            state.korrektionen.push({
+                idx,
+                action: 'qty_changed',
+                posNr: pos.nummer,
+                posBez: pos.bezeichnung,
+                von: oldQty,
+                nach: newQty,
+                notiz: pos.notiz || '',
+                timestamp: new Date().toLocaleTimeString('de-DE')
+            });
+
+            document.getElementById(`qty-display-${idx}`).textContent = newQty;
+            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+            updateTotals();
+        }
+
+        function updatePositionQty(idx, newQty) {
+            const pos = state.positions[idx];
+            const oldQty = pos.menge;
+            pos.menge = parseInt(newQty) || 1;
+            pos.korrigiert = true;
+            state.korrektionen.push({
+                idx,
+                action: 'qty_changed',
+                posNr: pos.nummer,
+                posBez: pos.bezeichnung,
+                von: oldQty,
+                nach: pos.menge,
+                notiz: pos.notiz || '',
+                timestamp: new Date().toLocaleTimeString('de-DE')
+            });
+            updateTotals();
+            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+        }
+
+        function removePosition(idx) {
+            const pos = state.positions[idx];
+            pos.entfernt = true;
+            state.korrektionen.push({
+                idx,
+                action: 'removed',
+                posNr: pos.nummer,
+                posBez: pos.bezeichnung,
+                notiz: pos.notiz || '',
+                timestamp: new Date().toLocaleTimeString('de-DE')
+            });
+            activePositionIdx = null;
+            renderPositions();
+            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+            showToast(`${pos.nummer} entfernt`);
+        }
+
+        function toggleKategorie(idx) {
+            const pos = state.positions[idx];
+            const oldKat = pos.kategorie;
+            pos.kategorie = oldKat === 'leistung' ? 'material' : 'leistung';
+            pos.korrigiert = true;
+
+            state.korrektionen.push({
+                idx,
+                action: 'kat_changed',
+                posNr: pos.nummer,
+                posBez: pos.bezeichnung,
+                von: oldKat,
+                nach: pos.kategorie,
+                timestamp: new Date().toLocaleTimeString('de-DE')
+            });
+
+            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+            renderPositions();
+            showToast(`${pos.nummer}: ${oldKat} → ${pos.kategorie}`);
+        }
+
+        function saveLernregel(idx) {
+            const textEl = document.getElementById(`learn-input-${idx}`);
+            const typeEl = document.getElementById(`learn-type-${idx}`);
+            if (!textEl || !textEl.value.trim()) {
+                showToast('Bitte Lernnotiz eingeben');
+                return;
+            }
+
+            const pos = state.positions[idx];
+            const regel = {
+                id: Date.now(),
+                posNr: pos.nummer,
+                posBez: pos.bezeichnung,
+                kuerzel: state.selectedKuerzel,
+                praxis: document.getElementById('select-praxis').value,
+                versicherung: state.versicherung,
+                typ: typeEl.value,
+                text: textEl.value.trim(),
+                timestamp: new Date().toISOString(),
+                timestampDisplay: new Date().toLocaleTimeString('de-DE')
+            };
+
+            state.lernregeln.push(regel);
+            pos.lernnotiz = textEl.value.trim();
+
+            updateLernregelnLog();
+            document.getElementById('lernregeln-count').textContent = `(${state.lernregeln.length})`;
+            switchLogTab('learn');
+            showToast('Lernregel gespeichert');
+        }
+
+        function switchLogTab(tab) {
+            const logTab = document.getElementById('tab-log');
+            const learnTab = document.getElementById('tab-learn');
+            const logBtn = document.getElementById('tab-log-btn');
+            const learnBtn = document.getElementById('tab-learn-btn');
+
+            if (tab === 'log') {
+                logTab.classList.remove('hidden');
+                learnTab.classList.add('hidden');
+                logBtn.classList.add('bg-slate-100', 'text-slate-700');
+                logBtn.classList.remove('text-slate-500');
+                learnBtn.classList.remove('bg-slate-100', 'text-slate-700');
+                learnBtn.classList.add('text-slate-500');
+            } else {
+                learnTab.classList.remove('hidden');
+                logTab.classList.add('hidden');
+                learnBtn.classList.add('bg-slate-100', 'text-slate-700');
+                learnBtn.classList.remove('text-slate-500');
+                logBtn.classList.remove('bg-slate-100', 'text-slate-700');
+                logBtn.classList.add('text-slate-500');
+            }
+        }
+
+        function updateLernregelnLog() {
+            const logEl = document.getElementById('lernregeln-log');
+            if (!logEl) return;
+            if (state.lernregeln.length === 0) {
+                logEl.innerHTML = '<p class="text-xs text-slate-400 text-center py-2">Noch keine Lernregeln</p>';
+                return;
+            }
+            const typLabels = {
+                kategorie: '🏷️ Kategorie',
+                menge: '🔢 Menge',
+                nicht_noetig: '❌ Nicht nötig',
+                fehlt: '➕ Position fehlt',
+                bedingung: '⚙️ Bedingung',
+                praxis_spezifisch: '🏥 Praxis-spez.',
+                sonstiges: '📝 Sonstiges'
+            };
+            logEl.innerHTML = state.lernregeln.slice().reverse().map(r => `
+                <div class="korrektur-log-entry border-amber-300 bg-amber-50">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="font-semibold">${r.posNr}</span>
+                        <span class="text-amber-700">${typLabels[r.typ] || r.typ}</span>
+                        <span class="text-slate-400 text-[10px] ml-auto">${r.kuerzel} · ${r.timestampDisplay}</span>
+                    </div>
+                    <div class="text-slate-700 mt-0.5 italic">"${r.text}"</div>
+                    ${r.praxis ? `<div class="text-slate-400 text-[10px] mt-0.5">Praxis: ${r.praxis}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function addManualPosition() {
+            const posNr = document.getElementById('select-manual-pos').value;
+            const qty = parseInt(document.getElementById('input-manual-qty').value) || 1;
+            if (!posNr) return;
+
+            const pos = POSITIONEN.find(p => p.nr === posNr);
+            if (!pos) return;
+
+            const praxisCode = document.getElementById('select-praxis').value;
+
+            state.positions.push({
+                nummer: pos.nr,
+                bezeichnung: pos.bez,
+                menge: qty,
+                einzelpreis: getPreis(posNr, praxisCode),
+                kategorie: pos.kat,
+                source: "manual",
+                korrigiert: true,
+                entfernt: false,
+                reason: [],
+                notiz: ''
+            });
+
+            state.korrektionen.push({
+                idx: state.positions.length - 1,
+                action: 'added',
+                posNr: pos.nr,
+                posBez: pos.bez,
+                menge: qty,
+                timestamp: new Date().toLocaleTimeString('de-DE')
+            });
+
+            document.getElementById('select-manual-pos').value = '';
+            document.getElementById('input-manual-qty').value = '1';
+            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+            renderPositions();
+            showToast(`${pos.nr} hinzugefügt`);
+        }
+
+        function updateKorrekturLog() {
+            const logEl = document.getElementById('korrektur-log');
+            if (!logEl) return;
+            const countEl = document.getElementById('korrektur-count');
+            if (countEl) countEl.textContent = `${state.korrektionen.length} Änderung${state.korrektionen.length !== 1 ? 'en' : ''}`;
+            if (state.korrektionen.length === 0) {
+                logEl.innerHTML = '<p class="text-xs text-slate-400 text-center py-2">Noch keine Korrekturen</p>';
+                return;
+            }
+            logEl.innerHTML = state.korrektionen.slice().reverse().map(k => {
+                let icon, color, text;
+                if (k.action === 'removed') {
+                    icon = 'fa-trash'; color = 'border-red-300 bg-red-50';
+                    text = `<strong>${k.posNr}</strong> entfernt`;
+                } else if (k.action === 'qty_changed') {
+                    icon = 'fa-pen'; color = 'border-blue-300 bg-blue-50';
+                    text = `<strong>${k.posNr}</strong> Menge: ${k.von} → ${k.nach}`;
+                } else if (k.action === 'added') {
+                    icon = 'fa-plus'; color = 'border-green-300 bg-green-50';
+                    text = `<strong>${k.posNr}</strong> hinzugefügt (×${k.menge})`;
+                } else if (k.action === 'kat_changed') {
+                    icon = 'fa-tag'; color = 'border-violet-300 bg-violet-50';
+                    text = `<strong>${k.posNr}</strong> ${k.von} → ${k.nach}`;
+                }
+                return `<div class="korrektur-log-entry ${color}">
+                    <div class="flex items-center gap-1.5">
+                        <i class="fas ${icon} text-[10px]"></i>
+                        <span>${text}</span>
+                        <span class="ml-auto text-slate-400">${k.timestamp}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function updateTotals() {
+            const activePositions = state.positions.filter(p => !p.entfernt);
+            const leistung = activePositions
+                .filter(p => p.kategorie === 'leistung')
+                .reduce((sum, p) => sum + (p.menge * p.einzelpreis), 0);
+            const material = activePositions
+                .filter(p => p.kategorie === 'material')
+                .reduce((sum, p) => sum + (p.menge * p.einzelpreis), 0);
+
+            const mwst = leistung * 0.07 + material * 0.19;
+            const gesamt = leistung + material + mwst;
+
+            document.getElementById('total-leistung').textContent = formatCurrency(leistung);
+            document.getElementById('total-material').textContent = formatCurrency(material);
+            document.getElementById('total-mwst').textContent = formatCurrency(mwst);
+            document.getElementById('total-gesamt').textContent = formatCurrency(gesamt);
+        }
+
+        function resetKVA() {
+            state.selectedTeeth.clear();
+            state.selectedKuerzel = null;
+            state.positions = [];
+            state.korrektionen = [];
+            activePositionIdx = null;
+            document.getElementById('input-patient').value = '';
+            document.getElementById('input-arbeitsart').value = '';
+            document.querySelectorAll('.kuerzel-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tooth-num').forEach(b => b.classList.remove('selected', 'has-work'));
+            document.querySelectorAll('.tooth-status-btn').forEach(b => {
+                b.classList.remove('active-I', 'active-G', 'active-V', 'active-S');
+            });
+            Object.keys(toothStatus).forEach(num => {
+                toothStatus[num] = { I: false, G: false, V: false, S: false };
+            });
+            updateTeethCount();
+            renderPositions();
+            document.getElementById('stat-korrektionen').textContent = '0';
+            document.getElementById('kva-nr-display').innerHTML = 'KVA-Nr: <span class="font-mono font-semibold text-slate-900">---</span>';
+            showToast('KVA zurückgesetzt');
+        }
+
+        function saveKVA() {
+            if (!state.selectedKuerzel) {
+                showToast('Kein Kürzel ausgewählt');
+                return;
+            }
+
+            // Calculate totals
+            const activePositions = state.positions.filter(p => !p.entfernt);
+            const leistung = activePositions
+                .filter(p => p.kategorie === 'leistung')
+                .reduce((sum, p) => sum + (p.menge * p.einzelpreis), 0);
+            const material = activePositions
+                .filter(p => p.kategorie === 'material')
+                .reduce((sum, p) => sum + (p.menge * p.einzelpreis), 0);
+            const mwst = leistung * 0.07 + material * 0.19;
+            const gesamt = leistung + material + mwst;
+
+            const kvaId = generateKVAId();
+            const kva = {
+                id: kvaId,
+                praxis: document.getElementById('select-praxis').value,
+                patient: document.getElementById('input-patient').value,
+                versicherung: state.versicherung,
+                gesichtsbogen: document.getElementById('select-gesichtsbogen').value,
+                arbeitsart: document.getElementById('input-arbeitsart').value,
+                kuerzel: state.selectedKuerzel,
+                zaehne: Array.from(state.selectedTeeth),
+                positions: state.positions.filter(p => !p.entfernt).map(p => ({
+                    nummer: p.nummer,
+                    bezeichnung: p.bezeichnung,
+                    menge: p.menge,
+                    einzelpreis: p.einzelpreis,
+                    kategorie: p.kategorie,
+                    source: p.source,
+                    korrigiert: p.korrigiert,
+                    notiz: p.notiz || ''
+                })),
+                korrektionen: [...state.korrektionen],
+                gesamtbetrag: gesamt,
+                timestamp: new Date().toISOString()
+            };
+
+            // Add status and korrekturen_count
+            kva.korrekturen_count = state.korrektionen.length;
+            if (state.korrektionen.length === 0) {
+                kva.status = 'korrekt';
+            } else if (state.korrektionen.length <= 2) {
+                kva.status = 'korrigiert';
+            } else {
+                kva.status = 'stark_korrigiert';
+            }
+
+            state.allKVAs.push(kva);
+            document.getElementById('kva-nr-display').innerHTML = `KVA-Nr: <span class="font-mono font-semibold text-slate-900">${kvaId}</span>`;
+            showToast('KVA gespeichert: ' + kvaId);
+        }
+
+        function exportKorrekturen() {
+            if (state.korrektionen.length === 0 && state.lernregeln.length === 0) {
+                showToast('Keine Korrekturen oder Lernregeln vorhanden');
+                return;
+            }
+            const data = {
+                kuerzel: state.selectedKuerzel,
+                praxis: document.getElementById('select-praxis').value,
+                versicherung: state.versicherung,
+                gesichtsbogen: document.getElementById('select-gesichtsbogen').value,
+                zaehne: Array.from(state.selectedTeeth),
+                korrekturen: state.korrektionen,
+                lernregeln: state.lernregeln,
+                positionen_final: state.positions.filter(p => !p.entfernt).map(p => ({
+                    nr: p.nummer, bez: p.bezeichnung, menge: p.menge, preis: p.einzelpreis,
+                    kat: p.kategorie, source: p.source, korrigiert: p.korrigiert, lernnotiz: p.lernnotiz || ''
+                })),
+                exportiert: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `korrektur_${state.selectedKuerzel || 'gesamt'}_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            showToast('Korrekturen + Lernregeln exportiert');
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

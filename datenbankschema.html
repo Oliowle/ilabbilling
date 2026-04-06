@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datenbankschema – Abrechnungsautomatisierung</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 24px; min-height: 100vh; }
+  h1 { text-align: center; font-size: 1.6rem; margin-bottom: 8px; color: #f8fafc; }
+  .subtitle { text-align: center; color: #94a3b8; margin-bottom: 32px; font-size: 0.95rem; }
+
+  .schema-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto 40px;
+  }
+
+  .table-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .table-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+
+  .table-header {
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .table-header .icon { font-size: 1.3rem; }
+  .table-header .badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .cat-stamm .table-header { background: linear-gradient(135deg, #1d4ed8, #2563eb); }
+  .cat-stamm .badge { background: #3b82f6; color: #fff; }
+
+  .cat-katalog .table-header { background: linear-gradient(135deg, #059669, #10b981); }
+  .cat-katalog .badge { background: #34d399; color: #064e3b; }
+
+  .cat-transaktion .table-header { background: linear-gradient(135deg, #d97706, #f59e0b); }
+  .cat-transaktion .badge { background: #fbbf24; color: #78350f; }
+
+  .cat-config .table-header { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+  .cat-config .badge { background: #a78bfa; color: #2e1065; }
+
+  .table-body { padding: 6px 0; }
+
+  .field-row {
+    display: flex;
+    align-items: center;
+    padding: 7px 18px;
+    font-size: 0.88rem;
+    border-bottom: 1px solid #1e293b;
+    gap: 8px;
+  }
+  .field-row:last-child { border-bottom: none; }
+  .field-row:hover { background: #253449; }
+
+  .field-key {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .pk { background: #fbbf24; color: #78350f; }
+  .fk { background: #60a5fa; color: #1e3a5f; }
+  .field-name { font-weight: 600; color: #f1f5f9; min-width: 140px; }
+  .field-type { color: #64748b; font-size: 0.8rem; font-family: 'SF Mono', Monaco, monospace; }
+  .field-desc { color: #94a3b8; font-size: 0.78rem; margin-left: auto; text-align: right; }
+
+  .section-title {
+    max-width: 1200px;
+    margin: 0 auto 16px;
+    padding: 8px 0;
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    border-bottom: 2px solid #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .flow-section {
+    max-width: 1200px;
+    margin: 40px auto;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .flow-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: #f8fafc; }
+
+  .flow-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 12px 0;
+  }
+  .flow-step {
+    background: #0f172a;
+    border: 1px solid #475569;
+    border-radius: 10px;
+    padding: 14px 18px;
+    min-width: 180px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .flow-step .step-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .flow-step .step-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+  .flow-step .step-desc { font-size: 0.78rem; color: #94a3b8; }
+  .flow-arrow {
+    color: #475569;
+    font-size: 1.5rem;
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+
+  .example-section {
+    max-width: 1200px;
+    margin: 40px auto;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .example-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; color: #f8fafc; }
+  .code-block {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'SF Mono', Monaco, 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    color: #e2e8f0;
+  }
+  .code-block .comment { color: #64748b; }
+  .code-block .keyword { color: #c084fc; }
+  .code-block .string { color: #34d399; }
+  .code-block .number { color: #fbbf24; }
+  .code-block .table-name { color: #60a5fa; }
+
+  .legend {
+    max-width: 1200px;
+    margin: 0 auto 24px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: #94a3b8;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>Datenbankschema – Abrechnungsautomatisierung</h1>
+<p class="subtitle">SQLite-Datenbank für dein Zahntechnisches Labor &middot; Entwurf v1.0</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div> Stammdaten</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> Preiskatalog</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Transaktionen</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div> Konfiguration</div>
+  <div class="legend-item"><div class="field-key pk" style="width:14px;height:14px;font-size:0.55rem">PK</div> Primärschlüssel</div>
+  <div class="legend-item"><div class="field-key fk" style="width:14px;height:14px;font-size:0.55rem">FK</div> Fremdschlüssel</div>
+</div>
+
+<!-- STAMMDATEN -->
+<div class="section-title"><div class="dot" style="background:#2563eb"></div> Stammdaten</div>
+<div class="schema-grid">
+
+  <div class="table-card cat-stamm">
+    <div class="table-header">
+      <span class="icon">🏥</span> praxen
+      <span class="badge">Stammdaten</span>
+    </div>
+    <div class="table-body">
+      <div class="field-row"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">INTEGER</span><span class="field-desc">Auto-Increment</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">kunden_nr</span><span class="field-type">TEXT</span><span class="field-desc">z.B. "1042"</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">name</span><span class="field-type">TEXT</span><span class="field-desc">Praxisname</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">anrede</span><span class="field-type">TEXT</span><span class="field-desc">"Zahnarztpraxis" etc.</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">strasse</span><span class="field-type">TEXT</span><span class="field-desc">Straße + Hausnr.</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">plz</span><span class="field-type">TEXT</span><span class="field-desc">Postleitzahl</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">ort</span><span class="field-type">TEXT</span><span class="field-desc">Stadt</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">kuerzel</span><span class="field-type">TEXT</span><span class="field-desc">"PHX", "LEX", "ROE"</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">skonto_prozent</span><span class="field-type">REAL</span><span class="field-desc">Standard: 2.0</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">zahlungsziel_tage</span><span class="field-type">INTEGER</span><span class="field-desc">Standard: 14</span></div>
+    </div>
+  </div>
+
+  <div class="table-card cat-stamm">
+    <div class="table-header">
+      <span class="icon">🔧</span> labor_config
+      <span class="badge">Stammdaten</span>
+    </div>
+    <div class="table-body">
+      <div class="field-row"><span class="field-key pk">PK</span><span class="field-name">key</span><span class="field-type">TEXT</span><span class="field-desc">Konfigschlüssel</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">value</span><span class="field-type">TEXT</span><span class="field-desc">Wert</span></div>
+    </div>
+    <div style="padding:8px 18px; font-size:0.78rem; color:#64748b; border-top:1px solid #334155;">
+      Einträge: steuer_nr, laborname, adresse, iban, bic, bankname, naechste_rg_nr, herstellungsort
+    </div>
+  </div>
+
+</div>
+
+<!-- PREISKATALOG -->
+<div class="section-title"><div class="dot" style="background:#10b981"></div> Preiskatalog</div>
+<div class="schema-grid">
+
+  <div class="table-card cat-katalog">
+    <div class="table-header">
+      <span class="icon">📋</span> positionen
+      <span class="badge">Katalog</span>
+    </div>
+    <div class="table-body">
+      <div class="field-row"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">INTEGER</span><span class="field-desc">Auto-Increment</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">nummer</span><span class="field-type">TEXT</span><span class="field-desc">"0001", "3002", "Z100"</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">bezeichnung</span><span class="field-type">TEXT</span><span class="field-desc">Beschreibung</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">einzelpreis</span><span class="field-type">REAL</span><span class="field-desc">Preis 2026 in €</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">kategorie</span><span class="field-type">TEXT</span><span class="field-desc">"material" / "leistung"</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">mwst_satz</span><span class="field-type">REAL</span><span class="field-desc">7.0 oder 19.0</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">beb_referenz</span><span class="field-type">TEXT</span><span class="field-desc">BEB 97 Referenz</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">bel2_referenz</span><span class="field-type">TEXT</span><span class="field-desc">BEL II Referenz</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">aktiv</span><span class="field-type">BOOLEAN</span><span class="field-desc">Position aktiv?</span></div>
+    </div>
+  </div>
+
+  <div class="table-card cat-katalog">
+    <div class="table-header">
+      <span class="icon">⚡</span> kuerzel
+      <span class="badge">Katalog</span>
+    </div>
+    <div class="table-body">
+      <div class="field-row"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">INTEGER</span><span class="field-desc">Auto-Increment</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">code</span><span class="field-type">TEXT</span><span class="field-desc">"ZK", "SCH", "EMX"</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">bezeichnung</span><span class="field-type">TEXT</span><span class="field-desc">Langbezeichnung</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">beschreibung</span><span class="field-type">TEXT</span><span class="field-desc">Details zur Arbeit</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">standard_mwst</span><span class="field-type">REAL</span><span class="field-desc">7.0 oder 19.0</span></div>
+    </div>
+  </div>
+
+  <div class="table-card cat-katalog">
+    <div class="table-header">
+      <span class="icon">🔗</span> kuerzel_positionen
+      <span class="badge">Verknüpfung</span>
+    </div>
+    <div class="table-body">
+      <div class="field-row"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">INTEGER</span><span class="field-desc">Auto-Increment</span></div>
+      <div class="field-row"><span class="field-key fk">FK</span><span class="field-name">kuerzel_id</span><span class="field-type">INTEGER</span><span class="field-desc">→ kuerzel.id</span></div>
+      <div class="field-row"><span class="field-key fk">FK</span><span class="field-name">position_id</span><span class="field-type">INTEGER</span><span class="field-desc">→ positionen.id</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">standard_menge</span><span class="field-type">REAL</span><span class="field-desc">Default-Menge (1.00)</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">ist_pflicht</span><span class="field-type">BOOLEAN</span><span class="field-desc">Immer dabei?</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">sortierung</span><span class="field-type">INTEGER</span><span class="field-desc">Reihenfolge</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">mengen_formel</span><span class="field-type">TEXT</span><span class="field-desc">"pro_zahn", "fix", "pro_glied"</span></div>
+    </div>
+    <div style="padding:8px 18px; font-size:0.78rem; color:#64748b; border-top:1px solid #334155;">
+      Herzstück: Verknüpft Kürzel mit allen automatisch einzufügenden Positionen
+    </div>
+  </div>
+
+</div>
+
+<!-- TRANSAKTIONEN -->
+<div class="section-title"><div class="dot" style="background:#f59e0b"></div> Transaktionen (Rechnungen)</div>
+<div class="schema-grid">
+
+  <div class="table-card cat-transaktion">
+    <div class="table-header">
+      <span class="icon">📄</span> rechnungen
+      <span class="badge">Transaktion</span>
+    </div>
+    <div class="table-body">
+      <div class="field-row"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">INTEGER</span><span class="field-desc">Auto-Increment</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">rg_nummer</span><span class="field-type">INTEGER</span><span class="field-desc">Fortlaufend (3459…)</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">beleg_nr</span><span class="field-type">TEXT</span><span class="field-desc">"2026.03.00001"</span></div>
+      <div class="field-row"><span class="field-key fk">FK</span><span class="field-name">praxis_id</span><span class="field-type">INTEGER</span><span class="field-desc">→ praxen.id</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">patient_name</span><span class="field-type">TEXT</span><span class="field-desc">"Nachname, Vorname"</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">praxis_auftrag</span><span class="field-type">TEXT</span><span class="field-desc">Auftrags-ID der Praxis</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">arbeitsart</span><span class="field-type">TEXT</span><span class="field-desc">"14 ZK", "SCH UK"</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">lieferdatum</span><span class="field-type">DATE</span><span class="field-desc">Lieferdatum</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">belegdatum</span><span class="field-type">DATE</span><span class="field-desc">Rechnungsdatum</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">typ</span><span class="field-type">TEXT</span><span class="field-desc">"rechnung" / "gutschrift" / "kva"</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">summe_material</span><span class="field-type">REAL</span><span class="field-desc">Berechnet</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">summe_leistung</span><span class="field-type">REAL</span><span class="field-desc">Berechnet</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">mwst_betrag</span><span class="field-type">REAL</span><span class="field-desc">Berechnet</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">gesamtbetrag</span><span class="field-type">REAL</span><span class="field-desc">Brutto inkl. MwSt</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">status</span><span class="field-type">TEXT</span><span class="field-desc">"entwurf" / "gestellt" / "bezahlt"</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">pdf_pfad</span><span class="field-type">TEXT</span><span class="field-desc">Pfad zur generierten PDF</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">erstellt_am</span><span class="field-type">DATETIME</span><span class="field-desc">Erstellungszeitpunkt</span></div>
+    </div>
+  </div>
+
+  <div class="table-card cat-transaktion">
+    <div class="table-header">
+      <span class="icon">📝</span> rechnungs_positionen
+      <span class="badge">Transaktion</span>
+    </div>
+    <div class="table-body">
+      <div class="field-row"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">INTEGER</span><span class="field-desc">Auto-Increment</span></div>
+      <div class="field-row"><span class="field-key fk">FK</span><span class="field-name">rechnung_id</span><span class="field-type">INTEGER</span><span class="field-desc">→ rechnungen.id</span></div>
+      <div class="field-row"><span class="field-key fk">FK</span><span class="field-name">position_id</span><span class="field-type">INTEGER</span><span class="field-desc">→ positionen.id</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">nummer</span><span class="field-type">TEXT</span><span class="field-desc">Position wie auf RG</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">menge</span><span class="field-type">REAL</span><span class="field-desc">z.B. 2.00</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">bezeichnung</span><span class="field-type">TEXT</span><span class="field-desc">Überschreibbar</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">einzelpreis</span><span class="field-type">REAL</span><span class="field-desc">Überschreibbar</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">material_betrag</span><span class="field-type">REAL</span><span class="field-desc">Menge × Preis (Material)</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">leistung_betrag</span><span class="field-type">REAL</span><span class="field-desc">Menge × Preis (Leistung)</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">sortierung</span><span class="field-type">INTEGER</span><span class="field-desc">Reihenfolge auf RG</span></div>
+    </div>
+  </div>
+
+  <div class="table-card cat-transaktion">
+    <div class="table-header">
+      <span class="icon">📊</span> sammelabrechnungen
+      <span class="badge">Transaktion</span>
+    </div>
+    <div class="table-body">
+      <div class="field-row"><span class="field-key pk">PK</span><span class="field-name">id</span><span class="field-type">INTEGER</span><span class="field-desc">Auto-Increment</span></div>
+      <div class="field-row"><span class="field-key fk">FK</span><span class="field-name">praxis_id</span><span class="field-type">INTEGER</span><span class="field-desc">→ praxen.id</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">monat</span><span class="field-type">INTEGER</span><span class="field-desc">1-12</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">jahr</span><span class="field-type">INTEGER</span><span class="field-desc">z.B. 2026</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">bruttosumme</span><span class="field-type">REAL</span><span class="field-desc">Summe aller RG</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">skonto_datum</span><span class="field-type">DATE</span><span class="field-desc">Skonto-Frist</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">faellig_datum</span><span class="field-type">DATE</span><span class="field-desc">Zahlungsziel</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">pdf_pfad</span><span class="field-type">TEXT</span><span class="field-desc">Pfad zur SA-PDF</span></div>
+      <div class="field-row"><span class="field-key"></span><span class="field-name">erstellt_am</span><span class="field-type">DATETIME</span><span class="field-desc">Erstellungszeitpunkt</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- WORKFLOW -->
+<div class="flow-section">
+  <div class="flow-title">So funktioniert die Automatisierung</div>
+  <div class="flow-steps">
+    <div class="flow-step">
+      <div class="step-num">Schritt 1</div>
+      <div class="step-title">Eingabe</div>
+      <div class="step-desc">Praxis: "PHX"<br>Patient: "Müller, Hans"<br>Arbeit: "ZK" × 2<br>Zähne: 14, 15</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-num">Schritt 2</div>
+      <div class="step-title">Auflösung</div>
+      <div class="step-desc">Kürzel "ZK" wird zu<br>8-12 BEB-Positionen<br>aufgelöst (Modell,<br>Desinf., Krone, Versand)</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-num">Schritt 3</div>
+      <div class="step-title">Berechnung</div>
+      <div class="step-desc">Preise aus Katalog,<br>Material/Leistung<br>getrennt, MwSt,<br>Rechnungsbetrag</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-num">Schritt 4</div>
+      <div class="step-title">PDF erstellen</div>
+      <div class="step-desc">Rechnung im<br>exakten Layout,<br>fortlaufende Nr.,<br>Beleg-Nr. Format</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-num">Monatsende</div>
+      <div class="step-title">SA generieren</div>
+      <div class="step-desc">Sammelabrechnung<br>pro Praxis mit<br>Skonto + Zahlungsziel<br>automatisch</div>
+    </div>
+  </div>
+</div>
+
+<!-- BEISPIEL -->
+<div class="example-section">
+  <div class="example-title">Beispiel: Du gibst ein → System erzeugt</div>
+  <div class="code-block">
+<span class="comment">-- Deine Eingabe (nur 4 Felder!):</span>
+<span class="keyword">Praxis:</span>    <span class="string">PHX</span>         <span class="comment">→ MVZ Phönixsee, Kunden-Nr. 1042</span>
+<span class="keyword">Patient:</span>   <span class="string">Müller, Hans</span>
+<span class="keyword">Kürzel:</span>    <span class="string">ZK</span>          <span class="comment">→ Zirkonkrone vollanatomisch</span>
+<span class="keyword">Anzahl:</span>    <span class="number">2</span>           <span class="comment">→ Zähne 14, 15</span>
+
+<span class="comment">-- Das System erzeugt automatisch diese Positionen:</span>
+<span class="table-name">Nummer  Menge  Bezeichnung                        Einzelpreis  Material  Leistung</span>
+0001    1.00   Eingang/Ausgang Desinfektion        4.83                   4.83
+0010    1.00   Modell (Hartgips)                    10.79       10.79
+0014    2.00   Sägemodell                           15.20                  30.40
+0051    2.00   Stumpfpräparation                    22.00                  44.00
+0120    1.00   Mittelwertartikulator                12.42       12.42
+0202    1.00   Antagonistenmontage                  11.79       11.79
+0301    2.00   Selektives Einschleifen              5.00                   10.00
+0600    2.00   Aufwachsen je Zahn                   23.00                  46.00
+3002    2.00   Zirkonkr. vollanatomisch             160.00                 320.00
+Z100    2.00   Zirkonrohling, je Einheit            45.00       90.00
+5504    2.00   Individ. Charakterisierung           34.00                  68.00
+5603    2.00   Stereomikroskoparbeit                35.00                  70.00
+5604    2.00   Passkontrolle je Krone               12.00                  24.00
+9330    2.00   Versandkosten                        7.17        14.34
+<span class="comment">─────────────────────────────────────────────────────────</span>
+                                    <span class="keyword">Summe Material:</span>  <span class="number">€ 139.34</span>
+                                    <span class="keyword">Summe Leistung:</span>  <span class="number">€ 617.23</span>
+                                    <span class="keyword">Gesamtsumme:</span>     <span class="number">€ 756.57</span>
+                                    <span class="keyword">zzgl. 7% MwSt:</span>   <span class="number">€  52.96</span>
+                                    <span class="keyword">Rechnungsbetrag:</span> <span class="number">€ 809.53</span>
+  </div>
+</div>
+
+</body>
+</html>
