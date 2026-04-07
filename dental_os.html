@@ -13,12 +13,11 @@
             .then(function(r){ return r.json(); })
             .then(function(d){
                 if (!d || !d.authenticated) {
-                    window.location.replace('/auth.html?next=billing#login');
+                    window.location.replace('/login.html?next=billing');
                 }
             })
             .catch(function(){
-                // Bei Netzwerk-Fehler trotzdem redirecten
-                window.location.replace('/auth.html?next=billing#login');
+                window.location.replace('/login.html?next=billing');
             });
     })();
     </script>
