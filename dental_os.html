@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DENTAL OS - Zahntechnisches Labor</title>
+    <script>
+    // Auth-Guard: prüft ob User eingeloggt ist (nutzt gleiche Session wie Labor-Board)
+    (function(){
+        // Nur prüfen wenn auf Server (nicht lokal als file://)
+        if (location.protocol === 'file:') return;
+        fetch('/api.php/auth/status', {credentials:'include'})
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+                if (!d || !d.authenticated) {
+                    window.location.replace('/auth.html?next=billing#login');
+                }
+            })
+            .catch(function(){
+                // Bei Netzwerk-Fehler trotzdem redirecten
+                window.location.replace('/auth.html?next=billing#login');
+            });
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
