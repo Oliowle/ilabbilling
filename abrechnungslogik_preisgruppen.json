@@ -1,0 +1,4828 @@
+{
+  "meta": {
+    "beschreibung": "Abrechnungslogik mit ECHTEN Preisen pro Praxis",
+    "prinzip": "Preise werden NICHT gemittelt - jede Praxis hat ihre exakten Preise",
+    "vorrang": "2026er Preise haben Vorrang vor 2025er Preisen",
+    "rabatt": "nicht_enthalten_wird_individuell_vergeben",
+    "gazaev": "eigene_komplettpreise_separat"
+  },
+  "preisgruppen_definition": {
+    "Preisgruppe_A": {
+      "beschreibung": "Günstigste Preise",
+      "score_bereich": {
+        "min": 0.921,
+        "max": 0.979
+      },
+      "praxen": [
+        "Helm",
+        "Wojahn Zahnmedizin",
+        "Das Hugo",
+        "Dr. Peter Krauß",
+        "Dr. Gabriele Schmidt",
+        "Dr. Susan Neuffer",
+        "MVZ Phönixsee",
+        "Röder u. Kollegen",
+        "Dr. Lex"
+      ]
+    },
+    "Preisgruppe_B": {
+      "beschreibung": "Mittlere Preise",
+      "score_bereich": {
+        "min": 1.04,
+        "max": 1.059
+      },
+      "praxen": [
+        "Martmöller u. Kollegen",
+        "Zahnärzte am Königsplatz",
+        "Dr. Kersting",
+        "Paul Seemann"
+      ]
+    },
+    "Preisgruppe_C": {
+      "beschreibung": "Höchste Preise",
+      "score_bereich": {
+        "min": 1.074,
+        "max": 1.074
+      },
+      "praxen": [
+        "Dr. Daut"
+      ]
+    }
+  },
+  "praxis_zuordnung": {
+    "Helm": {
+      "preisgruppe": "Preisgruppe_A",
+      "score": 0.921,
+      "rechnungen_gesamt": 7,
+      "rechnungen_2026": 0,
+      "umsatz": 9335.83
+    },
+    "Wojahn Zahnmedizin": {
+      "preisgruppe": "Preisgruppe_A",
+      "score": 0.921,
+      "rechnungen_gesamt": 23,
+      "rechnungen_2026": 0,
+      "umsatz": 9688.87
+    },
+    "Das Hugo": {
+      "preisgruppe": "Preisgruppe_A",
+      "score": 0.926,
+      "rechnungen_gesamt": 3,
+      "rechnungen_2026": 3,
+      "umsatz": 2423.91
+    },
+    "Dr. Peter Krauß": {
+      "preisgruppe": "Preisgruppe_A",
+      "score": 0.936,
+      "rechnungen_gesamt": 19,
+      "rechnungen_2026": 3,
+      "umsatz": 20533.38
+    },
+    "Dr. Gabriele Schmidt": {
+      "preisgruppe": "Preisgruppe_A",
+      "score": 0.941,
+      "rechnungen_gesamt": 65,
+      "rechnungen_2026": 9,
+      "umsatz": 21985.39
+    },
+    "Dr. Susan Neuffer": {
+      "preisgruppe": "Preisgruppe_A",
+      "score": 0.954,
+      "rechnungen_gesamt": 53,
+      "rechnungen_2026": 2,
+      "umsatz": 28361.33
+    },
+    "MVZ Phönixsee": {
+      "preisgruppe": "Preisgruppe_A",
+      "score": 0.956,
+      "rechnungen_gesamt": 91,
+      "rechnungen_2026": 12,
+      "umsatz": 150224.4
+    },
+    "Röder u. Kollegen": {
+      "preisgruppe": "Preisgruppe_A",
+      "score": 0.965,
+      "rechnungen_gesamt": 79,
+      "rechnungen_2026": 17,
+      "umsatz": 95789.24
+    },
+    "Dr. Lex": {
+      "preisgruppe": "Preisgruppe_A",
+      "score": 0.979,
+      "rechnungen_gesamt": 87,
+      "rechnungen_2026": 28,
+      "umsatz": 33346.32
+    },
+    "Martmöller u. Kollegen": {
+      "preisgruppe": "Preisgruppe_B",
+      "score": 1.04,
+      "rechnungen_gesamt": 3,
+      "rechnungen_2026": 1,
+      "umsatz": 8742.8
+    },
+    "Zahnärzte am Königsplatz": {
+      "preisgruppe": "Preisgruppe_B",
+      "score": 1.04,
+      "rechnungen_gesamt": 3,
+      "rechnungen_2026": 0,
+      "umsatz": 20447.1
+    },
+    "Dr. Kersting": {
+      "preisgruppe": "Preisgruppe_B",
+      "score": 1.046,
+      "rechnungen_gesamt": 2,
+      "rechnungen_2026": 0,
+      "umsatz": 4002.51
+    },
+    "Paul Seemann": {
+      "preisgruppe": "Preisgruppe_B",
+      "score": 1.059,
+      "rechnungen_gesamt": 35,
+      "rechnungen_2026": 3,
+      "umsatz": 40681.65
+    },
+    "Dr. Daut": {
+      "preisgruppe": "Preisgruppe_C",
+      "score": 1.074,
+      "rechnungen_gesamt": 2,
+      "rechnungen_2026": 0,
+      "umsatz": 1463.33
+    }
+  },
+  "praxis_preislisten": {
+    "Das Hugo": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*0070": {
+        "preis": 23.0,
+        "bezeichnung": "Zahnfleischmaske, abnehmbar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 4.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*0600": {
+        "preis": 20.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*1000": {
+        "preis": 110.0,
+        "bezeichnung": "Aufwand bei Suprakonstruktion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*1010": {
+        "preis": 83.0,
+        "bezeichnung": "Klebeverbindung Titan / Lisi / Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*1011": {
+        "preis": 11.8,
+        "bezeichnung": "Modellimplantat repositionieren",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*3003": {
+        "preis": 145.0,
+        "bezeichnung": "Zirkongerüst auf Implantat",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5003": {
+        "preis": 197.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*5500": {
+        "preis": 130.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 35.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*5601": {
+        "preis": 55.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5602": {
+        "preis": 27.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*5603": {
+        "preis": 35.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*5604": {
+        "preis": 10.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*8000": {
+        "preis": 14.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*9022": {
+        "preis": 22.0,
+        "bezeichnung": "Digitale Artikulation",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*9024": {
+        "preis": 33.71,
+        "bezeichnung": "Modell Implantat 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*9025": {
+        "preis": 24.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*9027": {
+        "preis": 20.22,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*I201": {
+        "preis": 30.0,
+        "bezeichnung": "Modellanalog",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*I614": {
+        "preis": 87.0,
+        "bezeichnung": "Klebebasis Titan",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*Z100": {
+        "preis": 45.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "9330": {
+        "preis": 7.17,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      }
+    },
+    "Decker Dent": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*020": {
+        "preis": 16.51,
+        "bezeichnung": "Sonderkunststoff",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0611": {
+        "preis": 106.74,
+        "bezeichnung": "Mock - up Schiene",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5602": {
+        "preis": 23.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 11.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9022": {
+        "preis": 22.0,
+        "bezeichnung": "Digitale Artikulation",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9025": {
+        "preis": 24.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      }
+    },
+    "Dr. Daut": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0201": {
+        "preis": 14.69,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 14.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0600": {
+        "preis": 23.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*3002": {
+        "preis": 213.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5003": {
+        "preis": 190.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5200": {
+        "preis": 145.0,
+        "bezeichnung": "Inlay aus Presskeramik, e.max",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 54.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5602": {
+        "preis": 33.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5604": {
+        "preis": 9.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*9025": {
+        "preis": 20.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9027": {
+        "preis": 20.22,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*Z100": {
+        "preis": 40.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      }
+    },
+    "Dr. Gabriele Schmidt": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0070": {
+        "preis": 25.0,
+        "bezeichnung": "Zahnfleischmaske, abnehmbar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0201": {
+        "preis": 14.69,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0250": {
+        "preis": 19.1,
+        "bezeichnung": "Einstellen u. Auswerten e. Registrates",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 4.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*0600": {
+        "preis": 20.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*0850": {
+        "preis": 264.05,
+        "bezeichnung": "Adjustierte Aufbissschiene",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*0857": {
+        "preis": 79.0,
+        "bezeichnung": "Miniplastschiene",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0858": {
+        "preis": 40.0,
+        "bezeichnung": "Jig-Aufbau",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*1000": {
+        "preis": 110.0,
+        "bezeichnung": "Aufwand bei Suprakonstruktion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*1010": {
+        "preis": 84.0,
+        "bezeichnung": "Klebeverbindung Titan / Lisi / Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*1011": {
+        "preis": 11.8,
+        "bezeichnung": "Modellimplantat repositionieren",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*1017": {
+        "preis": 60.0,
+        "bezeichnung": "Individuelles E.Max-Abutment",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*3000": {
+        "preis": 105.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*3002": {
+        "preis": 160.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*3003": {
+        "preis": 162.92,
+        "bezeichnung": "Zirkongerüst auf Implantat",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5003": {
+        "preis": 197.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5200": {
+        "preis": 145.0,
+        "bezeichnung": "Inlay aus Presskeramik, e.max",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5500": {
+        "preis": 119.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5502": {
+        "preis": 33.43,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 35.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3,
+        "preisaenderung_2025_2026": {
+          "von": 31.0,
+          "auf": 35.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5505": {
+        "preis": 195.0,
+        "bezeichnung": "Krone e.max auf Implantat",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5602": {
+        "preis": 27.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3,
+        "preisaenderung_2025_2026": {
+          "von": 23.0,
+          "auf": 27.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5603": {
+        "preis": 35.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3,
+        "preisaenderung_2025_2026": {
+          "von": 34.0,
+          "auf": 35.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5604": {
+        "preis": 10.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3,
+        "preisaenderung_2025_2026": {
+          "von": 9.5,
+          "auf": 10.5,
+          "jahr": "2025->2026"
+        }
+      },
+      "*8000": {
+        "preis": 14.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 11.0,
+          "auf": 14.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9022": {
+        "preis": 22.0,
+        "bezeichnung": "Digitale Artikulation",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6
+      },
+      "*9024": {
+        "preis": 33.71,
+        "bezeichnung": "Modell Implantat 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*9025": {
+        "preis": 24.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4
+      },
+      "*9027": {
+        "preis": 20.22,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*9032": {
+        "preis": 37.0,
+        "bezeichnung": "Digitale Axiographie-Integration",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*I201": {
+        "preis": 30.0,
+        "bezeichnung": "Modellanalog",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*I614": {
+        "preis": 87.0,
+        "bezeichnung": "Klebebasis Titan",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*S405": {
+        "preis": 39.0,
+        "bezeichnung": "PMMA Blank",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*Z100": {
+        "preis": 48.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 45.0,
+          "auf": 48.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "4010": {
+        "preis": 169.75,
+        "bezeichnung": "Aufbissbehelf m. adj. Oberfläche",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 162.01,
+          "auf": 169.75,
+          "jahr": "2025->2026"
+        }
+      },
+      "4021": {
+        "preis": 76.56,
+        "bezeichnung": "Miniplastschiene",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "7100": {
+        "preis": 15.33,
+        "bezeichnung": "Aufbiß",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 14.63,
+          "auf": 15.33,
+          "jahr": "2025->2026"
+        }
+      },
+      "9330": {
+        "preis": 7.17,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4,
+        "preisaenderung_2025_2026": {
+          "von": 6.84,
+          "auf": 7.17,
+          "jahr": "2025->2026"
+        }
+      }
+    },
+    "Dr. Kersting": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0010": {
+        "preis": 10.79,
+        "bezeichnung": "Modell aus Hartgips",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0012": {
+        "preis": 8.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0030": {
+        "preis": 27.0,
+        "bezeichnung": "Implantat Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0070": {
+        "preis": 25.0,
+        "bezeichnung": "Zahnfleischmaske, abnehmbar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0201": {
+        "preis": 14.69,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0301": {
+        "preis": 14.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0600": {
+        "preis": 23.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*3000": {
+        "preis": 105.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*3003": {
+        "preis": 162.92,
+        "bezeichnung": "Zirkongerüst auf Implantat",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5001": {
+        "preis": 109.0,
+        "bezeichnung": "Krone/Kappe/Schale Lithium disilicate",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 119.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5502": {
+        "preis": 33.43,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 57.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5509": {
+        "preis": 84.27,
+        "bezeichnung": "Indiv. Einzelzahn charakt.",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5604": {
+        "preis": 9.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5800": {
+        "preis": 83.15,
+        "bezeichnung": "Zahnfleisch aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5802": {
+        "preis": 43.0,
+        "bezeichnung": "Zahnfleisch a. Keramik Charakterisierung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 11.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*I199": {
+        "preis": 294.0,
+        "bezeichnung": "Individuelles Abutment Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*I201": {
+        "preis": 30.0,
+        "bezeichnung": "Modellanalog",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*Z100": {
+        "preis": 45.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      }
+    },
+    "Dr. Lex": {
+      "*0001": {
+        "preis": 5.4,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 14,
+        "preisaenderung_2025_2026": {
+          "von": 4.83,
+          "auf": 5.4,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0010": {
+        "preis": 10.79,
+        "bezeichnung": "Modell aus Hartgips",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0012": {
+        "preis": 6.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0014": {
+        "preis": 11.0,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0201": {
+        "preis": 16.0,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0207": {
+        "preis": 25.84,
+        "bezeichnung": "Virtueller Artikulator",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4
+      },
+      "*0250": {
+        "preis": 23.0,
+        "bezeichnung": "Einstellen u. Auswerten e. Registrates",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 12,
+        "preisaenderung_2025_2026": {
+          "von": 19.1,
+          "auf": 23.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0301": {
+        "preis": 4.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0402": {
+        "preis": 95.0,
+        "bezeichnung": "FGP Montage und Auswertung, pro Tisch",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0411": {
+        "preis": 135.0,
+        "bezeichnung": "FGP Montage u. Auswertung, pro Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0500": {
+        "preis": 19.0,
+        "bezeichnung": "Zahnfarbenbestimmung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0501": {
+        "preis": 60.0,
+        "bezeichnung": "Modell Funktionsanalyse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0600": {
+        "preis": 25.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 20.0,
+          "auf": 25.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0805": {
+        "preis": 93.26,
+        "bezeichnung": "Langzeitprovisorium Kst./ CAD-CAM",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0850": {
+        "preis": 269.0,
+        "bezeichnung": "Adjustierte Aufbissschiene",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 12,
+        "preisaenderung_2025_2026": {
+          "von": 264.05,
+          "auf": 269.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0851": {
+        "preis": 25.0,
+        "bezeichnung": "Aufbiss",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 12,
+        "preisaenderung_2025_2026": {
+          "von": 16.74,
+          "auf": 25.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0854": {
+        "preis": 150.0,
+        "bezeichnung": "Sportschutzschienen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0900": {
+        "preis": 16.0,
+        "bezeichnung": "Centridur Gips",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*3000": {
+        "preis": 135.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*3002": {
+        "preis": 160.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 130.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5502": {
+        "preis": 45.0,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 37.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 31.0,
+          "auf": 37.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5602": {
+        "preis": 23.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5604": {
+        "preis": 13.0,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5606": {
+        "preis": 42.0,
+        "bezeichnung": "TSC-Mehraufwand",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 23.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 13,
+        "preisaenderung_2025_2026": {
+          "von": 11.0,
+          "auf": 23.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9022": {
+        "preis": 18.0,
+        "bezeichnung": "Digitale Artikulation",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 14,
+        "preisaenderung_2025_2026": {
+          "von": 17.0,
+          "auf": 18.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9025": {
+        "preis": 23.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 19,
+        "preisaenderung_2025_2026": {
+          "von": 21.0,
+          "auf": 23.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9027": {
+        "preis": 21.0,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 19.0,
+          "auf": 21.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 18.5,
+          "auf": 19.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*C100": {
+        "preis": 30.0,
+        "bezeichnung": "Composit Block",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*S405": {
+        "preis": 39.0,
+        "bezeichnung": "PMMA Blank",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*Z100": {
+        "preis": 45.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0115": {
+        "preis": 10.49,
+        "bezeichnung": "Fixator UKPS",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "0120": {
+        "preis": 12.42,
+        "bezeichnung": "Mittelwertartikulator",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 5,
+        "preisaenderung_2025_2026": {
+          "von": 11.85,
+          "auf": 12.42,
+          "jahr": "2025->2026"
+        }
+      },
+      "0125": {
+        "preis": 12.41,
+        "bezeichnung": "Mittelwertartikulator UKPS",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "0207": {
+        "preis": 25.84,
+        "bezeichnung": "Virtueller Artikulator",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "1003": {
+        "preis": 50.0,
+        "bezeichnung": "Material",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "4010": {
+        "preis": 169.75,
+        "bezeichnung": "Aufbissbehelf m. adj. Oberfläche",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 5,
+        "preisaenderung_2025_2026": {
+          "von": 162.01,
+          "auf": 169.75,
+          "jahr": "2025->2026"
+        }
+      },
+      "5010": {
+        "preis": 309.92,
+        "bezeichnung": "Basen UKPS",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "5100": {
+        "preis": 20.91,
+        "bezeichnung": "Befestigungselement Protrusionselement",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "5110": {
+        "preis": 20.91,
+        "bezeichnung": "Montage Protrusionselement UKPS",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "5200": {
+        "preis": 12.01,
+        "bezeichnung": "Befestigungselement Mundöffnungs-",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "7100": {
+        "preis": 15.33,
+        "bezeichnung": "Aufbiß",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 5,
+        "preisaenderung_2025_2026": {
+          "von": 14.63,
+          "auf": 15.33,
+          "jahr": "2025->2026"
+        }
+      },
+      "9330": {
+        "preis": 7.17,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6,
+        "preisaenderung_2025_2026": {
+          "von": 6.84,
+          "auf": 7.17,
+          "jahr": "2025->2026"
+        }
+      },
+      "9335": {
+        "preis": 7.17,
+        "bezeichnung": "Versandkosten UKPS",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      }
+    },
+    "Dr. Martin Schlee und Kollegen": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0012": {
+        "preis": 8.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0201": {
+        "preis": 14.69,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 14.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0501": {
+        "preis": 67.42,
+        "bezeichnung": "Foto - und Modell Funktionsanalyse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0600": {
+        "preis": 23.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*3000": {
+        "preis": 105.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 115.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5502": {
+        "preis": 33.43,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 54.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5604": {
+        "preis": 9.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*Z100": {
+        "preis": 40.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      }
+    },
+    "Dr. Peter Krauß": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0012": {
+        "preis": 8.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0015": {
+        "preis": 42.02,
+        "bezeichnung": "Geller Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0056": {
+        "preis": 21.35,
+        "bezeichnung": "Stumpf aus feuerfester Masse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0070": {
+        "preis": 25.0,
+        "bezeichnung": "Zahnfleischmaske, abnehmbar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0110": {
+        "preis": 10.11,
+        "bezeichnung": "Dublieren eines Einzelstumpfes",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0201": {
+        "preis": 14.69,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*0250": {
+        "preis": 19.1,
+        "bezeichnung": "Einstellen u. Auswerten e. Registrates",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 4.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0500": {
+        "preis": 19.0,
+        "bezeichnung": "Zahnfarbenbestimmung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*0501": {
+        "preis": 67.42,
+        "bezeichnung": "Foto - und Modell Funktionsanalyse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0600": {
+        "preis": 20.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0611": {
+        "preis": 106.74,
+        "bezeichnung": "Mock - up Schiene",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0804": {
+        "preis": 41.57,
+        "bezeichnung": "Formteil für provisorische Versorgung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*1000": {
+        "preis": 110.0,
+        "bezeichnung": "Aufwand bei Suprakonstruktion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*1007": {
+        "preis": 38.2,
+        "bezeichnung": "Positionierungsschlüssel,",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*1010": {
+        "preis": 84.0,
+        "bezeichnung": "Klebeverbindung Titan / Lisi / Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*1011": {
+        "preis": 11.8,
+        "bezeichnung": "Modellimplantat repositionieren",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*3000": {
+        "preis": 105.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "*3002": {
+        "preis": 160.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*3003": {
+        "preis": 162.92,
+        "bezeichnung": "Zirkongerüst auf Implantat",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5001": {
+        "preis": 109.0,
+        "bezeichnung": "Krone/Kappe/Schale Lithium disilicate",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5002": {
+        "preis": 190.0,
+        "bezeichnung": "Krone aus Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5003": {
+        "preis": 197.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5007": {
+        "preis": 225.0,
+        "bezeichnung": "Teilkrone aus Keramik/ geschichtet",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5010": {
+        "preis": 144.94,
+        "bezeichnung": "Maryland, Anker gefräst, f. Klebebrücke",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 119.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*5502": {
+        "preis": 33.43,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5504": {
+        "preis": 31.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*5509": {
+        "preis": 150.0,
+        "bezeichnung": "Indiv. Einzelzahn charakt.",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*5602": {
+        "preis": 23.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*5604": {
+        "preis": 9.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*7000": {
+        "preis": 30.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop j.Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 11.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 9
+      },
+      "*9022": {
+        "preis": 22.0,
+        "bezeichnung": "Digitale Artikulation",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*9024": {
+        "preis": 33.71,
+        "bezeichnung": "Modell Implantat 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*9025": {
+        "preis": 24.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*9027": {
+        "preis": 20.22,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*I201": {
+        "preis": 30.0,
+        "bezeichnung": "Modellanalog",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*I614": {
+        "preis": 87.0,
+        "bezeichnung": "Klebebasis Titan",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*I802": {
+        "preis": 85.0,
+        "bezeichnung": "3D Scan-Body",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*Z100": {
+        "preis": 48.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 45.0,
+          "auf": 48.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0120": {
+        "preis": 11.85,
+        "bezeichnung": "Mittelwertartikulator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      }
+    },
+    "Dr. Stefan Neumeyer & Partner": {
+      "*0900": {
+        "preis": 14.0,
+        "bezeichnung": "Centridur Gips",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 12.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      }
+    },
+    "Dr. Susan Neuffer": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0010": {
+        "preis": 10.79,
+        "bezeichnung": "Modell aus Hartgips",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0012": {
+        "preis": 8.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0014": {
+        "preis": 15.0,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0070": {
+        "preis": 25.0,
+        "bezeichnung": "Zahnfleischmaske, abnehmbar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*020": {
+        "preis": 16.51,
+        "bezeichnung": "Sonderkunststoff",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0200": {
+        "preis": 15.51,
+        "bezeichnung": "Modellmontage in Mittelwertartikulator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0201": {
+        "preis": 14.69,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0250": {
+        "preis": 19.1,
+        "bezeichnung": "Einstellen u. Auswerten e. Registrates",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0301": {
+        "preis": 4.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0500": {
+        "preis": 19.0,
+        "bezeichnung": "Zahnfarbenbestimmung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0501": {
+        "preis": 67.42,
+        "bezeichnung": "Foto - und Modell Funktionsanalyse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*0600": {
+        "preis": 20.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0611": {
+        "preis": 106.74,
+        "bezeichnung": "Mock - up Schiene",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0811": {
+        "preis": 59.0,
+        "bezeichnung": "Provisorische Krone/ Brücke PMMA",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0850": {
+        "preis": 264.05,
+        "bezeichnung": "Adjustierte Aufbissschiene",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0851": {
+        "preis": 16.74,
+        "bezeichnung": "Aufbiss",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*1000": {
+        "preis": 110.0,
+        "bezeichnung": "Aufwand bei Suprakonstruktion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*1010": {
+        "preis": 84.0,
+        "bezeichnung": "Klebeverbindung Titan / Lisi / Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*1011": {
+        "preis": 11.8,
+        "bezeichnung": "Modellimplantat repositionieren",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*3000": {
+        "preis": 105.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*3002": {
+        "preis": 160.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*3003": {
+        "preis": 162.92,
+        "bezeichnung": "Zirkongerüst auf Implantat",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5002": {
+        "preis": 190.0,
+        "bezeichnung": "Krone aus Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5003": {
+        "preis": 197.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*5200": {
+        "preis": 145.0,
+        "bezeichnung": "Inlay aus Presskeramik, e.max",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5500": {
+        "preis": 119.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*5502": {
+        "preis": 33.43,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5504": {
+        "preis": 35.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 31.0,
+          "auf": 35.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5509": {
+        "preis": 150.0,
+        "bezeichnung": "Indiv. Einzelzahn charakt.",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "*5602": {
+        "preis": 27.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 23.0,
+          "auf": 27.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5603": {
+        "preis": 35.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 34.0,
+          "auf": 35.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5604": {
+        "preis": 10.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 9.5,
+          "auf": 10.5,
+          "jahr": "2025->2026"
+        }
+      },
+      "*6400": {
+        "preis": 43.0,
+        "bezeichnung": "Aufstellung Grundeinheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*6401": {
+        "preis": 5.52,
+        "bezeichnung": "Aufstellen Wachs o. Kst. je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*6404": {
+        "preis": 68.0,
+        "bezeichnung": "Fertigstellung Grundeinheit, Kst.basis",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*6406": {
+        "preis": 5.96,
+        "bezeichnung": "Fertigstellung je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*6409": {
+        "preis": 68.0,
+        "bezeichnung": "Sonderkunststoff",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 7.17,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 11.0,
+          "auf": 7.17,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9022": {
+        "preis": 25.0,
+        "bezeichnung": "Digitale Artikulation",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 22.0,
+          "auf": 25.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9024": {
+        "preis": 33.71,
+        "bezeichnung": "Modell Implantat 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*9025": {
+        "preis": 24.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*9027": {
+        "preis": 20.22,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 14
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*9100": {
+        "preis": 170.0,
+        "bezeichnung": "Arbeit mit SDMatrix/ Kiefergelenkanalyse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*I201": {
+        "preis": 30.0,
+        "bezeichnung": "Modellanalog",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*I614": {
+        "preis": 87.0,
+        "bezeichnung": "Klebebasis Titan",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*S100": {
+        "preis": 28.0,
+        "bezeichnung": "Zahn / Front",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*S405": {
+        "preis": 39.0,
+        "bezeichnung": "PMMA Blank",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*Z100": {
+        "preis": 48.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 45.0,
+          "auf": 48.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "0010": {
+        "preis": 8.45,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 8.06,
+          "auf": 8.45,
+          "jahr": "2025->2026"
+        }
+      },
+      "0021": {
+        "preis": 16.97,
+        "bezeichnung": "Doublieren eines Modells",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "0051": {
+        "preis": 19.88,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 18.98,
+          "auf": 19.88,
+          "jahr": "2025->2026"
+        }
+      },
+      "0112": {
+        "preis": 10.5,
+        "bezeichnung": "Fixator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0120": {
+        "preis": 12.42,
+        "bezeichnung": "Mittelwertartikulator",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 11.85,
+          "auf": 12.42,
+          "jahr": "2025->2026"
+        }
+      },
+      "0212": {
+        "preis": 27.56,
+        "bezeichnung": "Funktionslöffel",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0213": {
+        "preis": 27.56,
+        "bezeichnung": "Basis für Bissregistrierung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "0215": {
+        "preis": 27.56,
+        "bezeichnung": "Basis für Aufstellung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "0220": {
+        "preis": 7.94,
+        "bezeichnung": "Bisswall",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "3010": {
+        "preis": 36.2,
+        "bezeichnung": "Aufstellung, Grundeinheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "3020": {
+        "preis": 2.16,
+        "bezeichnung": "Aufstellen Wachs- oder Kunststoff",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "3610": {
+        "preis": 60.76,
+        "bezeichnung": "Fertigstellung Grundeinheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "3620": {
+        "preis": 3.9,
+        "bezeichnung": "Fertigstellen je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "3800": {
+        "preis": 11.99,
+        "bezeichnung": "Einfache gebogene Halte-/Stütz-",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "3810": {
+        "preis": 20.25,
+        "bezeichnung": "Sonstige gebogene Halte- und/oder",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "3822": {
+        "preis": 65.62,
+        "bezeichnung": "Sonderkunststoff",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "4010": {
+        "preis": 162.01,
+        "bezeichnung": "Aufbissbehelf m. adj. Oberfläche",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 11
+      },
+      "7100": {
+        "preis": 14.63,
+        "bezeichnung": "Aufbiß",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 11
+      },
+      "8090": {
+        "preis": 68.86,
+        "bezeichnung": "Vollständige Unterfütterung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "9330": {
+        "preis": 7.17,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 6.84,
+          "auf": 7.17,
+          "jahr": "2025->2026"
+        }
+      },
+      "S100": {
+        "preis": 28.0,
+        "bezeichnung": "Zahn / Front",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "S101": {
+        "preis": 15.99,
+        "bezeichnung": "Zahn / Seite",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      }
+    },
+    "Edelweiss": {
+      "*0001": {
+        "preis": 4.3,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0015": {
+        "preis": 37.4,
+        "bezeichnung": "Geller Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0016": {
+        "preis": 8.35,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0051": {
+        "preis": 20.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0056": {
+        "preis": 19.0,
+        "bezeichnung": "Stumpf aus feuerfester Masse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0110": {
+        "preis": 9.0,
+        "bezeichnung": "Dublieren eines Einzelstumpfes",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0201": {
+        "preis": 13.08,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0202": {
+        "preis": 9.6,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 14.25,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0600": {
+        "preis": 26.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 63.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5601": {
+        "preis": 61.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5604": {
+        "preis": 9.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 23.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      }
+    },
+    "Helm": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*0012": {
+        "preis": 8.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0015": {
+        "preis": 42.02,
+        "bezeichnung": "Geller Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*0056": {
+        "preis": 21.35,
+        "bezeichnung": "Stumpf aus feuerfester Masse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0110": {
+        "preis": 10.11,
+        "bezeichnung": "Dublieren eines Einzelstumpfes",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0201": {
+        "preis": 14.69,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0301": {
+        "preis": 4.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*0600": {
+        "preis": 20.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*3000": {
+        "preis": 105.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*3002": {
+        "preis": 160.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5001": {
+        "preis": 109.0,
+        "bezeichnung": "Krone/Kappe/Schale Lithium disilicate",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5003": {
+        "preis": 197.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5007": {
+        "preis": 225.0,
+        "bezeichnung": "Teilkrone aus Keramik/ geschichtet",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5302": {
+        "preis": 225.0,
+        "bezeichnung": "Verblendschale aus Keramik / Veneer",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 119.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5504": {
+        "preis": 31.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*5509": {
+        "preis": 150.0,
+        "bezeichnung": "Indiv. Einzelzahn charakt.",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "*5602": {
+        "preis": 23.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*5604": {
+        "preis": 9.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*Z100": {
+        "preis": 45.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "0120": {
+        "preis": 11.85,
+        "bezeichnung": "Mittelwertartikulator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      }
+    },
+    "Heukelbach": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 14.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0600": {
+        "preis": 23.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*3000": {
+        "preis": 105.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 115.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 62.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5509": {
+        "preis": 84.27,
+        "bezeichnung": "Indiv. Einzelzahn charakt.",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5604": {
+        "preis": 9.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 9.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9022": {
+        "preis": 22.0,
+        "bezeichnung": "Digitale Artikulation",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9025": {
+        "preis": 26.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9027": {
+        "preis": 20.22,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*Z100": {
+        "preis": 80.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      }
+    },
+    "MVZ Phönixsee": {
+      "*0001": {
+        "preis": 5.4,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 11,
+        "preisaenderung_2025_2026": {
+          "von": 4.83,
+          "auf": 5.4,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0010": {
+        "preis": 10.79,
+        "bezeichnung": "Modell aus Hartgips",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0011": {
+        "preis": 15.73,
+        "bezeichnung": "Superhartgipsmodell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0012": {
+        "preis": 6.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0014": {
+        "preis": 11.0,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0015": {
+        "preis": 37.4,
+        "bezeichnung": "Geller Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*0030": {
+        "preis": 17.0,
+        "bezeichnung": "Implantat Modell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0056": {
+        "preis": 21.35,
+        "bezeichnung": "Stumpf aus feuerfester Masse",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0070": {
+        "preis": 23.0,
+        "bezeichnung": "Zahnfleischmaske, abnehmbar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*0110": {
+        "preis": 10.11,
+        "bezeichnung": "Dublieren eines Einzelstumpfes",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*020": {
+        "preis": 14.7,
+        "bezeichnung": "Sonderkunststoff",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0200": {
+        "preis": 11.8,
+        "bezeichnung": "Modellmontage in Mittelwertartikulator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0201": {
+        "preis": 16.0,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0250": {
+        "preis": 19.1,
+        "bezeichnung": "Einstellen u. Auswerten e. Registrates",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*0301": {
+        "preis": 5.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 9,
+        "preisaenderung_2025_2026": {
+          "von": 4.5,
+          "auf": 5.5,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0501": {
+        "preis": 60.0,
+        "bezeichnung": "Foto - und Modell Funktionsanalyse",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0600": {
+        "preis": 25.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 9,
+        "preisaenderung_2025_2026": {
+          "von": 20.0,
+          "auf": 25.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0611": {
+        "preis": 106.74,
+        "bezeichnung": "Mock - up Schiene",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0804": {
+        "preis": 34.0,
+        "bezeichnung": "Formteil für provisorische Versorgung",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0805": {
+        "preis": 20.0,
+        "bezeichnung": "Langzeitprovisorium Kst./ CAD-CAM",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0850": {
+        "preis": 264.05,
+        "bezeichnung": "Adjustierte Aufbissschiene",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*0851": {
+        "preis": 16.74,
+        "bezeichnung": "Aufbiss",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0852": {
+        "preis": 100.93,
+        "bezeichnung": "Bleachingschiene",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*1000": {
+        "preis": 77.0,
+        "bezeichnung": "Aufwand bei Suprakonstruktion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*1010": {
+        "preis": 83.0,
+        "bezeichnung": "Klebeverbindung Titan / Lisi / Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*1011": {
+        "preis": 11.8,
+        "bezeichnung": "Modellimplantat repositionieren",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*3000": {
+        "preis": 135.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*3002": {
+        "preis": 165.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4,
+        "preisaenderung_2025_2026": {
+          "von": 160.0,
+          "auf": 165.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*3003": {
+        "preis": 145.0,
+        "bezeichnung": "Zirkongerüst auf Implantat",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*5001": {
+        "preis": 123.0,
+        "bezeichnung": "Krone/Kappe/Schale",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3,
+        "preisaenderung_2025_2026": {
+          "von": 113.0,
+          "auf": 123.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5002": {
+        "preis": 160.0,
+        "bezeichnung": "Krone aus Presskeramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5003": {
+        "preis": 140.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*5007": {
+        "preis": 225.0,
+        "bezeichnung": "Teilkrone aus Keramik/ geschichtet",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5200": {
+        "preis": 113.0,
+        "bezeichnung": "Inlay aus Presskeramik, e.max",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5302": {
+        "preis": 225.0,
+        "bezeichnung": "Verblendschale aus Keramik / Veneer",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*5500": {
+        "preis": 130.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4
+      },
+      "*5502": {
+        "preis": 45.0,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*5504": {
+        "preis": 37.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 8,
+        "preisaenderung_2025_2026": {
+          "von": 31.0,
+          "auf": 37.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5509": {
+        "preis": 158.0,
+        "bezeichnung": "Indiv. Einzelzahn charakt.",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5601": {
+        "preis": 55.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 5
+      },
+      "*5602": {
+        "preis": 25.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 7,
+        "preisaenderung_2025_2026": {
+          "von": 23.0,
+          "auf": 25.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 8
+      },
+      "*5604": {
+        "preis": 14.0,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 9,
+        "preisaenderung_2025_2026": {
+          "von": 13.0,
+          "auf": 14.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5800": {
+        "preis": 74.0,
+        "bezeichnung": "Zahnfleisch aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 23.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 11,
+        "preisaenderung_2025_2026": {
+          "von": 11.0,
+          "auf": 23.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9018": {
+        "preis": 3.51,
+        "bezeichnung": "Probe Zähne 195,00",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9022": {
+        "preis": 18.0,
+        "bezeichnung": "Digitale Artikulation",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 8,
+        "preisaenderung_2025_2026": {
+          "von": 17.0,
+          "auf": 18.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9024": {
+        "preis": 33.71,
+        "bezeichnung": "Modell Implantat 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*9025": {
+        "preis": 23.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 10,
+        "preisaenderung_2025_2026": {
+          "von": 21.0,
+          "auf": 23.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9026": {
+        "preis": 3.6,
+        "bezeichnung": "Stumpf 3D Druck",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9027": {
+        "preis": 21.0,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6,
+        "preisaenderung_2025_2026": {
+          "von": 19.0,
+          "auf": 21.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 7,
+        "preisaenderung_2025_2026": {
+          "von": 18.5,
+          "auf": 19.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9032": {
+        "preis": 37.0,
+        "bezeichnung": "Digitale Axiographie-Integration",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9100": {
+        "preis": 170.0,
+        "bezeichnung": "Arbeit mit SDMatrix/ Kiefergelenkanalyse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 8
+      },
+      "*9101": {
+        "preis": 700.0,
+        "bezeichnung": "Funtionelles WaxUp, OK+UK",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*9105": {
+        "preis": 30.0,
+        "bezeichnung": "Silikonschl. f. temp. Übertr./Mod.",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*E005": {
+        "preis": 30.0,
+        "bezeichnung": "Amber Mill",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*I201": {
+        "preis": 25.0,
+        "bezeichnung": "Modellanalog",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*I614": {
+        "preis": 77.0,
+        "bezeichnung": "Klebebasis Titan",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*Z100": {
+        "preis": 49.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 7,
+        "preisaenderung_2025_2026": {
+          "von": 45.0,
+          "auf": 49.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "0021": {
+        "preis": 16.97,
+        "bezeichnung": "Doublieren eines Modells",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "0120": {
+        "preis": 11.85,
+        "bezeichnung": "Mittelwertartikulator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "3822": {
+        "preis": 65.62,
+        "bezeichnung": "Sonderkunststoff",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "4010": {
+        "preis": 162.01,
+        "bezeichnung": "Aufbissbehelf m. adj. Oberfläche",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "7100": {
+        "preis": 14.63,
+        "bezeichnung": "Aufbiß",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      }
+    },
+    "Martmöller u. Kollegen": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0010": {
+        "preis": 10.79,
+        "bezeichnung": "Modell aus Hartgips",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0011": {
+        "preis": 15.73,
+        "bezeichnung": "Superhartgipsmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0012": {
+        "preis": 8.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0014": {
+        "preis": 20.0,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0201": {
+        "preis": 16.0,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 14.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0501": {
+        "preis": 60.0,
+        "bezeichnung": "Foto - und Modell Funktionsanalyse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0600": {
+        "preis": 26.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*3000": {
+        "preis": 125.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5001": {
+        "preis": 113.0,
+        "bezeichnung": "Krone/Kappe/Schale Lithium disilicate",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 125.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5502": {
+        "preis": 45.0,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 37.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 62.0,
+          "auf": 37.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5601": {
+        "preis": 57.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5602": {
+        "preis": 45.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5604": {
+        "preis": 13.0,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 11.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*E001": {
+        "preis": 30.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*E005": {
+        "preis": 30.0,
+        "bezeichnung": "Amber Mill",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*Z100": {
+        "preis": 45.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      }
+    },
+    "Paul Seemann": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 19
+      },
+      "*0010": {
+        "preis": 11.0,
+        "bezeichnung": "Modell aus Hartgips",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0011": {
+        "preis": 14.0,
+        "bezeichnung": "Superhartgipsmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*0012": {
+        "preis": 9.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 13
+      },
+      "*0014": {
+        "preis": 19.0,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0016": {
+        "preis": 12.0,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*0030": {
+        "preis": 19.1,
+        "bezeichnung": "Implantat Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0051": {
+        "preis": 20.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 15
+      },
+      "*0070": {
+        "preis": 24.0,
+        "bezeichnung": "Zahnfleischmaske, abnehmbar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0100": {
+        "preis": 21.0,
+        "bezeichnung": "Dublieren eines Modells",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*0201": {
+        "preis": 16.0,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0250": {
+        "preis": 17.0,
+        "bezeichnung": "Einstellen u. Auswerten e. Registrates",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*0301": {
+        "preis": 14.25,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 15
+      },
+      "*0500": {
+        "preis": 19.0,
+        "bezeichnung": "Zahnfarbenbestimmung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0600": {
+        "preis": 25.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 15
+      },
+      "*0850": {
+        "preis": 235.0,
+        "bezeichnung": "Adjustierte Aufbissschiene",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*0851": {
+        "preis": 16.75,
+        "bezeichnung": "Aufbiss",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*1000": {
+        "preis": 83.0,
+        "bezeichnung": "Aufwand bei Suprakonstruktion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*1010": {
+        "preis": 74.0,
+        "bezeichnung": "Klebeverbindung Titan / Lisi / Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*1011": {
+        "preis": 11.8,
+        "bezeichnung": "Modellimplantat repositionieren",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*1016": {
+        "preis": 278.0,
+        "bezeichnung": "Individuelles Zirkonabutment",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*3000": {
+        "preis": 125.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "*3002": {
+        "preis": 240.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*5003": {
+        "preis": 195.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 125.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "*5502": {
+        "preis": 45.0,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*5504": {
+        "preis": 55.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 15
+      },
+      "*5601": {
+        "preis": 57.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5602": {
+        "preis": 23.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 13
+      },
+      "*5603": {
+        "preis": 27.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 15
+      },
+      "*5604": {
+        "preis": 13.0,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 15
+      },
+      "*8000": {
+        "preis": 13.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 7
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*I200": {
+        "preis": 60.0,
+        "bezeichnung": "Abformpfosten offene Abformung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*I201": {
+        "preis": 25.0,
+        "bezeichnung": "Modellanalog",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*I221": {
+        "preis": 77.0,
+        "bezeichnung": "Camlog Titanbasis",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*Z100": {
+        "preis": 50.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 15
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "0021": {
+        "preis": 16.97,
+        "bezeichnung": "Doublieren eines Modells",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 12
+      },
+      "0120": {
+        "preis": 11.85,
+        "bezeichnung": "Mittelwertartikulator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 11
+      },
+      "4010": {
+        "preis": 162.01,
+        "bezeichnung": "Aufbissbehelf m. adj. Oberfläche",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "7100": {
+        "preis": 14.63,
+        "bezeichnung": "Aufbiß",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      }
+    },
+    "Pützfeld": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0201": {
+        "preis": 16.0,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 14.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0600": {
+        "preis": 26.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5001": {
+        "preis": 113.0,
+        "bezeichnung": "Krone/Kappe/Schale Lithium disilicate",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5003": {
+        "preis": 190.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 130.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 62.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5601": {
+        "preis": 57.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5602": {
+        "preis": 45.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5604": {
+        "preis": 13.0,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 23.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9025": {
+        "preis": 26.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9027": {
+        "preis": 20.22,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      }
+    },
+    "Röder u. Kollegen": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 15
+      },
+      "*0010": {
+        "preis": 8.45,
+        "bezeichnung": "Modell aus Hartgips",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 10.79,
+          "auf": 8.45,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0011": {
+        "preis": 15.73,
+        "bezeichnung": "Superhartgipsmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 11
+      },
+      "*0012": {
+        "preis": 11.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3,
+        "preisaenderung_2025_2026": {
+          "von": 8.0,
+          "auf": 11.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0014": {
+        "preis": 19.88,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 15.0,
+          "auf": 19.88,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0015": {
+        "preis": 42.02,
+        "bezeichnung": "Geller Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 5
+      },
+      "*0030": {
+        "preis": 27.0,
+        "bezeichnung": "Implantat Modell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6
+      },
+      "*0056": {
+        "preis": 21.35,
+        "bezeichnung": "Stumpf aus feuerfester Masse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0070": {
+        "preis": 25.0,
+        "bezeichnung": "Zahnfleischmaske, abnehmbar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6
+      },
+      "*0110": {
+        "preis": 10.11,
+        "bezeichnung": "Dublieren eines Einzelstumpfes",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0200": {
+        "preis": 15.51,
+        "bezeichnung": "Modellmontage in Mittelwertartikulator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0201": {
+        "preis": 15.69,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 13,
+        "preisaenderung_2025_2026": {
+          "von": 14.69,
+          "auf": 15.69,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0202": {
+        "preis": 11.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 12,
+        "preisaenderung_2025_2026": {
+          "von": 10.79,
+          "auf": 11.79,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0301": {
+        "preis": 4.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 15
+      },
+      "*0500": {
+        "preis": 19.0,
+        "bezeichnung": "Zahnfarbenbestimmung",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0501": {
+        "preis": 67.42,
+        "bezeichnung": "Foto - und Modell Funktionsanalyse",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0600": {
+        "preis": 20.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 14
+      },
+      "*0611": {
+        "preis": 106.74,
+        "bezeichnung": "Mock - up Schiene",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0752": {
+        "preis": 29.66,
+        "bezeichnung": "Individueller Löffel für Imp.",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*0804": {
+        "preis": 41.57,
+        "bezeichnung": "Formteil für provisorische Versorgung",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1,
+        "preisaenderung_2025_2026": {
+          "von": 91.0,
+          "auf": 41.57,
+          "jahr": "2025->2026"
+        }
+      },
+      "*0805": {
+        "preis": 93.26,
+        "bezeichnung": "Langzeitprovisorium Kst./ CAD-CAM",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*1000": {
+        "preis": 110.0,
+        "bezeichnung": "Aufwand bei Suprakonstruktion",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6
+      },
+      "*1010": {
+        "preis": 84.0,
+        "bezeichnung": "Klebeverbindung Titan / Lisi / Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6
+      },
+      "*1011": {
+        "preis": 11.8,
+        "bezeichnung": "Modellimplantat repositionieren",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6
+      },
+      "*3000": {
+        "preis": 110.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 5,
+        "preisaenderung_2025_2026": {
+          "von": 105.0,
+          "auf": 110.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*3002": {
+        "preis": 160.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4
+      },
+      "*3003": {
+        "preis": 162.92,
+        "bezeichnung": "Zirkongerüst auf Implantat",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4
+      },
+      "*5001": {
+        "preis": 109.0,
+        "bezeichnung": "Krone/Kappe/Schale Lithium disilicate",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2
+      },
+      "*5002": {
+        "preis": 190.0,
+        "bezeichnung": "Krone aus Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5003": {
+        "preis": 197.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "*5010": {
+        "preis": 144.94,
+        "bezeichnung": "Maryland, Anker gefräst, f. Klebebrücke",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5302": {
+        "preis": 225.0,
+        "bezeichnung": "Verblendschale aus Keramik / Veneer",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 125.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 10,
+        "preisaenderung_2025_2026": {
+          "von": 119.0,
+          "auf": 125.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5502": {
+        "preis": 35.0,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3,
+        "preisaenderung_2025_2026": {
+          "von": 33.43,
+          "auf": 35.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5504": {
+        "preis": 35.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 15,
+        "preisaenderung_2025_2026": {
+          "von": 31.0,
+          "auf": 35.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5509": {
+        "preis": 150.0,
+        "bezeichnung": "Indiv. Einzelzahn charakt.",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6
+      },
+      "*5602": {
+        "preis": 27.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 11,
+        "preisaenderung_2025_2026": {
+          "von": 23.0,
+          "auf": 27.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5603": {
+        "preis": 35.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 15,
+        "preisaenderung_2025_2026": {
+          "von": 34.0,
+          "auf": 35.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5604": {
+        "preis": 10.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 15,
+        "preisaenderung_2025_2026": {
+          "von": 9.5,
+          "auf": 10.5,
+          "jahr": "2025->2026"
+        }
+      },
+      "*5800": {
+        "preis": 83.15,
+        "bezeichnung": "Zahnfleisch aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*7000": {
+        "preis": 30.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop j.Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*8000": {
+        "preis": 7.17,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4,
+        "preisaenderung_2025_2026": {
+          "von": 11.0,
+          "auf": 7.17,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9022": {
+        "preis": 25.0,
+        "bezeichnung": "Digitale Artikulation",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3,
+        "preisaenderung_2025_2026": {
+          "von": 22.0,
+          "auf": 25.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "*9024": {
+        "preis": 33.71,
+        "bezeichnung": "Modell Implantat 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*9025": {
+        "preis": 24.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 8
+      },
+      "*9027": {
+        "preis": 20.22,
+        "bezeichnung": "Digitalen Stumpf designen/ drucken",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 5
+      },
+      "*9030": {
+        "preis": 19.0,
+        "bezeichnung": "Kontrollmodell 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 8
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 3
+      },
+      "*I200": {
+        "preis": 60.0,
+        "bezeichnung": "Abformpfosten offene Abformung",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4
+      },
+      "*I201": {
+        "preis": 30.0,
+        "bezeichnung": "Camlog Modellanalog",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6
+      },
+      "*I614": {
+        "preis": 87.0,
+        "bezeichnung": "Klebebasis Titan",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 6
+      },
+      "*I615": {
+        "preis": 312.0,
+        "bezeichnung": "Klebebasis Ceralog Camlog",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*I616": {
+        "preis": 66.3,
+        "bezeichnung": "Ceralog Laboranalog u. Laborschraube",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*Z100": {
+        "preis": 48.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 12,
+        "preisaenderung_2025_2026": {
+          "von": 45.0,
+          "auf": 48.0,
+          "jahr": "2025->2026"
+        }
+      },
+      "0010": {
+        "preis": 8.45,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 7,
+        "preisaenderung_2025_2026": {
+          "von": 8.06,
+          "auf": 8.45,
+          "jahr": "2025->2026"
+        }
+      },
+      "0021": {
+        "preis": 17.78,
+        "bezeichnung": "Doublieren eines Modells",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 16.97,
+          "auf": 17.78,
+          "jahr": "2025->2026"
+        }
+      },
+      "0051": {
+        "preis": 19.88,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 4,
+        "preisaenderung_2025_2026": {
+          "von": 18.98,
+          "auf": 19.88,
+          "jahr": "2025->2026"
+        }
+      },
+      "0120": {
+        "preis": 12.42,
+        "bezeichnung": "Mittelwertartikulator",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 11.85,
+          "auf": 12.42,
+          "jahr": "2025->2026"
+        }
+      },
+      "4010": {
+        "preis": 169.75,
+        "bezeichnung": "Aufbissbehelf m. adj. Oberfläche",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 162.01,
+          "auf": 169.75,
+          "jahr": "2025->2026"
+        }
+      },
+      "7100": {
+        "preis": 15.33,
+        "bezeichnung": "Aufbiß",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 2,
+        "preisaenderung_2025_2026": {
+          "von": 14.63,
+          "auf": 15.33,
+          "jahr": "2025->2026"
+        }
+      },
+      "9024": {
+        "preis": 33.71,
+        "bezeichnung": "Modell Implantat 3d Print",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 1
+      },
+      "9330": {
+        "preis": 7.17,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2026",
+        "anzahl_belege": 13,
+        "preisaenderung_2025_2026": {
+          "von": 6.84,
+          "auf": 7.17,
+          "jahr": "2025->2026"
+        }
+      }
+    },
+    "Wojahn Zahnmedizin": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 8
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "*0201": {
+        "preis": 14.69,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 15
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 8
+      },
+      "*0250": {
+        "preis": 19.1,
+        "bezeichnung": "Einstellen u. Auswerten e. Registrates",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0301": {
+        "preis": 4.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*0500": {
+        "preis": 19.0,
+        "bezeichnung": "Zahnfarbenbestimmung",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0600": {
+        "preis": 20.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0850": {
+        "preis": 264.05,
+        "bezeichnung": "Adjustierte Aufbissschiene",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0851": {
+        "preis": 16.74,
+        "bezeichnung": "Aufbiss",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*3000": {
+        "preis": 105.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*3002": {
+        "preis": 160.0,
+        "bezeichnung": "Zirkonkr./ Br.-Glied vollanatomisch",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5001": {
+        "preis": 109.0,
+        "bezeichnung": "Krone/Kappe/Schale Lithium disilicate",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5003": {
+        "preis": 197.0,
+        "bezeichnung": "Teilkrone/Onlay Presskeramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5010": {
+        "preis": 144.94,
+        "bezeichnung": "Maryland, Anker gefräst, f. Klebebrücke",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 119.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5502": {
+        "preis": 33.43,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 31.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*5509": {
+        "preis": 84.27,
+        "bezeichnung": "Indiv. Einzelzahn charakt.",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5601": {
+        "preis": 56.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*5602": {
+        "preis": 23.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 4
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "*5604": {
+        "preis": 9.5,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 6
+      },
+      "*7000": {
+        "preis": 30.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop j.Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*8000": {
+        "preis": 11.0,
+        "bezeichnung": "Versand, je Versandgang",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*9025": {
+        "preis": 24.0,
+        "bezeichnung": "Modell 3d Print",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 10
+      },
+      "*E001": {
+        "preis": 25.0,
+        "bezeichnung": "e-max Presspellet, je Teil",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*Z100": {
+        "preis": 45.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "0021": {
+        "preis": 16.97,
+        "bezeichnung": "Doublieren eines Modells",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 8
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 5
+      },
+      "0120": {
+        "preis": 11.85,
+        "bezeichnung": "Mittelwertartikulator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 8
+      },
+      "4010": {
+        "preis": 162.01,
+        "bezeichnung": "Aufbissbehelf m. adj. Oberfläche",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 8
+      },
+      "7100": {
+        "preis": 14.63,
+        "bezeichnung": "Aufbiß",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 8
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 13
+      }
+    },
+    "Zahnärzte am Königsplatz": {
+      "*0001": {
+        "preis": 4.83,
+        "bezeichnung": "Eingang/Ausgang Desinfektion",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0012": {
+        "preis": 8.0,
+        "bezeichnung": "Kontrollmodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0016": {
+        "preis": 9.38,
+        "bezeichnung": "Split-Cast Sockel an Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*0051": {
+        "preis": 25.0,
+        "bezeichnung": "Stumpf säg. unter Mik., vorb. inkl. Pin",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0201": {
+        "preis": 16.0,
+        "bezeichnung": "Montage nach Gesichtsbogen",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0202": {
+        "preis": 10.79,
+        "bezeichnung": "Montage eines Gegenkiefermodelles",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*0301": {
+        "preis": 14.5,
+        "bezeichnung": "Selektives Einschleifen Modellpaar",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*0600": {
+        "preis": 26.0,
+        "bezeichnung": "Wax - up diagnostisch, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*3000": {
+        "preis": 125.0,
+        "bezeichnung": "Krone/Brückenglied gefräst aus Zirkon",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5500": {
+        "preis": 125.0,
+        "bezeichnung": "Mehrflächige Verblendung Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5502": {
+        "preis": 45.0,
+        "bezeichnung": "Wurzelpontic aus Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 1
+      },
+      "*5504": {
+        "preis": 37.0,
+        "bezeichnung": "Indiv. charakt. Keramik",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5601": {
+        "preis": 57.0,
+        "bezeichnung": "Frontzahn. n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5602": {
+        "preis": 33.0,
+        "bezeichnung": "Kaufläche n. gnathologischen Kriterien",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "*5603": {
+        "preis": 34.0,
+        "bezeichnung": "Arbeiten unter Stereomikroskop, je Zahn",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*5604": {
+        "preis": 13.0,
+        "bezeichnung": "Aufpassen auf Zweitmodell, je Krone",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "*Z100": {
+        "preis": 45.0,
+        "bezeichnung": "Zirkonrohling, je Einheit",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "0010": {
+        "preis": 8.06,
+        "bezeichnung": "Modell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "0051": {
+        "preis": 18.98,
+        "bezeichnung": "Sägemodell",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      },
+      "0120": {
+        "preis": 11.85,
+        "bezeichnung": "Mittelwertartikulator",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 2
+      },
+      "9330": {
+        "preis": 6.84,
+        "bezeichnung": "Versandkosten",
+        "quelle_jahr": "2025",
+        "anzahl_belege": 3
+      }
+    }
+  },
+  "sonderfaelle": {
+    "Berns Dentaltechnik": {
+      "grund": "Fremdlabor",
+      "rechnungen": 10,
+      "umsatz": 8603.7,
+      "preisliste": {
+        "*5030": {
+          "preis": 50.0,
+          "bezeichnung": "Lithium Desilicate fräsen"
+        },
+        "*Z100": {
+          "preis": 35.0,
+          "bezeichnung": "Zirkonrohling, je Einheit"
+        }
+      }
+    },
+    "Clinic Drohomyretska": {
+      "grund": "Sonderkonditionen",
+      "rechnungen": 4,
+      "umsatz": 14980.0,
+      "preisliste": {
+        "*8000": {
+          "preis": 60.0,
+          "bezeichnung": "Versand, je Versandgang"
+        },
+        "*9007": {
+          "preis": 8.32,
+          "bezeichnung": "Krone Zirkon, je Zahn 640,00"
+        },
+        "*9008": {
+          "preis": 900.0,
+          "bezeichnung": "Implantatkrone , je Zahn, (dig. Konst.)"
+        },
+        "0622": {
+          "preis": 100.0,
+          "bezeichnung": "Digitale Konstruktion, je Stunde"
+        }
+      }
+    },
+    "Kostas Papadopoulos": {
+      "grund": "Sonderkonditionen",
+      "rechnungen": 1,
+      "umsatz": 750.0,
+      "preisliste": {
+        "*8000": {
+          "preis": 100.0,
+          "bezeichnung": "Versand, je Versandgang"
+        },
+        "9004": {
+          "preis": 650.0,
+          "bezeichnung": "e.max Krone geschichtet, je Zahn"
+        }
+      }
+    },
+    "Omar Gazaev": {
+      "grund": "Komplettpreise",
+      "rechnungen": 5,
+      "umsatz": 44212.0,
+      "preisliste": {
+        "*0001": {
+          "preis": 47.0,
+          "bezeichnung": "Sonstiges"
+        },
+        "*9100": {
+          "preis": 170.0,
+          "bezeichnung": "Arbeit mit SDMatrix/ Kiefergelenkanalyse"
+        },
+        "*9101": {
+          "preis": 700.0,
+          "bezeichnung": "Funtionelles WaxUp, OK+UK"
+        },
+        "*9998": {
+          "preis": 3.3,
+          "bezeichnung": "Beratung/ Planung/ Online (Skype) 275,00"
+        },
+        "*9999": {
+          "preis": 50.0,
+          "bezeichnung": "Zeiteinheit ZTM, je 30 Min."
+        }
+      }
+    },
+    "Smile Atelier": {
+      "grund": "Sonderkonditionen",
+      "rechnungen": 2,
+      "umsatz": 490.0,
+      "preisliste": {
+        "*9100": {
+          "preis": 170.0,
+          "bezeichnung": "Arbeit mit SDMatrix/ Kiefergelenkanalyse"
+        },
+        "*9102": {
+          "preis": 150.0,
+          "bezeichnung": "Schiene repositio-/distrakt. Digital"
+        }
+      }
+    },
+    "Zaharenko Dental": {
+      "grund": "Sonderkonditionen",
+      "rechnungen": 1,
+      "umsatz": 870.0,
+      "preisliste": {
+        "*9100": {
+          "preis": 170.0,
+          "bezeichnung": "Arbeit mit SDMatrix/ Kiefergelenkanalyse"
+        },
+        "*9101": {
+          "preis": 700.0,
+          "bezeichnung": "Funtionelles WaxUp, OK+UK"
+        }
+      }
+    }
+  },
+  "einmal_praxen": {
+    "hinweis": "Nur 1 Rechnung - zu wenig Daten, Preise trotzdem gespeichert",
+    "praxen": {
+      "Decker Dent": {
+        "*0001": 4.83,
+        "*020": 16.51,
+        "*0611": 106.74,
+        "*5601": 56.0,
+        "*5602": 23.0,
+        "*8000": 11.0,
+        "*9022": 22.0,
+        "*9025": 24.0
+      },
+      "Dr. Martin Schlee und Kollegen": {
+        "*0001": 4.83,
+        "*0012": 8.0,
+        "*0016": 9.38,
+        "*0051": 25.0,
+        "*0201": 14.69,
+        "*0202": 10.79,
+        "*0301": 14.5,
+        "*0501": 67.42,
+        "*0600": 23.0,
+        "*3000": 105.0,
+        "*5500": 115.0,
+        "*5502": 33.43,
+        "*5504": 54.0,
+        "*5601": 56.0,
+        "*5603": 34.0,
+        "*5604": 9.5,
+        "*Z100": 40.0,
+        "0010": 8.06,
+        "0051": 18.98,
+        "9330": 6.84
+      },
+      "Dr. Stefan Neumeyer & Partner": {
+        "*0900": 14.0,
+        "*8000": 12.0
+      },
+      "Edelweiss": {
+        "*0001": 4.3,
+        "*0015": 37.4,
+        "*0016": 8.35,
+        "*0051": 20.0,
+        "*0056": 19.0,
+        "*0110": 9.0,
+        "*0201": 13.08,
+        "*0202": 9.6,
+        "*0301": 14.25,
+        "*0600": 26.0,
+        "*5504": 63.0,
+        "*5601": 61.0,
+        "*5603": 34.0,
+        "*5604": 9.5,
+        "*8000": 23.0
+      },
+      "Heukelbach": {
+        "*0001": 4.83,
+        "*0301": 14.5,
+        "*0600": 23.0,
+        "*3000": 105.0,
+        "*5500": 115.0,
+        "*5504": 62.0,
+        "*5509": 84.27,
+        "*5601": 56.0,
+        "*5603": 34.0,
+        "*5604": 9.5,
+        "*8000": 9.0,
+        "*9022": 22.0,
+        "*9025": 26.0,
+        "*9027": 20.22,
+        "*9030": 19.0,
+        "*Z100": 80.0
+      },
+      "Pützfeld": {
+        "*0001": 4.83,
+        "*0201": 16.0,
+        "*0202": 10.79,
+        "*0301": 14.5,
+        "*0600": 26.0,
+        "*5001": 113.0,
+        "*5003": 190.0,
+        "*5500": 130.0,
+        "*5504": 62.0,
+        "*5601": 57.0,
+        "*5602": 45.0,
+        "*5603": 34.0,
+        "*5604": 13.0,
+        "*8000": 23.0,
+        "*9025": 26.0,
+        "*9027": 20.22,
+        "*9030": 19.0,
+        "*E001": 25.0
+      }
+    }
+  }
+}
