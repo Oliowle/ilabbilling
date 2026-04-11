@@ -580,6 +580,7 @@
             arbeitsart: '',
             selectedTeeth: new Set(),
             selectedKuerzel: null,
+            toothKuerzel: {},
             positions: [],
             korrektionen: [],
             lernregeln: [],
@@ -1950,6 +1951,13 @@
         // Track per-tooth status: { 14: { I: true, G: false, V: false, S: true }, ... }
         const toothStatus = {};
 
+        const KUERZEL_COLORS = {
+            ZK:'#3b82f6', ZKV:'#2563eb', ZBR:'#f59e0b', PK:'#8b5cf6', EMX:'#ec4899',
+            SKM:'#14b8a6', SCH:'#6b7280', VEN:'#06b6d4', INL:'#84cc16', TKR:'#f97316',
+            LZP:'#a855f7', MOCK:'#64748b', SMIL:'#e11d48', ZKAP:'#0ea5e9',
+            SCHS:'#78716c', MINI:'#a3a3a3', JIG:'#737373', MBR:'#d97706',
+        };
+
         function generateTeethSchema() {
             const toothNumbers = {
                 'upper-left': [18, 17, 16, 15, 14, 13, 12, 11],
@@ -1968,7 +1976,6 @@
                     const col = document.createElement('div');
                     col.className = 'tooth-col';
 
-                    // Status buttons (I, G, V, S)
                     statusTypes.forEach(type => {
                         const sb = document.createElement('div');
                         sb.className = 'tooth-status-btn';
@@ -1982,7 +1989,6 @@
                         col.appendChild(sb);
                     });
 
-                    // Tooth number button
                     const numBtn = document.createElement('div');
                     numBtn.className = 'tooth-num';
                     numBtn.textContent = num;
@@ -1990,8 +1996,32 @@
                     numBtn.onclick = () => toggleTooth(num);
                     col.appendChild(numBtn);
 
+                    const label = document.createElement('div');
+                    label.id = `tooth-label-${num}`;
+                    label.style.cssText = 'font-size:9px;font-weight:700;text-align:center;min-height:14px;margin-top:2px;border-radius:3px;padding:0 2px;';
+                    col.appendChild(label);
+
                     container.appendChild(col);
                 });
+            }
+        }
+
+        function updateToothLabels() {
+            for (const [tooth, code] of Object.entries(state.toothKuerzel)) {
+                const label = document.getElementById(`tooth-label-${tooth}`);
+                if (!label) continue;
+                const color = KUERZEL_COLORS[code] || '#6b7280';
+                label.textContent = code;
+                label.style.color = '#fff';
+                label.style.backgroundColor = color;
+            }
+            updateArbeitsartFromTeeth();
+        }
+
+        function updateArbeitsartFromTeeth() {
+            const arbeitsart = buildArbeitsart();
+            if (arbeitsart) {
+                document.getElementById('input-arbeitsart').value = arbeitsart;
             }
         }
 
@@ -2018,12 +2048,15 @@
             if (state.selectedTeeth.has(num)) {
                 state.selectedTeeth.delete(num);
                 numBtn.classList.remove('selected', 'has-work');
-                // Clear all status indicators
                 ['I','G','V','S'].forEach(type => {
                     toothStatus[num][type] = false;
                     const sb = document.querySelector(`.tooth-status-btn[data-tooth="${num}"][data-type="${type}"]`);
                     if (sb) sb.classList.remove(`active-${type}`);
                 });
+                delete state.toothKuerzel[num];
+                const label = document.getElementById(`tooth-label-${num}`);
+                if (label) { label.textContent = ''; label.style.backgroundColor = ''; }
+                updateArbeitsartFromTeeth();
             } else {
                 state.selectedTeeth.add(num);
                 numBtn.classList.add('selected');
@@ -2054,21 +2087,44 @@
             document.querySelectorAll('.kuerzel-card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
 
-            const teethRequired = ['ZK', 'ZKV', 'ZBR', 'SKM', 'PK', 'EMX', 'EMXI', 'VEN', 'INL', 'LZP'];
+            const teethRequired = ['ZK', 'ZKV', 'ZBR', 'SKM', 'PK', 'EMX', 'EMXI', 'VEN', 'INL', 'LZP', 'TKR', 'ZKAP', 'MBR'];
             if (teethRequired.includes(code) && state.selectedTeeth.size === 0) {
                 showToast('Mindestens einen Zahn auswählen');
                 return;
             }
 
             state.selectedKuerzel = code;
+
+            if (state.selectedTeeth.size > 0) {
+                state.selectedTeeth.forEach(tooth => {
+                    state.toothKuerzel[tooth] = code;
+                });
+                updateToothLabels();
+            }
+
             renderPositions();
         }
 
         function buildArbeitsart() {
-            const teeth = Array.from(state.selectedTeeth).sort((a, b) => a - b);
-            const code = state.selectedKuerzel || '';
-            if (!code) return '';
-            return teeth.length > 0 ? `${teeth.join(',')} ${code}` : code;
+            const kuerzelToTeeth = {};
+            for (const [tooth, code] of Object.entries(state.toothKuerzel)) {
+                if (!kuerzelToTeeth[code]) kuerzelToTeeth[code] = [];
+                kuerzelToTeeth[code].push(parseInt(tooth));
+            }
+
+            if (Object.keys(kuerzelToTeeth).length === 0) {
+                const code = state.selectedKuerzel || '';
+                if (!code) return '';
+                const teeth = Array.from(state.selectedTeeth).sort((a, b) => a - b);
+                return teeth.length > 0 ? `${teeth.join(',')} ${code}` : code;
+            }
+
+            const parts = [];
+            for (const [code, teeth] of Object.entries(kuerzelToTeeth)) {
+                const sorted = teeth.sort((a, b) => a - b);
+                parts.push(`${sorted.join(',')} ${code}`);
+            }
+            return parts.join('; ');
         }
 
         function getPraxisName() {
@@ -2535,6 +2591,7 @@
         function resetKVA() {
             state.selectedTeeth.clear();
             state.selectedKuerzel = null;
+            state.toothKuerzel = {};
             state.positions = [];
             state.korrektionen = [];
             activePositionIdx = null;
@@ -2544,6 +2601,9 @@
             document.querySelectorAll('.tooth-num').forEach(b => b.classList.remove('selected', 'has-work'));
             document.querySelectorAll('.tooth-status-btn').forEach(b => {
                 b.classList.remove('active-I', 'active-G', 'active-V', 'active-S');
+            });
+            document.querySelectorAll('[id^="tooth-label-"]').forEach(l => {
+                l.textContent = ''; l.style.backgroundColor = '';
             });
             Object.keys(toothStatus).forEach(num => {
                 toothStatus[num] = { I: false, G: false, V: false, S: false };
