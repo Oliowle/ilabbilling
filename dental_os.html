@@ -2051,11 +2051,9 @@
         }
 
         function selectKuerzel(code, element) {
-            // Remove previous active
             document.querySelectorAll('.kuerzel-card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
 
-            // Check if teeth required
             const teethRequired = ['ZK', 'ZKV', 'ZBR', 'SKM', 'PK', 'EMX', 'EMXI', 'VEN', 'INL', 'LZP'];
             if (teethRequired.includes(code) && state.selectedTeeth.size === 0) {
                 showToast('Mindestens einen Zahn auswählen');
@@ -2064,6 +2062,58 @@
 
             state.selectedKuerzel = code;
             renderPositions();
+        }
+
+        function buildArbeitsart() {
+            const teeth = Array.from(state.selectedTeeth).sort((a, b) => a - b);
+            const code = state.selectedKuerzel || '';
+            if (!code) return '';
+            return teeth.length > 0 ? `${teeth.join(',')} ${code}` : code;
+        }
+
+        function getPraxisName() {
+            const code = document.getElementById('select-praxis').value;
+            const praxis = PRAXEN.find(p => p.code === code);
+            return praxis ? praxis.name : '';
+        }
+
+        async function resolveFromAPI(arbeitsart, praxisName, kasse, gb) {
+            try {
+                const apiBase = location.protocol === 'file:' ? 'http://localhost:8000' : '/billing';
+                const resp = await fetch(`${apiBase}/api/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        arbeitsart,
+                        praxis: praxisName || null,
+                        kasse,
+                        gesichtsbogen: gb,
+                        abdruck: true,
+                    }),
+                });
+                if (!resp.ok) throw new Error(`API ${resp.status}`);
+                const data = await resp.json();
+
+                return data.positionen.map(p => {
+                    const nr = p.nummer.replace(/^\*/, '');
+                    const posInfo = POSITIONEN.find(x => x.nr === nr);
+                    return {
+                        nummer: nr,
+                        bezeichnung: posInfo ? posInfo.bez : nr,
+                        menge: p.menge,
+                        einzelpreis: p.preis || (posInfo ? posInfo.preise[0] : 0),
+                        kategorie: posInfo ? posInfo.kat : 'leistung',
+                        source: 'api',
+                        korrigiert: false,
+                        entfernt: false,
+                        reason: [`via Abrechnungsintelligenz (${data.praxis_norm || 'Standard'})`],
+                        ist_pflicht: p.ist_pflicht,
+                    };
+                });
+            } catch (err) {
+                console.warn('API fallback to local resolve:', err.message);
+                return null;
+            }
         }
 
         function updateCalcType() {
@@ -2076,7 +2126,7 @@
 
         let activePositionIdx = null;
 
-        function renderPositions() {
+        async function renderPositions() {
             if (!state.selectedKuerzel) {
                 document.getElementById('positions-list').innerHTML = `
                     <div class="p-6 text-center text-slate-500 text-sm">
@@ -2094,9 +2144,11 @@
             const zaehne = Math.max(state.selectedTeeth.size, 1);
             const praxisCode = document.getElementById('select-praxis').value;
 
-            // Only re-resolve if no manual edits yet
             if (state.korrektionen.length === 0) {
-                state.positions = resolve(state.selectedKuerzel, zaehne, kasse, gb, praxisCode);
+                const arbeitsart = buildArbeitsart();
+                const praxisName = getPraxisName();
+                const apiResult = await resolveFromAPI(arbeitsart, praxisName, kasse, gb);
+                state.positions = apiResult || resolve(state.selectedKuerzel, zaehne, kasse, gb, praxisCode);
             }
 
             const list = document.getElementById('positions-list');
