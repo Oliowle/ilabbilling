@@ -2455,7 +2455,7 @@
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
 
-            sendCorrectionToAPI(null, pos.nummer.startsWith('*') ? pos.nummer : `*${pos.nummer}`, 'menge_aendern', newQty, oldQty, `Menge ${oldQty} → ${newQty}`);
+            sendCorrectionToAPI(null, pos.nummer, 'menge_aendern', newQty, oldQty, `Menge ${oldQty} → ${newQty}`);
             document.getElementById(`qty-display-${idx}`).textContent = newQty;
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
             updateTotals();
@@ -2476,7 +2476,7 @@
                 notiz: pos.notiz || '',
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
-            sendCorrectionToAPI(null, pos.nummer.startsWith('*') ? pos.nummer : `*${pos.nummer}`, 'menge_aendern', pos.menge, oldQty, `Menge ${oldQty} → ${pos.menge}`);
+            sendCorrectionToAPI(null, pos.nummer, 'menge_aendern', pos.menge, oldQty, `Menge ${oldQty} → ${pos.menge}`);
             updateTotals();
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
         }
@@ -2492,7 +2492,7 @@
                 notiz: pos.notiz || '',
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
-            sendCorrectionToAPI(null, pos.nummer.startsWith('*') ? pos.nummer : `*${pos.nummer}`, 'entfernen', null, null, `Position ${pos.nummer} entfernt`);
+            sendCorrectionToAPI(null, pos.nummer, 'entfernen', null, null, `Position ${pos.nummer} entfernt`);
             activePositionIdx = null;
             renderPositions();
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
