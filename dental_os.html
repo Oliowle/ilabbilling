@@ -2401,6 +2401,28 @@
             }
         }
 
+        function sendCorrectionToAPI(kuerzel, position, aktion, neuerWert, alterWert, erklaerung) {
+            const praxisName = getPraxisName();
+            const kasse = state.versicherung === 'kasse';
+            const apiBase = location.protocol === 'file:' ? 'http://localhost:8000' : '/billing';
+            fetch(`${apiBase}/api/korrektur`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    kuerzel: kuerzel || state.selectedKuerzel || Object.values(state.toothKuerzel)[0] || '',
+                    position,
+                    aktion,
+                    neuer_wert: neuerWert,
+                    alter_wert: alterWert,
+                    praxis: praxisName || null,
+                    kasse: kasse || null,
+                    erklaerung,
+                }),
+            }).then(r => r.json()).then(d => {
+                if (d.status === 'ok') console.log('Korrektur gespeichert:', d.korrektur?.id);
+            }).catch(e => console.warn('Korrektur-API Fehler:', e));
+        }
+
         function adjustQty(idx, delta) {
             const pos = state.positions[idx];
             const oldQty = pos.menge;
@@ -2421,6 +2443,7 @@
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
 
+            sendCorrectionToAPI(null, pos.nummer.startsWith('*') ? pos.nummer : `*${pos.nummer}`, 'menge_aendern', newQty, oldQty, `Menge ${oldQty} → ${newQty}`);
             document.getElementById(`qty-display-${idx}`).textContent = newQty;
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
             updateTotals();
@@ -2441,6 +2464,7 @@
                 notiz: pos.notiz || '',
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
+            sendCorrectionToAPI(null, pos.nummer.startsWith('*') ? pos.nummer : `*${pos.nummer}`, 'menge_aendern', pos.menge, oldQty, `Menge ${oldQty} → ${pos.menge}`);
             updateTotals();
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
         }
@@ -2456,6 +2480,7 @@
                 notiz: pos.notiz || '',
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
+            sendCorrectionToAPI(null, pos.nummer.startsWith('*') ? pos.nummer : `*${pos.nummer}`, 'entfernen', null, null, `Position ${pos.nummer} entfernt`);
             activePositionIdx = null;
             renderPositions();
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
