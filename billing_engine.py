@@ -324,7 +324,6 @@ KUERZEL_POS = [
     ("ZBR", "*8000", 0, 2, "fix", None),
     ("ZBR", "*9022", 0, 1, "fix", None),
     ("ZBR", "*9025", 0, 2, "fix", None),
-    ("ZBR", "*9027", 0, 1, "pro_zahn", None),
     ("ZBR", "*0201", 0, 1, "fix", None),
     ("ZBR", "*0202", 0, 1, "fix", None),
 
