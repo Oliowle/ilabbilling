@@ -1184,7 +1184,7 @@
             // Revenue
             const totalRevenue = state.allKVAs.reduce((s, k) => s + (k.gesamtbetrag || 0), 0);
 
-            return { total, korrekt, korrigiert, stark, trefferquote, errorTypes, posCorrectionCount, byKuerzel, byPraxis, totalRevenue, allKorrektionen };
+            return { total, korrekt, korrigiert, stark, trefferquote, errorTypes, posCorrectionCount, byKuerzel, byPraxis, totalRevenue, allKorrektionen: allKorrektionen.length };
         }
 
         function renderDashboard() {
@@ -2088,6 +2088,7 @@
             }
             updateTeethCount();
             updateSelectionBadge();
+            if (Object.keys(state.toothKuerzel).length > 0) renderPositions();
         }
 
         function selectToothRange(from, to) {
@@ -2264,7 +2265,8 @@
 
         async function renderPositions() {
             const hasAssignments = Object.keys(state.toothKuerzel).length > 0;
-            if (!state.selectedKuerzel && !hasAssignments) {
+            const hasPositions = state.positions.length > 0;
+            if (!state.selectedKuerzel && !hasAssignments && !hasPositions) {
                 document.getElementById('positions-list').innerHTML = `
                     <div class="p-6 text-center text-slate-500 text-sm">
                         <p><i class="fas fa-inbox w-6 h-6 mx-auto mb-2 opacity-50"></i></p>
@@ -2533,10 +2535,10 @@
                 id: Date.now(),
                 posNr: pos.nummer,
                 posBez: pos.bezeichnung,
-                kuerzel: state.selectedKuerzel,
+                kuerzel: state.selectedKuerzel || Object.values(state.toothKuerzel)[0] || '',
                 praxis: document.getElementById('select-praxis').value,
                 versicherung: state.versicherung,
-                typ: typeEl.value,
+                typ: typeEl ? typeEl.value : 'info',
                 text: textEl.value.trim(),
                 timestamp: new Date().toISOString(),
                 timestampDisplay: new Date().toLocaleTimeString('de-DE')
@@ -2635,11 +2637,12 @@
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
 
+            sendCorrectionToAPI(null, pos.nr, 'hinzufuegen', qty, null, `Position ${pos.nr} manuell hinzugefügt (Menge ${qty})`);
             document.getElementById('select-manual-pos').value = '';
             document.getElementById('input-manual-qty').value = '1';
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
             renderPositions();
-            showToast(`${pos.nr} hinzugefügt`);
+            showToast(`${pos.nr} hinzugefügt (${qty}×)`);
         }
 
         function updateKorrekturLog() {
@@ -2701,8 +2704,13 @@
             state.positions = [];
             state.korrektionen = [];
             activePositionIdx = null;
+            state.lernregeln = [];
             document.getElementById('input-patient').value = '';
             document.getElementById('input-arbeitsart').value = '';
+            document.getElementById('select-praxis').value = '';
+            document.getElementById('select-versicherung').value = 'privat';
+            document.getElementById('select-workflow').value = 'scan';
+            document.getElementById('select-gesichtsbogen').value = 'ohne';
             document.querySelectorAll('.kuerzel-card').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tooth-num').forEach(b => b.classList.remove('selected', 'has-work'));
             document.querySelectorAll('.tooth-status-btn').forEach(b => {
@@ -2722,8 +2730,9 @@
         }
 
         function saveKVA() {
-            if (!state.selectedKuerzel) {
-                showToast('Kein Kürzel ausgewählt');
+            const hasAssignments = Object.keys(state.toothKuerzel).length > 0;
+            if (!state.selectedKuerzel && !hasAssignments && state.positions.length === 0) {
+                showToast('Keine Positionen vorhanden');
                 return;
             }
 
