@@ -419,6 +419,9 @@ FIX_POSITIONEN = {
     "9330", "0120", "0010", "0021", "4010", "7100",
 }
 
+ANALOG_POSITIONEN = {"*0010", "*0051", "*0200", "*0201", "*0202", "*0301"}
+DIGITAL_POSITIONEN = {"*9022", "*9025", "*9027", "*9030"}
+
 # Alle bekannten Kürzel
 KNOWN_KUERZEL = set(KPOS_INDEX.keys())
 
@@ -637,6 +640,10 @@ def resolve_positionen(
             continue
         if bedingung == "kein_gb_privat" and (gesichtsbogen or kasse):
             continue
+        if pos in ANALOG_POSITIONEN and not abdruck:
+            continue
+        if pos in DIGITAL_POSITIONEN and abdruck:
+            continue
 
         # Menge berechnen
         if formel == "pro_zahn":
@@ -648,6 +655,10 @@ def resolve_positionen(
 
         # Desinfektion: Abdruck = 2x, Scan = 1x
         if pos == "*0001":
+            menge = 2 if abdruck else 1
+
+        # Versand: Abdruck = 2x, Scan = 1x
+        if pos == "*8000":
             menge = 2 if abdruck else 1
 
         if menge > 0:
