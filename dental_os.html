@@ -2145,16 +2145,14 @@
             element.classList.add('active');
 
             const teethRequired = ['ZK', 'ZKV', 'ZBR', 'SKM', 'PK', 'EMX', 'EMXI', 'VEN', 'INL', 'LZP', 'TKR', 'ZKAP', 'MBR'];
-            const unassigned = Array.from(state.selectedTeeth).filter(t => !state.toothKuerzel[t]);
-
-            if (teethRequired.includes(code) && unassigned.length === 0 && state.selectedTeeth.size === 0) {
+            if (teethRequired.includes(code) && state.selectedTeeth.size === 0) {
                 showToast('Mindestens einen Zahn auswählen');
                 return;
             }
 
             state.selectedKuerzel = code;
 
-            const teethToAssign = unassigned.length > 0 ? unassigned : Array.from(state.selectedTeeth);
+            const teethToAssign = Array.from(state.selectedTeeth);
             if (teethToAssign.length > 0) {
                 teethToAssign.forEach(tooth => {
                     state.toothKuerzel[tooth] = code;
