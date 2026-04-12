@@ -297,8 +297,16 @@
                                     <option value="kasse">Kasse</option>
                                 </select>
                             </div>
-                            <!-- Gesichtsbogen (3 cols) -->
-                            <div class="col-span-3">
+                            <!-- Workflow (2 cols) -->
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Workflow</label>
+                                <select id="select-workflow" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="scan">Scan (digital)</option>
+                                    <option value="abdruck">Abdruck (analog)</option>
+                                </select>
+                            </div>
+                            <!-- Gesichtsbogen (2 cols) -->
+                            <div class="col-span-2">
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Gesichtsbogen</label>
                                 <select id="select-gesichtsbogen" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="ohne">Ohne</option>
@@ -1941,6 +1949,7 @@
             // Event listeners
             document.getElementById('select-versicherung').addEventListener('change', updateCalcType);
             document.getElementById('select-gesichtsbogen').addEventListener('change', renderPositions);
+            document.getElementById('select-workflow').addEventListener('change', renderPositions);
 
             // Search listeners
             document.getElementById('alle-kvas-search')?.addEventListener('keyup', renderAlleKVAs);
@@ -2203,6 +2212,7 @@
 
         async function resolveFromAPI(arbeitsart, praxisName, kasse, gb) {
             try {
+                const abdruck = document.getElementById('select-workflow').value === 'abdruck';
                 const apiBase = location.protocol === 'file:' ? 'http://localhost:8000' : '/billing';
                 const resp = await fetch(`${apiBase}/api/generate`, {
                     method: 'POST',
@@ -2212,7 +2222,7 @@
                         praxis: praxisName || null,
                         kasse,
                         gesichtsbogen: gb,
-                        abdruck: true,
+                        abdruck,
                     }),
                 });
                 if (!resp.ok) throw new Error(`API ${resp.status}`);
@@ -2243,7 +2253,9 @@
         function updateCalcType() {
             state.versicherung = document.getElementById('select-versicherung').value;
             const kasse = state.versicherung === 'kasse';
-            const label = kasse ? 'Kasse / BEL' : 'Privat / BEB';
+            const workflow = document.getElementById('select-workflow').value;
+            const wfLabel = workflow === 'abdruck' ? 'Abdruck' : 'Scan';
+            const label = `${kasse ? 'Kasse / BEL' : 'Privat / BEB'} · ${wfLabel}`;
             document.getElementById('calc-type').textContent = label;
             if (state.selectedKuerzel || Object.keys(state.toothKuerzel).length > 0) renderPositions();
         }
