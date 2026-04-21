@@ -23,6 +23,7 @@ Starten:
 
 import os
 import json
+from datetime import datetime
 from typing import Optional, List
 from pathlib import Path
 
@@ -39,6 +40,7 @@ BASE_DIR = Path(__file__).parent
 HTML_FILE = BASE_DIR / "dental_os.html"
 PRICES_FILE = BASE_DIR / "abrechnungslogik_preisgruppen.json"
 KORREKTUREN_FILE = BASE_DIR / "data" / "korrekturen.json"
+HEALTH_HISTORY_FILE = BASE_DIR / "data" / "health_history.json"
 
 os.makedirs(BASE_DIR / "data", exist_ok=True)
 
@@ -277,6 +279,18 @@ def api_health():
     else:
         status = "critical"
 
+    history = _load_health_history()
+    trend_7days = [h.get("match_rate") for h in history[-7:]]
+    last_rate = history[-1]["match_rate"] if history else None
+    alert = bool(last_rate is not None and rate < last_rate - 5.0)
+
+    _append_health_history({
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "match_rate": rate,
+        "status": status,
+        "korrekturen_aktiv": len(learning_store.list_active()),
+    })
+
     return {
         "status": status,
         "match_rate": rate,
@@ -287,6 +301,46 @@ def api_health():
         "korrekturen_aktiv": len(learning_store.list_active()),
         "praxen_geladen": len(price_loader.list_praxen()),
         "kuerzel_bekannt": len(KNOWN_KUERZEL),
+        "trend_7days": trend_7days,
+        "alert": alert,
+        "alert_reason": (
+            f"Match-Rate gefallen von {last_rate}% auf {rate}%" if alert else None
+        ),
+    }
+
+
+def _load_health_history() -> List[dict]:
+    """Lädt die History-Liste (max. 100 Einträge)."""
+    if not HEALTH_HISTORY_FILE.exists():
+        return []
+    try:
+        return json.loads(HEALTH_HISTORY_FILE.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return []
+
+
+def _append_health_history(entry: dict, max_entries: int = 100):
+    """Hängt einen Eintrag an die History an. Überspringt Duplikate (gleiche Stunde)."""
+    history = _load_health_history()
+    cur_hour = entry["timestamp"][:13]
+    if history and history[-1]["timestamp"][:13] == cur_hour:
+        history[-1] = entry
+    else:
+        history.append(entry)
+    history = history[-max_entries:]
+    HEALTH_HISTORY_FILE.write_text(
+        json.dumps(history, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
+@app.get("/api/health/history")
+def api_health_history(limit: int = 30):
+    """Gibt die letzten N Health-Check-Einträge zurück (für Trend-Charts)."""
+    history = _load_health_history()
+    return {
+        "entries": history[-limit:],
+        "total": len(history),
     }
 
 

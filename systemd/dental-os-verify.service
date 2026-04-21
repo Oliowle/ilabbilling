@@ -1,0 +1,15 @@
+[Unit]
+Description=Dental OS - Tägliche Self-Verification
+Documentation=https://github.com/Oliowle/ilabbilling
+After=dental-os.service network.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/var/www/ilabbilling
+ExecStart=/bin/bash /var/www/ilabbilling/post_deploy_check.sh http://127.0.0.1:8100/api/health
+StandardOutput=append:/var/log/dental-os-verify.log
+StandardError=append:/var/log/dental-os-verify.log
+
+[Install]
+WantedBy=multi-user.target

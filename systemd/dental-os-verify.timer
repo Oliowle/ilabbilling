@@ -1,0 +1,12 @@
+[Unit]
+Description=Dental OS - Self-Verification Timer (täglich)
+Requires=dental-os.service
+
+[Timer]
+OnCalendar=*-*-* 06:00:00
+RandomizedDelaySec=10min
+Persistent=true
+Unit=dental-os-verify.service
+
+[Install]
+WantedBy=timers.target

@@ -126,10 +126,10 @@ KUERZEL_POS = [
     ("ZK", "*8000", 0, 2, "fix", "privat"),
     ("ZK", "9330", 0, 2, "fix", "kasse"),
     ("ZK", "*0010", 0, 1, "fix", "kein_gb_privat"),
-    ("ZK", "*0051", 0, 1, "fix", "gesichtsbogen"),
+    ("ZK", "*0051", 0, 1, "fix", None),
     ("ZK", "*0200", 0, 1, "fix", "gesichtsbogen"),
     ("ZK", "*0201", 0, 1, "fix", None),
-    ("ZK", "*0202", 0, 1, "fix", None),
+    ("ZK", "*0202", 0, 1, "fix", "gesichtsbogen"),
     ("ZK", "*9100", 0, 1, "fix", "privat"),
 
     # ─── ZKV — Zirkonkrone mit Verblendung ────────────────────────────────
@@ -143,7 +143,7 @@ KUERZEL_POS = [
     ("ZKV", "*5500", 1, 1, "pro_zahn", None),
     ("ZKV", "*3000", 1, 1, "pro_zahn", None),
     ("ZKV", "*0201", 1, 1, "fix", None),
-    ("ZKV", "*0202", 1, 1, "fix", None),
+    ("ZKV", "*0202", 0, 1, "fix", "gesichtsbogen"),
     ("ZKV", "*0051", 0, 1, "fix", None),
     ("ZKV", "*5602", 0, 1, "pro_zahn", None),
     ("ZKV", "*5601", 0, 1, "pro_zahn", None),
@@ -175,7 +175,7 @@ KUERZEL_POS = [
     ("PK", "*9030", 0, 1, "fix", None),
     ("PK", "*8000", 0, 2, "fix", "privat"),
     ("PK", "*0201", 0, 1, "fix", None),
-    ("PK", "*0202", 0, 1, "fix", None),
+    ("PK", "*0202", 0, 1, "fix", "gesichtsbogen"),
     ("PK", "*5001", 0, 1, "pro_zahn", None),
     ("PK", "*5500", 0, 1, "pro_zahn", None),
     ("PK", "*5601", 0, 1, "pro_zahn", None),
@@ -183,7 +183,7 @@ KUERZEL_POS = [
     ("PK", "*9022", 0, 1, "fix", None),
     ("PK", "9330", 0, 2, "fix", "kasse"),
     ("PK", "*0010", 0, 1, "fix", "kein_gb_privat"),
-    ("PK", "*0051", 0, 1, "fix", "gesichtsbogen"),
+    ("PK", "*0051", 0, 1, "fix", None),
     ("PK", "*0200", 0, 1, "fix", "gesichtsbogen"),
     ("PK", "*E060", 0, 1, "pro_zahn", None),
 
@@ -210,7 +210,7 @@ KUERZEL_POS = [
     ("SKM", "*5500", 0, 1, "pro_zahn", None),
     ("SKM", "*9024", 0, 1, "fix", None),
     ("SKM", "*0201", 0, 1, "fix", None),
-    ("SKM", "*0202", 0, 1, "fix", None),
+    ("SKM", "*0202", 0, 1, "fix", "gesichtsbogen"),
     ("SKM", "*9022", 0, 1, "fix", None),
     ("SKM", "*3002", 0, 1, "pro_zahn", None),
     ("SKM", "*0030", 0, 1, "fix", None),
@@ -261,7 +261,7 @@ KUERZEL_POS = [
     ("VEN", "*9027", 0, 1, "pro_zahn", None),
     ("VEN", "*9030", 0, 1, "fix", None),
     ("VEN", "*0201", 0, 1, "fix", None),
-    ("VEN", "*0202", 0, 1, "fix", None),
+    ("VEN", "*0202", 0, 1, "fix", "gesichtsbogen"),
     ("VEN", "*0010", 0, 1, "fix", "kein_gb_privat"),
     ("VEN", "*0051", 0, 1, "fix", "gesichtsbogen"),
     ("VEN", "*0200", 0, 1, "fix", "gesichtsbogen"),
@@ -282,7 +282,7 @@ KUERZEL_POS = [
     ("INL", "*9025", 0, 2, "fix", None),
     ("INL", "*9027", 0, 1, "pro_zahn", None),
     ("INL", "*0201", 0, 1, "fix", None),
-    ("INL", "*0202", 0, 1, "fix", None),
+    ("INL", "*0202", 0, 1, "fix", "gesichtsbogen"),
     ("INL", "*0010", 0, 1, "fix", "kein_gb_privat"),
     ("INL", "*0051", 0, 1, "fix", "gesichtsbogen"),
     ("INL", "*0200", 0, 1, "fix", "gesichtsbogen"),
@@ -322,7 +322,7 @@ KUERZEL_POS = [
     ("ZBR", "*9022", 0, 1, "fix", None),
     ("ZBR", "*9025", 0, 2, "fix", None),
     ("ZBR", "*0201", 0, 1, "fix", None),
-    ("ZBR", "*0202", 0, 1, "fix", None),
+    ("ZBR", "*0202", 0, 1, "fix", "gesichtsbogen"),
 
     # ─── LZP — Langzeitprovisorium ────────────────────────────────────────
     ("LZP", "*0001", 1, 1, "fix", None),
@@ -653,13 +653,14 @@ def resolve_positionen(
         else:
             menge = standard_menge
 
-        # Desinfektion: Abdruck = 2x, Scan = 1x
+        # Desinfektion: Standard 1x (echte Rechnungen zeigen 1x in 60/62 Fällen).
+        # Wenn 2x gewünscht (z.B. OK + UK Modelle), via Korrektur-System.
         if pos == "*0001":
-            menge = 2 if abdruck else 1
+            menge = 1
 
-        # Versand: Abdruck = 2x, Scan = 1x
+        # Versand: Standard 1x. Bei OK+UK Abdruck via Korrektur 2x.
         if pos == "*8000":
-            menge = 2 if abdruck else 1
+            menge = 1
 
         if menge > 0:
             positionen.append({

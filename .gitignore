@@ -8,3 +8,5 @@ node_modules/
 .venv/
 setup_deploy.sh
 data/
+!data/baseline.json
+!data/.gitkeep

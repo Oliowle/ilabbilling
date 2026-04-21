@@ -1,0 +1,17 @@
+{
+  "comment": "Baseline-Werte für Regression-Tests. Wird automatisch aktualisiert beim 'run_test.sh --update-baseline'.",
+  "letzte_aktualisierung": "2026-04-21T23:32:40",
+  "abdruck": {
+    "match_rate": 85.82,
+    "qty_diffs": 27,
+    "missing": 33,
+    "extra": 83
+  },
+  "scan": {
+    "match_rate": 55.32,
+    "qty_diffs": 27,
+    "missing": 162,
+    "extra": 27
+  },
+  "min_acceptable_rate": 70.0
+}
