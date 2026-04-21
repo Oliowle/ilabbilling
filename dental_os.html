@@ -692,7 +692,8 @@
         const KUERZEL = [
             {code:"ZK", bez:"Vollanatomische Zirkonkrone", desc:"Vollanatomisch, gefräst, individuell charakterisiert"},
             {code:"ZKV", bez:"Zirkonkrone mit Verblendung", desc:"Zirkon mit keramischer Verblendung"},
-            {code:"ZBR", bez:"Zirkon-Brücke", desc:"Brücke vollanatomisch aus Zirkon"},
+            {code:"ZBR", bez:"Zirkon-Brücke verblendet", desc:"Brückenglied mit Verblendung (*3000 + *5500)"},
+            {code:"ZB", bez:"Zirkon-Brückenglied unverblendet", desc:"Brückenglied vollanatomisch ohne Verblendung (*3002, kein *5500)"},
             {code:"SCH", bez:"Aufbissschiene", desc:"Adjustierte Aufbissschiene"},
             {code:"SKM", bez:"Suprakonstruktion", desc:"Zirkonkrone auf Implantat"},
             {code:"PK", bez:"Presskeramik", desc:"Teilkrone/Onlay Presskeramik"},
@@ -756,7 +757,26 @@
                 {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
                 {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
                 {nr:"0120",pf:1,m:1,f:"fix",b:null},
+                {nr:"3000",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5500",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"Z100",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0401",pf:1,m:1,f:"pro_glied",b:null},
+                {nr:"9022",pf:1,m:1,f:"fix",b:null},
+                {nr:"9025",pf:1,m:2,f:"fix",b:null},
+                {nr:"9027",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"8000",pf:1,m:1,f:"fix",b:"privat"},
+                {nr:"9330",pf:1,m:1,f:"fix",b:"kasse"},
+            ],
+            "ZB": [
+                {nr:"0010",pf:1,m:1,f:"fix",b:null},
+                {nr:"0051",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"0200",pf:1,m:1,f:"fix",b:"kein_gb_privat"},
+                {nr:"0201",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0202",pf:1,m:1,f:"fix",b:"gesichtsbogen"},
+                {nr:"0120",pf:1,m:1,f:"fix",b:null},
                 {nr:"3002",pf:1,m:1,f:"pro_zahn",b:null},
+                {nr:"5504",pf:1,m:1,f:"pro_zahn",b:null},
                 {nr:"5602",pf:1,m:1,f:"pro_zahn",b:null},
                 {nr:"Z100",pf:1,m:1,f:"pro_zahn",b:null},
                 {nr:"0401",pf:1,m:1,f:"pro_glied",b:null},
@@ -1964,7 +1984,7 @@
         const toothStatus = {};
 
         const KUERZEL_COLORS = {
-            ZK:'#3b82f6', ZKV:'#2563eb', ZBR:'#f59e0b', PK:'#8b5cf6', EMX:'#ec4899',
+            ZK:'#3b82f6', ZKV:'#2563eb', ZBR:'#f59e0b', ZB:'#fbbf24', PK:'#8b5cf6', EMX:'#ec4899',
             SKM:'#14b8a6', SCH:'#6b7280', VEN:'#06b6d4', INL:'#84cc16', TKR:'#f97316',
             LZP:'#a855f7', MOCK:'#64748b', SMIL:'#e11d48', ZKAP:'#0ea5e9',
             SCHS:'#78716c', MINI:'#a3a3a3', JIG:'#737373', MBR:'#d97706',
@@ -2154,7 +2174,7 @@
             document.querySelectorAll('.kuerzel-card').forEach(c => c.classList.remove('active'));
             element.classList.add('active');
 
-            const teethRequired = ['ZK', 'ZKV', 'ZBR', 'SKM', 'PK', 'EMX', 'EMXI', 'VEN', 'INL', 'LZP', 'TKR', 'ZKAP', 'MBR'];
+            const teethRequired = ['ZK', 'ZKV', 'ZBR', 'ZB', 'SKM', 'PK', 'EMX', 'EMXI', 'VEN', 'INL', 'LZP', 'TKR', 'ZKAP', 'MBR'];
             if (teethRequired.includes(code) && state.selectedTeeth.size === 0) {
                 showToast('Mindestens einen Zahn auswählen');
                 return;
