@@ -212,6 +212,84 @@ def api_engine_updates():
     return learning_store.export_for_engine_update()
 
 
+@app.get("/api/health")
+def api_health():
+    """Health-Check + Self-Verification gegen Test-Rechnungen.
+
+    Prüft die Engine gegen 10 Beispiel-Rechnungen und liefert die Trefferquote.
+    Status:
+        - "ok": >= 70% Trefferquote
+        - "warning": 50-70% Trefferquote
+        - "critical": < 50% Trefferquote
+    """
+    test_cases = [
+        {"arbeitsart": "46 ZK", "praxis": "Dr. Gabriele Schmidt", "expected": ["*0001", "*0301", "*0600", "*3002", "*5504"]},
+        {"arbeitsart": "16 ZK", "praxis": "Dr. Gabriele Schmidt", "expected": ["*0001", "*0301", "*0600", "*3002", "*5504"]},
+        {"arbeitsart": "37 PK", "praxis": "Röder u. Kollegen", "expected": ["*0001", "*0301", "*5504", "*5003"]},
+        {"arbeitsart": "11,21 ZKV", "praxis": "Röder u. Kollegen", "expected": ["*0001", "*5500", "*5504"]},
+        {"arbeitsart": "25,27 ZKV; 26 ZBR", "praxis": "Röder u. Kollegen", "expected": ["*3000", "*5500", "*5504"]},
+        {"arbeitsart": "12-22 EMX", "praxis": "Dr. Lex", "expected": ["*5001", "*5500"]},
+        {"arbeitsart": "SCH", "praxis": "Dr. Neuffer", "expected": ["*0250", "*0850"]},
+        {"arbeitsart": "11 VEN", "praxis": "Das Hugo", "expected": ["*5001", "*5500"]},
+        {"arbeitsart": "36 INL", "praxis": "Helm", "expected": ["*5200", "*5504"]},
+        {"arbeitsart": "44,46 SKM; 45 ZBR", "praxis": "MVZ Phönixsee", "expected": ["*1000", "*5500"]},
+    ]
+
+    total_expected = 0
+    total_matches = 0
+    failed_cases = []
+
+    for case in test_cases:
+        try:
+            praxis_norm = price_loader.normalize_praxis(case["praxis"])
+            praxis_preise = price_loader.get_praxis_prices(praxis_norm)
+            result = generate_invoice(
+                arbeitsart=case["arbeitsart"],
+                praxis=praxis_norm,
+                kasse=False,
+                abdruck=True,
+                gesichtsbogen=False,
+                praxis_preise=praxis_preise,
+            )
+            generated = {p["nummer"] for p in result["positionen"]}
+            matches = sum(1 for p in case["expected"] if p in generated)
+            total_expected += len(case["expected"])
+            total_matches += matches
+            if matches < len(case["expected"]):
+                missing = [p for p in case["expected"] if p not in generated]
+                failed_cases.append({
+                    "arbeitsart": case["arbeitsart"],
+                    "praxis": case["praxis"],
+                    "missing": missing,
+                })
+        except Exception as e:
+            failed_cases.append({
+                "arbeitsart": case["arbeitsart"],
+                "praxis": case["praxis"],
+                "error": str(e),
+            })
+
+    rate = round(100 * total_matches / total_expected, 2) if total_expected else 0
+    if rate >= 70:
+        status = "ok"
+    elif rate >= 50:
+        status = "warning"
+    else:
+        status = "critical"
+
+    return {
+        "status": status,
+        "match_rate": rate,
+        "test_cases": len(test_cases),
+        "expected_positions": total_expected,
+        "matched_positions": total_matches,
+        "failed_cases": failed_cases,
+        "korrekturen_aktiv": len(learning_store.list_active()),
+        "praxen_geladen": len(price_loader.list_praxen()),
+        "kuerzel_bekannt": len(KNOWN_KUERZEL),
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
