@@ -702,6 +702,7 @@ def generate_invoice(
     abdruck: bool = True,
     gesichtsbogen: bool = False,
     praxis_preise: Optional[Dict[str, float]] = None,
+    correction_store=None,
 ) -> Dict:
     """Generiere eine vollständige Rechnung aus einer Arbeitsart-Zeile.
 
@@ -739,6 +740,13 @@ def generate_invoice(
             kuerzel, zaehne, kasse=kasse,
             gesichtsbogen=gesichtsbogen, abdruck=abdruck,
         )
+        if correction_store is not None:
+            resolved = correction_store.apply_corrections(
+                resolved,
+                kuerzel=kuerzel,
+                praxis=praxis,
+                kasse=kasse,
+            )
         for rp in resolved:
             num = rp["nummer"]
             if num in FIX_POSITIONEN and num in gen_pos:
@@ -753,6 +761,8 @@ def generate_invoice(
                     "menge": rp["menge"],
                     "ist_pflicht": rp["ist_pflicht"],
                 }
+
+    apply_praxis_model_profile(gen_pos, parsed, praxis=praxis, abdruck=abdruck)
 
     # Preise einsetzen
     if praxis_preise:
@@ -775,6 +785,79 @@ def generate_invoice(
         "abdruck": abdruck,
         "fehler": fehler,
     }
+
+
+def _normalize_profile_name(name: Optional[str]) -> str:
+    """Normalize praxis names for conservative historical profile checks."""
+    if not name:
+        return ""
+    text = name.lower().strip()
+    replacements = {
+        "ö": "oe",
+        "ö": "oe",
+        "ä": "ae",
+        "ü": "ue",
+        "ß": "ss",
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    return re.sub(r"\s+", " ", text)
+
+
+def _has_any_kuerzel(parsed: List[Tuple[str, List[int]]], kuerzel_set: set) -> bool:
+    return any(k in kuerzel_set for k, _ in parsed)
+
+
+def _add_fix_position(gen_pos: Dict[str, Dict], nummer: str, menge: int = 1):
+    if nummer not in gen_pos:
+        gen_pos[nummer] = {"nummer": nummer, "menge": menge, "ist_pflicht": 0}
+
+
+def apply_praxis_model_profile(
+    gen_pos: Dict[str, Dict],
+    parsed: List[Tuple[str, List[int]]],
+    praxis: Optional[str] = None,
+    abdruck: bool = True,
+) -> None:
+    """Restore highly stable praxis/model positions after learning corrections.
+
+    Historical invoices show that model positions are praxis-dependent. Keeping
+    this after corrections prevents broad global corrections from suppressing
+    positions that are consistently billed for specific praxis profiles.
+    """
+    if not abdruck:
+        return
+    praxis_key = _normalize_profile_name(praxis)
+    if not praxis_key:
+        return
+
+    has_zk_family = _has_any_kuerzel(parsed, {"ZK", "ZKV", "ZB", "ZBR"})
+    has_pk_family = _has_any_kuerzel(parsed, {"PK", "EMX", "INL"})
+
+    add_model_pair = False
+    if has_zk_family and (
+        "roeder" in praxis_key
+        or "seemann" in praxis_key
+        or "schlee" in praxis_key
+        or "kersting" in praxis_key
+        or "lex" in praxis_key
+        or praxis_key == "helm"
+    ):
+        add_model_pair = True
+    if has_pk_family and ("wojahn" in praxis_key or "roeder" in praxis_key):
+        add_model_pair = True
+
+    if add_model_pair:
+        _add_fix_position(gen_pos, "*0201")
+        _add_fix_position(gen_pos, "*0202")
+
+    if (
+        add_model_pair
+        or "paul seemann" in praxis_key
+        or "neuffer" in praxis_key
+        or (has_pk_family and "krauss" in praxis_key)
+    ):
+        _add_fix_position(gen_pos, "*0051")
 
 
 # ============================================================================

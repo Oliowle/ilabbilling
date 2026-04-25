@@ -108,17 +108,8 @@ def api_generate(req: GenerateRequest):
         abdruck=req.abdruck,
         gesichtsbogen=req.gesichtsbogen,
         praxis_preise=praxis_preise,
+        correction_store=learning_store,
     )
-
-    for kuerzel, zaehne in result["parsed"]:
-        if "UNBEKANNT" in kuerzel or kuerzel == "_SKIP":
-            continue
-        result["positionen"] = learning_store.apply_corrections(
-            result["positionen"],
-            kuerzel=kuerzel,
-            praxis=praxis_norm,
-            kasse=req.kasse,
-        )
 
     preis_details = {}
     if praxis_norm:
