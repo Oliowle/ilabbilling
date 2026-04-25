@@ -91,7 +91,7 @@ def call_api(api_url, arbeitsart, praxis, abdruck):
         return json.loads(resp.read().decode("utf-8"))
 
 
-def verify_single(row, loader, abdruck=True, api_url=None):
+def verify_single(row, loader, abdruck=True, api_url=None, correction_store=None):
     """Verifiziere eine einzelne Rechnung."""
     arbeitsart = row.get("arbeitsart", "").strip()
     praxis = row.get("praxis", "").strip()
@@ -113,6 +113,7 @@ def verify_single(row, loader, abdruck=True, api_url=None):
                 abdruck=abdruck,
                 gesichtsbogen=False,
                 praxis_preise=praxis_preise,
+                correction_store=correction_store,
             )
     except Exception as e:
         return {"error": str(e), "arbeitsart": arbeitsart, "praxis": praxis}

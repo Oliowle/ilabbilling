@@ -204,7 +204,7 @@ def api_verify_historical(limit: Optional[int] = None, abdruck: bool = True):
     results = []
     errors = []
     for row in rows:
-        result = verify_single(row, price_loader, abdruck=abdruck)
+        result = verify_single(row, price_loader, abdruck=abdruck, correction_store=learning_store)
         if not result:
             continue
         if "error" in result:
