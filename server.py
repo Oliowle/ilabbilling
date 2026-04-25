@@ -197,6 +197,12 @@ def api_verify_historical(limit: Optional[int] = None, abdruck: bool = True):
     """Staging/Admin-Check gegen historische Rechnungen."""
     from verify_invoices import DEFAULT_CSV, parse_csv, verify_single
 
+    if not DEFAULT_CSV.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="Historische CSV ist auf diesem Server nicht vorhanden. Bitte verify_invoices.py --api gegen Staging ausführen.",
+        )
+
     rows = parse_csv(DEFAULT_CSV)
     if limit:
         rows = rows[:limit]
