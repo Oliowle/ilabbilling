@@ -1970,6 +1970,14 @@
             document.getElementById('select-versicherung').addEventListener('change', updateCalcType);
             document.getElementById('select-gesichtsbogen').addEventListener('change', renderPositions);
             document.getElementById('select-workflow').addEventListener('change', renderPositions);
+            let arbeitsartTimer = null;
+            document.getElementById('input-arbeitsart').addEventListener('input', () => {
+                clearTimeout(arbeitsartTimer);
+                arbeitsartTimer = setTimeout(() => {
+                    state.positions = [];
+                    renderPositions();
+                }, 250);
+            });
 
             // Search listeners
             document.getElementById('alle-kvas-search')?.addEventListener('keyup', renderAlleKVAs);
@@ -2050,8 +2058,12 @@
             updateArbeitsartFromTeeth();
         }
 
+        function getTypedArbeitsart() {
+            return (document.getElementById('input-arbeitsart')?.value || '').trim();
+        }
+
         function updateArbeitsartFromTeeth() {
-            const arbeitsart = buildArbeitsart();
+            const arbeitsart = buildArbeitsartFromTeeth();
             if (arbeitsart) {
                 document.getElementById('input-arbeitsart').value = arbeitsart;
             }
@@ -2203,7 +2215,7 @@
             renderPositions();
         }
 
-        function buildArbeitsart() {
+        function buildArbeitsartFromTeeth() {
             const kuerzelToTeeth = {};
             for (const [tooth, code] of Object.entries(state.toothKuerzel)) {
                 if (!kuerzelToTeeth[code]) kuerzelToTeeth[code] = [];
@@ -2223,6 +2235,11 @@
                 parts.push(`${sorted.join(',')} ${code}`);
             }
             return parts.join('; ');
+        }
+
+        function buildArbeitsart() {
+            const typed = getTypedArbeitsart();
+            return typed || buildArbeitsartFromTeeth();
         }
 
         function getPraxisName() {
@@ -2261,8 +2278,10 @@
                         source: 'api',
                         korrigiert: false,
                         entfernt: false,
-                        reason: [`via Abrechnungsintelligenz (${data.praxis_norm || 'Standard'})`],
+                        reason: (p.reasons && p.reasons.length ? p.reasons : [`via Abrechnungsintelligenz (${data.praxis_norm || 'Standard'})`]),
                         ist_pflicht: p.ist_pflicht,
+                        confidence: p.confidence || (p.ist_pflicht ? 0.86 : 0.68),
+                        needs_review: Boolean(p.needs_review),
                     };
                 });
             } catch (err) {
@@ -2278,7 +2297,7 @@
             const wfLabel = workflow === 'abdruck' ? 'Abdruck' : 'Scan';
             const label = `${kasse ? 'Kasse / BEL' : 'Privat / BEB'} · ${wfLabel}`;
             document.getElementById('calc-type').textContent = label;
-            if (state.selectedKuerzel || Object.keys(state.toothKuerzel).length > 0) renderPositions();
+            if (state.selectedKuerzel || Object.keys(state.toothKuerzel).length > 0 || getTypedArbeitsart()) renderPositions();
         }
 
         let activePositionIdx = null;
@@ -2286,12 +2305,13 @@
         async function renderPositions() {
             const hasAssignments = Object.keys(state.toothKuerzel).length > 0;
             const hasPositions = state.positions.length > 0;
-            if (!state.selectedKuerzel && !hasAssignments && !hasPositions) {
+            const typedArbeitsart = getTypedArbeitsart();
+            if (!state.selectedKuerzel && !hasAssignments && !hasPositions && !typedArbeitsart) {
                 document.getElementById('positions-list').innerHTML = `
                     <div class="p-6 text-center text-slate-500 text-sm">
                         <p><i class="fas fa-inbox w-6 h-6 mx-auto mb-2 opacity-50"></i></p>
-                        <p>Kein Kürzel zugewiesen</p>
-                        <p class="text-xs mt-1">Zähne auswählen → Kürzel klicken</p>
+                        <p>Keine Arbeitsart eingegeben</p>
+                        <p class="text-xs mt-1">Arbeitsart eingeben oder Zähne auswählen → Kürzel klicken</p>
                     </div>
                 `;
                 updateTotals();
@@ -2307,7 +2327,7 @@
                 const arbeitsart = buildArbeitsart();
                 const praxisName = getPraxisName();
                 const apiResult = await resolveFromAPI(arbeitsart, praxisName, kasse, gb);
-                state.positions = apiResult || resolve(state.selectedKuerzel, zaehne, kasse, gb, praxisCode);
+                state.positions = apiResult || (state.selectedKuerzel ? resolve(state.selectedKuerzel, zaehne, kasse, gb, praxisCode) : []);
             }
 
             const list = document.getElementById('positions-list');
@@ -2322,6 +2342,8 @@
                     const isActive = activePositionIdx === realIdx;
                     const korrigiertBadge = pos.korrigiert ? '<span class="text-xs px-1.5 py-0.5 rounded bg-orange-100 text-orange-700">Korrigiert</span>' : '';
                     const manualBadge = pos.source === 'manual' ? '<span class="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700">Manuell</span>' : '';
+                    const reviewBadge = pos.needs_review ? '<span class="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">Prüfen</span>' : '';
+                    const confidenceBadge = pos.confidence ? `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">${Math.round(pos.confidence * 100)}%</span>` : '';
 
                     const katToggleLabel = pos.kategorie === 'leistung' ? 'Material' : 'Leistung';
                     const katToggleIcon = pos.kategorie === 'leistung' ? 'fa-boxes-stacked' : 'fa-hand-holding-medical';
@@ -2332,7 +2354,7 @@
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2">
                                         <span class="mono text-xs text-slate-400">${pos.nummer}</span>
-                                        ${korrigiertBadge}${manualBadge}
+                                        ${korrigiertBadge}${manualBadge}${reviewBadge}${confidenceBadge}
                                     </div>
                                     <div class="text-sm font-medium text-slate-900 truncate">${pos.bezeichnung}</div>
                                     <div class="flex gap-2 mt-1">
@@ -2435,15 +2457,24 @@
             }
         }
 
-        function sendCorrectionToAPI(kuerzel, position, aktion, neuerWert, alterWert, erklaerung) {
+        function sendCorrectionToAPI(kuerzel, position, aktion, neuerWert, alterWert, erklaerung, explicit = false) {
+            if (!explicit) return;
             const praxisName = getPraxisName();
             const kasse = state.versicherung === 'kasse';
+            const resolvedKuerzel = kuerzel || state.selectedKuerzel || Object.values(state.toothKuerzel)[0] || '';
+            if (!resolvedKuerzel) {
+                showToast('Lernregel braucht ein eindeutiges Kürzel');
+                return;
+            }
+            if (!window.confirm(`Diese Änderung dauerhaft als Lernregel für ${resolvedKuerzel} speichern?`)) {
+                return;
+            }
             const apiBase = location.protocol === 'file:' ? 'http://localhost:8000' : '/billing';
             fetch(`${apiBase}/api/korrektur`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    kuerzel: kuerzel || state.selectedKuerzel || Object.values(state.toothKuerzel)[0] || '',
+                    kuerzel: resolvedKuerzel,
                     position,
                     aktion,
                     neuer_wert: neuerWert,
@@ -2453,8 +2484,16 @@
                     erklaerung,
                 }),
             }).then(r => r.json()).then(d => {
-                if (d.status === 'ok') console.log('Korrektur gespeichert:', d.korrektur?.id);
-            }).catch(e => console.warn('Korrektur-API Fehler:', e));
+                if (d.status === 'ok') {
+                    showToast('Lernregel dauerhaft gespeichert');
+                    console.log('Korrektur gespeichert:', d.korrektur?.id);
+                } else {
+                    showToast(d.detail || 'Lernregel wurde abgelehnt');
+                }
+            }).catch(e => {
+                showToast('Korrektur-API Fehler');
+                console.warn('Korrektur-API Fehler:', e);
+            });
         }
 
         function adjustQty(idx, delta) {
@@ -2477,7 +2516,6 @@
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
 
-            sendCorrectionToAPI(null, pos.nummer, 'menge_aendern', newQty, oldQty, `Menge ${oldQty} → ${newQty}`);
             document.getElementById(`qty-display-${idx}`).textContent = newQty;
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
             updateTotals();
@@ -2498,7 +2536,6 @@
                 notiz: pos.notiz || '',
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
-            sendCorrectionToAPI(null, pos.nummer, 'menge_aendern', pos.menge, oldQty, `Menge ${oldQty} → ${pos.menge}`);
             updateTotals();
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
         }
@@ -2514,7 +2551,6 @@
                 notiz: pos.notiz || '',
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
-            sendCorrectionToAPI(null, pos.nummer, 'entfernen', null, null, `Position ${pos.nummer} entfernt`);
             activePositionIdx = null;
             renderPositions();
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
@@ -2566,6 +2602,15 @@
 
             state.lernregeln.push(regel);
             pos.lernnotiz = textEl.value.trim();
+
+            if (typeEl && ['menge', 'nicht_noetig', 'fehlt'].includes(typeEl.value)) {
+                const actionMap = {
+                    menge: 'menge_aendern',
+                    nicht_noetig: 'entfernen',
+                    fehlt: 'hinzufuegen',
+                };
+                sendCorrectionToAPI(regel.kuerzel, pos.nummer, actionMap[typeEl.value], pos.menge, null, regel.text, true);
+            }
 
             updateLernregelnLog();
             document.getElementById('lernregeln-count').textContent = `(${state.lernregeln.length})`;
@@ -2657,7 +2702,6 @@
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
 
-            sendCorrectionToAPI(null, pos.nr, 'hinzufuegen', qty, null, `Position ${pos.nr} manuell hinzugefügt (Menge ${qty})`);
             document.getElementById('select-manual-pos').value = '';
             document.getElementById('input-manual-qty').value = '1';
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;

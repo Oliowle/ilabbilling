@@ -21,7 +21,7 @@ import urllib.error
 from pathlib import Path
 from collections import defaultdict
 
-from billing_engine import generate_invoice
+from billing_engine import generate_invoice, parse_arbeitsart, build_tooth_units, summarize_tooth_units
 from billing_prices import PriceLoader
 
 DEFAULT_CSV = Path(__file__).parent.parent / "ANALYSIS_Bridge_Crown_Invoices_May_Sep_2025.csv"
@@ -119,6 +119,12 @@ def verify_single(row, loader, abdruck=True, api_url=None):
 
     generated = {p["nummer"]: p["menge"] for p in result["positionen"]}
     expected = get_expected_positions(row)
+    tooth_units = result.get("tooth_units")
+    formula_counts = result.get("formula_counts")
+    if tooth_units is None or formula_counts is None:
+        parsed = parse_arbeitsart(arbeitsart)
+        tooth_units = build_tooth_units(parsed)
+        formula_counts = summarize_tooth_units(tooth_units)
 
     matches = []
     qty_diffs = []
@@ -140,6 +146,26 @@ def verify_single(row, loader, abdruck=True, api_url=None):
         if pos in generated and pos not in expected:
             extra.append((pos, generated[pos]))
 
+    formula_expected = {}
+    if "*0600" in expected:
+        formula_expected["stump_count"] = expected["*0600"]
+    if "*5500" in expected:
+        formula_expected["facing_count"] = expected["*5500"]
+    material_candidates = [expected.get("*3000", 0), expected.get("*3002", 0), expected.get("*5504", 0)]
+    if any(material_candidates):
+        formula_expected["material_count"] = max(material_candidates)
+
+    formula_generated = {
+        "stump_count": formula_counts.get("stump_count", 0),
+        "facing_count": formula_counts.get("facing_count", 0),
+        "material_count": max(formula_counts.get("zirconia_count", 0), formula_counts.get("ceramic_count", 0)),
+    }
+    formula_diffs = []
+    for name, exp in formula_expected.items():
+        gen = formula_generated.get(name, 0)
+        if gen != exp:
+            formula_diffs.append((name, exp, gen))
+
     return {
         "invoice_num": row.get("invoice_num"),
         "praxis": praxis,
@@ -151,6 +177,9 @@ def verify_single(row, loader, abdruck=True, api_url=None):
         "expected_count": len(expected),
         "generated_count": len(generated),
         "match_count": len(matches),
+        "tooth_units": tooth_units,
+        "formula_counts": formula_counts,
+        "formula_diffs": formula_diffs,
     }
 
 
@@ -163,6 +192,8 @@ def main():
     parser.add_argument("--abdruck", action="store_true", help="Abdruck-Workflow (default: Scan)")
     parser.add_argument("--api", default=None, help="Live-API URL (z.B. https://www.ilabdashboard.com/billing/api)")
     parser.add_argument("--json", action="store_true", help="Output als JSON")
+    parser.add_argument("--report", default=None, help="JSON-Report-Datei schreiben")
+    parser.add_argument("--min-rate", type=float, default=92.0, help="Mindestquote fuer erfolgreichen Deploy")
     args = parser.parse_args()
 
     csv_path = Path(args.csv)
@@ -194,22 +225,96 @@ def main():
     total_diffs = sum(len(r["qty_diffs"]) for r in results)
     total_missing = sum(len(r["missing"]) for r in results)
     total_extra = sum(len(r["extra"]) for r in results)
+    total_formula_diffs = sum(len(r["formula_diffs"]) for r in results)
+
+    pos_stats = defaultdict(lambda: {"matches": 0, "diffs": 0, "missing": 0, "extra": 0})
+    praxis_stats = defaultdict(lambda: {"problems": 0, "checked": 0})
+    kuerzel_stats = defaultdict(lambda: {"problems": 0, "checked": 0})
+    formula_stats = defaultdict(lambda: {"diffs": 0})
+    for r in results:
+        praxis_stats[r["praxis"]]["checked"] += 1
+        parsed_codes = sorted({u["code"] for u in r.get("tooth_units", [])})
+        for code in parsed_codes or ["UNBEKANNT"]:
+            kuerzel_stats[code]["checked"] += 1
+        has_problem = bool(r["qty_diffs"] or r["missing"] or r["extra"] or r["formula_diffs"])
+        if has_problem:
+            praxis_stats[r["praxis"]]["problems"] += 1
+            for code in parsed_codes or ["UNBEKANNT"]:
+                kuerzel_stats[code]["problems"] += 1
+        for p in r["matches"]:
+            pos_stats[p]["matches"] += 1
+        for p, _, _ in r["qty_diffs"]:
+            pos_stats[p]["diffs"] += 1
+        for p, _ in r["missing"]:
+            pos_stats[p]["missing"] += 1
+        for p, _ in r["extra"]:
+            pos_stats[p]["extra"] += 1
+        for name, _, _ in r["formula_diffs"]:
+            formula_stats[name]["diffs"] += 1
+
+    match_rate = round(100 * total_matches / total_expected, 2) if total_expected else 0
+    report = {
+        "source": args.api or "local",
+        "workflow": "abdruck" if args.abdruck else "scan",
+        "rechnungen": len(results),
+        "expected": total_expected,
+        "matches": total_matches,
+        "match_rate": match_rate,
+        "qty_diffs": total_diffs,
+        "missing": total_missing,
+        "extra": total_extra,
+        "formula_diffs": total_formula_diffs,
+        "errors": len(errors),
+        "min_rate": args.min_rate,
+        "passed": match_rate >= args.min_rate,
+        "top_position_errors": sorted(
+            [
+                {"position": pos, **stats}
+                for pos, stats in pos_stats.items()
+                if stats["diffs"] or stats["missing"] or stats["extra"]
+            ],
+            key=lambda x: x["diffs"] + x["missing"] + x["extra"],
+            reverse=True,
+        )[:20],
+        "top_praxis_errors": sorted(
+            [{"praxis": praxis, **stats} for praxis, stats in praxis_stats.items()],
+            key=lambda x: x["problems"],
+            reverse=True,
+        )[:20],
+        "top_kuerzel_errors": sorted(
+            [{"kuerzel": code, **stats} for code, stats in kuerzel_stats.items()],
+            key=lambda x: x["problems"],
+            reverse=True,
+        )[:20],
+        "top_formula_errors": sorted(
+            [{"formula": name, **stats} for name, stats in formula_stats.items()],
+            key=lambda x: x["diffs"],
+            reverse=True,
+        ),
+        "examples": [
+            {
+                "invoice_num": r["invoice_num"],
+                "praxis": r["praxis"],
+                "arbeitsart": r["arbeitsart"],
+                "tooth_units": r["tooth_units"],
+                "formula_counts": r["formula_counts"],
+                "formula_diffs": r["formula_diffs"],
+                "qty_diffs": r["qty_diffs"],
+                "missing": r["missing"],
+                "extra": r["extra"],
+            }
+            for r in results
+            if r["qty_diffs"] or r["missing"] or r["extra"] or r["formula_diffs"]
+        ][:25],
+    }
+
+    if args.report:
+        report_path = Path(args.report)
+        report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
 
     if args.json:
-        summary = {
-            "source": args.api or "local",
-            "workflow": "abdruck" if args.abdruck else "scan",
-            "rechnungen": len(results),
-            "expected": total_expected,
-            "matches": total_matches,
-            "match_rate": round(100 * total_matches / total_expected, 2) if total_expected else 0,
-            "qty_diffs": total_diffs,
-            "missing": total_missing,
-            "extra": total_extra,
-            "errors": len(errors),
-        }
-        print(json.dumps(summary, indent=2))
-        sys.exit(0 if summary["match_rate"] >= 70 else 1)
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+        sys.exit(0 if report["passed"] else 1)
 
     print("=" * 70)
     print(f"GESAMT-ERGEBNIS  ({'API: ' + args.api if args.api else 'LOKAL'})")
@@ -223,17 +328,6 @@ def main():
     print(f"  Parse-Fehler:         {len(errors)}")
     print()
 
-    pos_stats = defaultdict(lambda: {"matches": 0, "diffs": 0, "missing": 0, "extra": 0})
-    for r in results:
-        for p in r["matches"]:
-            pos_stats[p]["matches"] += 1
-        for p, _, _ in r["qty_diffs"]:
-            pos_stats[p]["diffs"] += 1
-        for p, _ in r["missing"]:
-            pos_stats[p]["missing"] += 1
-        for p, _ in r["extra"]:
-            pos_stats[p]["extra"] += 1
-
     print("=" * 70)
     print(f"DETAILS PRO POSITION")
     print("=" * 70)
@@ -242,6 +336,14 @@ def main():
     for pos in sorted(pos_stats.keys()):
         s = pos_stats[pos]
         print(f"  {pos:10s} {s['matches']:>5d} {s['diffs']:>12d} {s['missing']:>7d} {s['extra']:>8d}")
+
+    if formula_stats:
+        print()
+        print("=" * 70)
+        print("FORMEL-ABWEICHUNGEN")
+        print("=" * 70)
+        for name, stats in sorted(formula_stats.items(), key=lambda item: item[1]["diffs"], reverse=True):
+            print(f"  {name:16s} {stats['diffs']:>5d} Abweichungen")
 
     if args.verbose:
         print()

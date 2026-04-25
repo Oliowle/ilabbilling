@@ -23,6 +23,7 @@ Starten:
 
 import os
 import json
+import re
 from datetime import datetime
 from typing import Optional, List
 from pathlib import Path
@@ -32,7 +33,7 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from billing_engine import generate_invoice, parse_arbeitsart, KNOWN_KUERZEL, KUERZEL_ALIAS
+from billing_engine import generate_invoice, parse_arbeitsart, KNOWN_KUERZEL, KUERZEL_ALIAS, KUERZEL_POS
 from billing_prices import PriceLoader
 from billing_learning import LearningStore
 
@@ -66,6 +67,33 @@ class KorrekturRequest(BaseModel):
     praxis: Optional[str] = None
     kasse: Optional[bool] = None
     erklaerung: str = ""
+
+
+def normalize_position_number(position: str) -> str:
+    """Normalisiere UI-Positionsnummern auf Engine-Format."""
+    pos = (position or "").strip().upper()
+    if not pos:
+        raise HTTPException(status_code=400, detail="Position darf nicht leer sein")
+    if not re.match(r"^\*?[A-Z0-9]+$", pos):
+        raise HTTPException(status_code=400, detail="Ungültiges Positionsformat")
+    known_positions = {row[1].upper() for row in KUERZEL_POS}
+    if pos not in known_positions and not pos.startswith("*") and ("*" + pos) in known_positions:
+        pos = "*" + pos
+    if pos not in known_positions:
+        raise HTTPException(status_code=400, detail=f"Unbekannte Position: {pos}")
+    return pos
+
+
+def validate_korrektur_request(req: KorrekturRequest):
+    kuerzel = (req.kuerzel or "").strip().upper()
+    if not kuerzel:
+        raise HTTPException(status_code=400, detail="Kürzel ist für Lernkorrekturen erforderlich")
+    kuerzel = KUERZEL_ALIAS.get(kuerzel, kuerzel)
+    if kuerzel not in KNOWN_KUERZEL:
+        raise HTTPException(status_code=400, detail=f"Unbekanntes Kürzel: {kuerzel}")
+    if req.aktion not in {"hinzufuegen", "entfernen", "menge_aendern", "preis_aendern"}:
+        raise HTTPException(status_code=400, detail=f"Unbekannte Aktion: {req.aktion}")
+    return kuerzel, normalize_position_number(req.position)
 
 
 # ─── FastAPI App ──────────────────────────────────────────────────────────────
@@ -119,6 +147,7 @@ def api_generate(req: GenerateRequest):
             preis_details[num] = {"preis": preis, "quelle": quelle}
             if preis is not None and pos.get("preis") is None:
                 pos["preis"] = preis
+            pos.setdefault("reasons", []).append(f"Preisquelle: {quelle or 'kein Preisprofil'}")
 
     total = sum(
         (p.get("preis") or 0) * p.get("menge", 1)
@@ -136,10 +165,11 @@ def api_generate(req: GenerateRequest):
 @app.post("/api/korrektur")
 def api_korrektur(req: KorrekturRequest):
     """Speichere eine Korrektur von Oliver."""
+    kuerzel, position = validate_korrektur_request(req)
     praxis_norm = price_loader.normalize_praxis(req.praxis) if req.praxis else None
     korrektur = learning_store.add_correction(
-        kuerzel=req.kuerzel,
-        position=req.position,
+        kuerzel=kuerzel,
+        position=position,
         aktion=req.aktion,
         neuer_wert=req.neuer_wert,
         alter_wert=req.alter_wert,
@@ -160,6 +190,43 @@ def api_korrekturen(kuerzel: Optional[str] = None):
 def api_stats():
     """Korrektur-Statistiken."""
     return learning_store.stats()
+
+
+@app.get("/api/verify/historical")
+def api_verify_historical(limit: Optional[int] = None, abdruck: bool = True):
+    """Staging/Admin-Check gegen historische Rechnungen."""
+    from verify_invoices import DEFAULT_CSV, parse_csv, verify_single
+
+    rows = parse_csv(DEFAULT_CSV)
+    if limit:
+        rows = rows[:limit]
+
+    results = []
+    errors = []
+    for row in rows:
+        result = verify_single(row, price_loader, abdruck=abdruck)
+        if not result:
+            continue
+        if "error" in result:
+            errors.append(result)
+        else:
+            results.append(result)
+
+    total_expected = sum(r["expected_count"] for r in results)
+    total_matches = sum(r["match_count"] for r in results)
+    match_rate = round(100 * total_matches / total_expected, 2) if total_expected else 0
+    return {
+        "rechnungen": len(results),
+        "expected": total_expected,
+        "matches": total_matches,
+        "match_rate": match_rate,
+        "qty_diffs": sum(len(r["qty_diffs"]) for r in results),
+        "missing": sum(len(r["missing"]) for r in results),
+        "extra": sum(len(r["extra"]) for r in results),
+        "formula_diffs": sum(len(r["formula_diffs"]) for r in results),
+        "errors": len(errors),
+        "passed": match_rate >= 92.0,
+    }
 
 
 @app.get("/api/praxen")

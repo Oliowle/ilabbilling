@@ -449,6 +449,27 @@ DIGITAL_POSITIONEN = {"*9022", "*9025", "*9027", "*9030"}
 KNOWN_KUERZEL = set(KPOS_INDEX.keys())
 
 # ============================================================================
+# ZAHNROLLEN-MODELL
+# ============================================================================
+
+TOOTH_ROLE_PROFILES = {
+    # Natürliche Kronen / Veneers / Inlays: zählen als Stumpf.
+    "ZK": {"label": "Zirkonkrone", "needs_stump": True, "has_facing": False, "is_implant": False, "is_pontic": False, "material": "zirconia"},
+    "ZKV": {"label": "Zirkonkrone mit Verblendung", "needs_stump": True, "has_facing": True, "is_implant": False, "is_pontic": False, "material": "zirconia"},
+    "PK": {"label": "Presskeramik", "needs_stump": True, "has_facing": False, "is_implant": False, "is_pontic": False, "material": "ceramic"},
+    "EMX": {"label": "E.Max Krone", "needs_stump": True, "has_facing": False, "is_implant": False, "is_pontic": False, "material": "ceramic"},
+    "VEN": {"label": "Veneer", "needs_stump": True, "has_facing": True, "is_implant": False, "is_pontic": False, "material": "ceramic"},
+    "INL": {"label": "Inlay", "needs_stump": True, "has_facing": False, "is_implant": False, "is_pontic": False, "material": "ceramic"},
+    "TKR": {"label": "Teilkrone", "needs_stump": True, "has_facing": False, "is_implant": False, "is_pontic": False, "material": "ceramic"},
+    # Implantate und Brückenglieder zählen als Einheit, aber nicht als Stumpf.
+    "SKM": {"label": "Suprakonstruktion", "needs_stump": False, "has_facing": True, "is_implant": True, "is_pontic": False, "material": "zirconia"},
+    "ZB": {"label": "Zirkon-Brückenglied vollanatomisch", "needs_stump": False, "has_facing": False, "is_implant": False, "is_pontic": True, "material": "zirconia"},
+    "ZBR": {"label": "Zirkon-Brücke verblendet", "needs_stump": False, "has_facing": True, "is_implant": False, "is_pontic": True, "material": "zirconia"},
+    "LZP": {"label": "Langzeitprovisorium", "needs_stump": True, "has_facing": False, "is_implant": False, "is_pontic": False, "material": "temporary"},
+    "ZKAP": {"label": "Zirkonkäppchen", "needs_stump": True, "has_facing": False, "is_implant": False, "is_pontic": False, "material": "zirconia"},
+}
+
+# ============================================================================
 # FDI ZAHNBOGEN
 # ============================================================================
 UPPER_ARCH = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28]
@@ -522,7 +543,7 @@ def parse_arbeitsart(arbeitsart: str) -> List[Tuple[str, List[int]]]:
     - "12-22 K Emax" → [("EMX", [12,11,21,22])]
     - "Adjustierte Aufbissschiene" → [("SCH", [])]
     """
-    art = arbeitsart.strip()
+    art = re.sub(r'\s+(?:und|&)\s+(?=\d)', ', ', arbeitsart.strip(), flags=re.IGNORECASE)
 
     # Sonderfall: Ganzer Text ist ein Alias
     art_lower = art.lower()
@@ -613,6 +634,84 @@ def parse_arbeitsart(arbeitsart: str) -> List[Tuple[str, List[int]]]:
                 ergebnis.append(("UNBEKANNT:" + teil_clean, []))
 
     return ergebnis
+
+
+def build_tooth_units(parsed: List[Tuple[str, List[int]]]) -> List[Dict]:
+    """Baue die fachliche Zahnrollen-Ebene aus den erkannten Kürzeln.
+
+    Diese Ebene trennt bewusst "versorgte Einheit" von "Stumpf", "Implantat"
+    und "Brückenglied". Beispiel: SKM und ZB zählen als Einheiten, aber nicht
+    als Stümpfe.
+    """
+    units = []
+    virtual_idx = 1
+    for code, teeth in parsed:
+        if "UNBEKANNT" in code or code == "_SKIP":
+            continue
+        profile = TOOTH_ROLE_PROFILES.get(code)
+        if not profile:
+            continue
+        role_teeth = teeth[:] if teeth else [0]
+        for tooth in role_teeth:
+            unit_id = str(tooth) if tooth else f"virtual-{virtual_idx}"
+            if not tooth:
+                virtual_idx += 1
+            units.append({
+                "tooth": tooth,
+                "unit_id": unit_id,
+                "code": code,
+                "label": profile["label"],
+                "is_unit": True,
+                "needs_stump": bool(profile["needs_stump"]),
+                "has_facing": bool(profile["has_facing"]),
+                "is_implant": bool(profile["is_implant"]),
+                "is_pontic": bool(profile["is_pontic"]),
+                "material": profile["material"],
+            })
+    return units
+
+
+def summarize_tooth_units(tooth_units: List[Dict]) -> Dict:
+    """Verdichte Zahnrollen zu Mengenformeln für Training und Erklärungen."""
+    return {
+        "units_total": sum(1 for u in tooth_units if u.get("is_unit")),
+        "stump_count": sum(1 for u in tooth_units if u.get("needs_stump")),
+        "facing_count": sum(1 for u in tooth_units if u.get("has_facing")),
+        "implant_count": sum(1 for u in tooth_units if u.get("is_implant")),
+        "pontic_count": sum(1 for u in tooth_units if u.get("is_pontic")),
+        "zirconia_count": sum(1 for u in tooth_units if u.get("material") == "zirconia"),
+        "ceramic_count": sum(1 for u in tooth_units if u.get("material") == "ceramic"),
+    }
+
+
+def describe_formula_source(pos: str, kuerzel: str, zaehne: List[int], formel: str, tooth_counts: Dict) -> str:
+    if formel == "pro_zahn":
+        return f"{pos}: Menge aus {kuerzel} × {max(len(zaehne), 1)} Zahn/Zähne abgeleitet."
+    if formel == "pro_glied":
+        return f"{pos}: Menge aus Brückenglied-Formel für {kuerzel} abgeleitet."
+    if pos in {"*0051", "*0201", "*0202"}:
+        return f"{pos}: Modell-/Stumpfposition; Zahnrollen aktuell {tooth_counts.get('stump_count', 0)} Stümpfe."
+    return f"{pos}: Fixposition aus {kuerzel}."
+
+
+def apply_role_quantity_overrides(gen_pos: Dict[str, Dict], tooth_counts: Dict) -> None:
+    """Korrigiere bekannte Mengenformeln über die Zahnrollen statt über Rohsegmente."""
+    role_formulas = {
+        "*5500": ("facing_count", "Verblendmenge aus Zähnen mit Verblendanteil"),
+        "*3000": ("facing_count", "Keramik-/Verblendbrand aus Zähnen mit Verblendanteil"),
+    }
+    for pos, (count_name, label) in role_formulas.items():
+        if pos not in gen_pos:
+            continue
+        count = tooth_counts.get(count_name, 0)
+        if count <= 0:
+            continue
+        old_qty = gen_pos[pos].get("menge", 0)
+        if old_qty != count:
+            gen_pos[pos]["menge"] = count
+            gen_pos[pos].setdefault("reasons", []).append(
+                f"{label}: {old_qty} → {count} gemäß Zahnrollen-Modell."
+            )
 
 
 def detect_kasse(positionen: List[Dict]) -> bool:
@@ -725,6 +824,8 @@ def generate_invoice(
         }
     """
     parsed = parse_arbeitsart(arbeitsart)
+    tooth_units = build_tooth_units(parsed)
+    tooth_counts = summarize_tooth_units(tooth_units)
 
     fehler = []
     for k, z in parsed:
@@ -750,19 +851,37 @@ def generate_invoice(
         for rp in resolved:
             num = rp["nummer"]
             if num in FIX_POSITIONEN and num in gen_pos:
+                reason = describe_formula_source(num, kuerzel, zaehne, "fix", tooth_counts)
+                gen_pos[num].setdefault("reasons", []).append(reason)
                 continue  # Fix-Positionen nur 1x pro Rechnung
+            reason = describe_formula_source(num, kuerzel, zaehne, "fix", tooth_counts)
+            for pos, _ist_pflicht, _standard_menge, formel, _bedingung in KPOS_INDEX[kuerzel]:
+                if pos == num:
+                    reason = describe_formula_source(num, kuerzel, zaehne, formel, tooth_counts)
+                    break
             if num in gen_pos:
                 gen_pos[num]["menge"] += rp["menge"]
                 if rp["ist_pflicht"]:
                     gen_pos[num]["ist_pflicht"] = 1
+                gen_pos[num].setdefault("reasons", []).append(reason)
             else:
                 gen_pos[num] = {
                     "nummer": num,
                     "menge": rp["menge"],
                     "ist_pflicht": rp["ist_pflicht"],
+                    "confidence": 0.86 if rp["ist_pflicht"] else 0.68,
+                    "needs_review": not bool(rp["ist_pflicht"]),
+                    "reasons": [reason],
                 }
 
-    apply_praxis_model_profile(gen_pos, parsed, praxis=praxis, abdruck=abdruck)
+    apply_praxis_model_profile(gen_pos, parsed, praxis=praxis, abdruck=abdruck, tooth_counts=tooth_counts)
+    apply_role_quantity_overrides(gen_pos, tooth_counts)
+
+    for data in gen_pos.values():
+        data["reasons"] = list(dict.fromkeys(data.get("reasons", [])))
+        if data.get("ist_pflicht"):
+            data["confidence"] = max(data.get("confidence", 0), 0.86)
+            data["needs_review"] = False
 
     # Preise einsetzen
     if praxis_preise:
@@ -781,6 +900,8 @@ def generate_invoice(
         "arbeitsart": arbeitsart,
         "parsed": [(k, z) for k, z in parsed],
         "positionen": positionen,
+        "tooth_units": tooth_units,
+        "formula_counts": tooth_counts,
         "kasse": kasse,
         "abdruck": abdruck,
         "fehler": fehler,
@@ -808,9 +929,44 @@ def _has_any_kuerzel(parsed: List[Tuple[str, List[int]]], kuerzel_set: set) -> b
     return any(k in kuerzel_set for k, _ in parsed)
 
 
+PRAXIS_MODEL_RULES = [
+    {
+        "match": ["roeder", "seemann", "schlee", "kersting", "lex", "helm"],
+        "kuerzel_family": {"ZK", "ZKV", "ZB", "ZBR"},
+        "positions": ["*0201", "*0202", "*0051"],
+        "reason": "Praxisprofil + Abdruck: Zirkon-/Brückenfälle historisch mit Modellpositionen abgerechnet.",
+    },
+    {
+        "match": ["wojahn", "roeder"],
+        "kuerzel_family": {"PK", "EMX", "INL"},
+        "positions": ["*0201", "*0202", "*0051"],
+        "reason": "Praxisprofil + Abdruck: Keramikfälle historisch mit Modellpositionen abgerechnet.",
+    },
+    {
+        "match": ["paul seemann", "neuffer"],
+        "kuerzel_family": set(KNOWN_KUERZEL),
+        "positions": ["*0051"],
+        "reason": "Praxisprofil: *0051 wird in historischen Rechnungen regelmäßig genutzt.",
+    },
+    {
+        "match": ["krauss"],
+        "kuerzel_family": {"PK", "EMX", "INL"},
+        "positions": ["*0051"],
+        "reason": "Praxisprofil Krauss + Keramik: *0051 historisch regelmäßig.",
+    },
+]
+
+
 def _add_fix_position(gen_pos: Dict[str, Dict], nummer: str, menge: int = 1):
     if nummer not in gen_pos:
-        gen_pos[nummer] = {"nummer": nummer, "menge": menge, "ist_pflicht": 0}
+        gen_pos[nummer] = {
+            "nummer": nummer,
+            "menge": menge,
+            "ist_pflicht": 0,
+            "confidence": 0.72,
+            "needs_review": True,
+            "reasons": [],
+        }
 
 
 def apply_praxis_model_profile(
@@ -818,6 +974,7 @@ def apply_praxis_model_profile(
     parsed: List[Tuple[str, List[int]]],
     praxis: Optional[str] = None,
     abdruck: bool = True,
+    tooth_counts: Optional[Dict] = None,
 ) -> None:
     """Restore highly stable praxis/model positions after learning corrections.
 
@@ -831,33 +988,17 @@ def apply_praxis_model_profile(
     if not praxis_key:
         return
 
-    has_zk_family = _has_any_kuerzel(parsed, {"ZK", "ZKV", "ZB", "ZBR"})
-    has_pk_family = _has_any_kuerzel(parsed, {"PK", "EMX", "INL"})
-
-    add_model_pair = False
-    if has_zk_family and (
-        "roeder" in praxis_key
-        or "seemann" in praxis_key
-        or "schlee" in praxis_key
-        or "kersting" in praxis_key
-        or "lex" in praxis_key
-        or praxis_key == "helm"
-    ):
-        add_model_pair = True
-    if has_pk_family and ("wojahn" in praxis_key or "roeder" in praxis_key):
-        add_model_pair = True
-
-    if add_model_pair:
-        _add_fix_position(gen_pos, "*0201")
-        _add_fix_position(gen_pos, "*0202")
-
-    if (
-        add_model_pair
-        or "paul seemann" in praxis_key
-        or "neuffer" in praxis_key
-        or (has_pk_family and "krauss" in praxis_key)
-    ):
-        _add_fix_position(gen_pos, "*0051")
+    stump_count = (tooth_counts or {}).get("stump_count", 0)
+    for rule in PRAXIS_MODEL_RULES:
+        if not any(token == praxis_key or token in praxis_key for token in rule["match"]):
+            continue
+        if not _has_any_kuerzel(parsed, rule["kuerzel_family"]):
+            continue
+        for nummer in rule["positions"]:
+            _add_fix_position(gen_pos, nummer)
+            gen_pos[nummer].setdefault("reasons", []).append(
+                f"{rule['reason']} Zahnrollen zeigen {stump_count} Stumpf/Stümpfe."
+            )
 
 
 # ============================================================================
