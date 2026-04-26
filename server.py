@@ -24,8 +24,9 @@ Starten:
 import os
 import json
 import re
+import sqlite3
 from datetime import datetime
-from typing import Any, Optional, List
+from typing import Any, Optional, List, Dict
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -42,6 +43,7 @@ HTML_FILE = BASE_DIR / "dental_os.html"
 PRICES_FILE = BASE_DIR / "abrechnungslogik_preisgruppen.json"
 KORREKTUREN_FILE = BASE_DIR / "data" / "korrekturen.json"
 HEALTH_HISTORY_FILE = BASE_DIR / "data" / "health_history.json"
+UI_DB_FILE = BASE_DIR / "data" / "dental_os.sqlite3"
 
 os.makedirs(BASE_DIR / "data", exist_ok=True)
 
@@ -74,6 +76,148 @@ class KorrekturRequest(BaseModel):
 class KorrekturStatusRequest(BaseModel):
     status: str
     grund: str = ""
+
+
+class KVARequest(BaseModel):
+    id: str
+    praxis: Optional[str] = ""
+    patient: Optional[str] = ""
+    versicherung: Optional[str] = "privat"
+    gesichtsbogen: Optional[str] = "ohne"
+    arbeitsart: Optional[str] = ""
+    kuerzel: Optional[str] = None
+    zaehne: List[Any] = []
+    positions: List[Dict[str, Any]] = []
+    korrektionen: List[Dict[str, Any]] = []
+    gesamtbetrag: Optional[float] = 0
+    timestamp: Optional[str] = None
+    korrekturen_count: int = 0
+    status: Optional[str] = "korrekt"
+
+
+class PraxisOverrideRequest(BaseModel):
+    code: str
+    name: str
+    preisliste: int = 0
+    telefon: str = ""
+    email: str = ""
+    notizen: str = ""
+
+
+class LeistungOverrideRequest(BaseModel):
+    nr: str
+    bez: str
+    kat: str
+    preise: List[float]
+
+
+def connect_ui_db():
+    conn = sqlite3.connect(str(UI_DB_FILE))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_ui_db():
+    with connect_ui_db() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS kvas (
+                id TEXT PRIMARY KEY,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                praxis TEXT,
+                patient TEXT,
+                status TEXT,
+                payload_json TEXT NOT NULL
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS praxis_overrides (
+                code TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                preisliste INTEGER NOT NULL DEFAULT 0,
+                telefon TEXT NOT NULL DEFAULT '',
+                email TEXT NOT NULL DEFAULT '',
+                notizen TEXT NOT NULL DEFAULT '',
+                updated_at TEXT NOT NULL,
+                payload_json TEXT NOT NULL
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS leistung_overrides (
+                nr TEXT PRIMARY KEY,
+                bez TEXT NOT NULL,
+                kat TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                payload_json TEXT NOT NULL
+            )
+        """)
+
+
+def decode_payload(row: sqlite3.Row) -> dict:
+    return json.loads(row["payload_json"])
+
+
+def validate_kva_payload(payload: dict) -> dict:
+    kva_id = (payload.get("id") or "").strip()
+    if not kva_id:
+        raise HTTPException(status_code=400, detail="KVA-ID darf nicht leer sein")
+    payload["id"] = kva_id
+    payload["timestamp"] = payload.get("timestamp") or datetime.now().isoformat(timespec="seconds")
+    payload["positions"] = payload.get("positions") or []
+    payload["korrektionen"] = payload.get("korrektionen") or []
+    payload["zaehne"] = payload.get("zaehne") or []
+    return payload
+
+
+def validate_praxis_payload(payload: dict) -> dict:
+    code = (payload.get("code") or "").strip().upper()
+    name = (payload.get("name") or "").strip()
+    if not code:
+        raise HTTPException(status_code=400, detail="Praxis-Code darf nicht leer sein")
+    if not name:
+        raise HTTPException(status_code=400, detail="Praxis-Name darf nicht leer sein")
+    try:
+        preisliste = int(payload.get("preisliste", 0))
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="Preisliste muss numerisch sein")
+    if preisliste < 0 or preisliste > 4:
+        raise HTTPException(status_code=400, detail="Preisliste muss zwischen 0 und 4 liegen")
+    payload["code"] = code
+    payload["name"] = name
+    payload["preisliste"] = preisliste
+    payload["telefon"] = str(payload.get("telefon") or "")
+    payload["email"] = str(payload.get("email") or "")
+    payload["notizen"] = str(payload.get("notizen") or "")
+    return payload
+
+
+def validate_leistung_payload(payload: dict) -> dict:
+    nr = (payload.get("nr") or "").strip()
+    bez = (payload.get("bez") or "").strip()
+    kat = (payload.get("kat") or "").strip()
+    if not nr:
+        raise HTTPException(status_code=400, detail="Leistungsnummer darf nicht leer sein")
+    known_numbers = {row[1].lstrip("*") for row in KUERZEL_POS}
+    if nr.lstrip("*") not in known_numbers:
+        raise HTTPException(status_code=400, detail=f"Unbekannte Leistungsnummer: {nr}")
+    if not bez:
+        raise HTTPException(status_code=400, detail="Leistungsbezeichnung darf nicht leer sein")
+    if kat not in {"leistung", "material"}:
+        raise HTTPException(status_code=400, detail="Kategorie muss 'leistung' oder 'material' sein")
+    preise = payload.get("preise")
+    if not isinstance(preise, list) or len(preise) != 5:
+        raise HTTPException(status_code=400, detail="Es müssen genau 5 Preislistenwerte übergeben werden")
+    try:
+        normalized_prices = [round(float(price), 2) for price in preise]
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="Preise müssen numerisch sein")
+    if any(price < 0 for price in normalized_prices):
+        raise HTTPException(status_code=400, detail="Preise dürfen nicht negativ sein")
+    payload["nr"] = nr.lstrip("*")
+    payload["bez"] = bez
+    payload["kat"] = kat
+    payload["preise"] = normalized_prices
+    return payload
 
 
 def normalize_position_number(position: str) -> str:
@@ -143,6 +287,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+init_ui_db()
 
 
 # ─── Routes ───────────────────────────────────────────────────────────────────
@@ -318,6 +464,126 @@ def api_praxen():
             "umsatz_gesamt": info.get("umsatz_gesamt", 0),
         })
     return result
+
+
+@app.get("/api/kvas")
+def api_kvas():
+    """Alle dauerhaft gespeicherten KVAs aus SQLite."""
+    with connect_ui_db() as conn:
+        rows = conn.execute("SELECT payload_json FROM kvas ORDER BY created_at ASC").fetchall()
+    return api_envelope({"kvas": [decode_payload(row) for row in rows]})
+
+
+@app.get("/api/kvas/{kva_id}")
+def api_kva_detail(kva_id: str):
+    with connect_ui_db() as conn:
+        row = conn.execute("SELECT payload_json FROM kvas WHERE id = ?", (kva_id,)).fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail=f"KVA {kva_id} nicht gefunden")
+    return api_envelope({"kva": decode_payload(row)})
+
+
+@app.post("/api/kvas")
+def api_save_kva(req: KVARequest):
+    """Speichere oder aktualisiere einen KVA dauerhaft."""
+    payload = validate_kva_payload(req.dict())
+    now = datetime.now().isoformat(timespec="seconds")
+    created_at = payload.get("timestamp") or now
+    payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    with connect_ui_db() as conn:
+        conn.execute("""
+            INSERT INTO kvas (id, created_at, updated_at, praxis, patient, status, payload_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET
+                updated_at = excluded.updated_at,
+                praxis = excluded.praxis,
+                patient = excluded.patient,
+                status = excluded.status,
+                payload_json = excluded.payload_json
+        """, (
+            payload["id"],
+            created_at,
+            now,
+            payload.get("praxis"),
+            payload.get("patient"),
+            payload.get("status"),
+            payload_json,
+        ))
+    return api_envelope({"status": "ok", "kva": payload})
+
+
+@app.get("/api/praxen/overrides")
+def api_praxis_overrides():
+    """UI-Stammdaten zu Praxen, die dauerhaft geändert wurden."""
+    with connect_ui_db() as conn:
+        rows = conn.execute("SELECT payload_json FROM praxis_overrides ORDER BY name ASC").fetchall()
+    return api_envelope({"praxen": [decode_payload(row) for row in rows]})
+
+
+@app.post("/api/praxen/overrides")
+def api_save_praxis_override(req: PraxisOverrideRequest):
+    """Speichere UI-Stammdaten einer Praxis dauerhaft."""
+    payload = validate_praxis_payload(req.dict())
+    now = datetime.now().isoformat(timespec="seconds")
+    payload["updated_at"] = now
+    payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    with connect_ui_db() as conn:
+        conn.execute("""
+            INSERT INTO praxis_overrides (code, name, preisliste, telefon, email, notizen, updated_at, payload_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(code) DO UPDATE SET
+                name = excluded.name,
+                preisliste = excluded.preisliste,
+                telefon = excluded.telefon,
+                email = excluded.email,
+                notizen = excluded.notizen,
+                updated_at = excluded.updated_at,
+                payload_json = excluded.payload_json
+        """, (
+            payload["code"],
+            payload["name"],
+            payload["preisliste"],
+            payload["telefon"],
+            payload["email"],
+            payload["notizen"],
+            now,
+            payload_json,
+        ))
+    return api_envelope({"status": "ok", "praxis": payload})
+
+
+@app.get("/api/leistungen/overrides")
+def api_leistung_overrides():
+    """UI-Änderungen an Leistungen und Preislisten aus SQLite."""
+    with connect_ui_db() as conn:
+        rows = conn.execute("SELECT payload_json FROM leistung_overrides ORDER BY nr ASC").fetchall()
+    return api_envelope({"leistungen": [decode_payload(row) for row in rows]})
+
+
+@app.post("/api/leistungen/overrides")
+def api_save_leistung_override(req: LeistungOverrideRequest):
+    """Speichere eine UI-Änderung an einer Leistung dauerhaft."""
+    payload = validate_leistung_payload(req.dict())
+    now = datetime.now().isoformat(timespec="seconds")
+    payload["updated_at"] = now
+    payload_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    with connect_ui_db() as conn:
+        conn.execute("""
+            INSERT INTO leistung_overrides (nr, bez, kat, updated_at, payload_json)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(nr) DO UPDATE SET
+                bez = excluded.bez,
+                kat = excluded.kat,
+                updated_at = excluded.updated_at,
+                payload_json = excluded.payload_json
+        """, (
+            payload["nr"],
+            payload["bez"],
+            payload["kat"],
+            now,
+            payload_json,
+        ))
+    return api_envelope({"status": "ok", "leistung": payload})
 
 
 @app.get("/api/kuerzel")

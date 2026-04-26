@@ -7,8 +7,8 @@
     <script>
     // Auth-Guard: prüft ob User eingeloggt ist (nutzt gleiche Session wie Labor-Board)
     (function(){
-        // Nur prüfen wenn auf Server (nicht lokal als file://)
-        if (location.protocol === 'file:') return;
+        // Nur prüfen wenn auf Server (nicht lokal oder im lokalen Dev-Server)
+        if (location.protocol === 'file:' || ['localhost', '127.0.0.1'].includes(location.hostname)) return;
         fetch('/api.php/auth/status', {credentials:'include'})
             .then(function(r){ return r.json(); })
             .then(function(d){
@@ -600,7 +600,9 @@
         };
 
         function getApiBase() {
-            return location.protocol === 'file:' ? 'http://localhost:8000' : '/billing';
+            if (location.protocol === 'file:') return 'http://localhost:8000';
+            if (['localhost', '127.0.0.1'].includes(location.hostname)) return '';
+            return '/billing';
         }
 
         async function apiRequest(path, options = {}) {
@@ -618,6 +620,128 @@
         function isCorrectionTestMode() {
             const params = new URLSearchParams(location.search);
             return params.get('test_mode') === '1' || params.get('billing_test') === '1';
+        }
+
+        function normalizeKVA(kva) {
+            return {
+                ...kva,
+                zaehne: Array.isArray(kva.zaehne) ? kva.zaehne : [],
+                positions: Array.isArray(kva.positions) ? kva.positions : [],
+                korrektionen: Array.isArray(kva.korrektionen) ? kva.korrektionen : []
+            };
+        }
+
+        async function loadBackendKVAs() {
+            try {
+                const data = await apiRequest('/api/kvas');
+                state.allKVAs = (data.kvas || []).map(normalizeKVA);
+            } catch (err) {
+                console.warn('KVAs konnten nicht geladen werden:', err);
+                showToast('KVAs konnten nicht geladen werden');
+            }
+        }
+
+        function syncPraxisSelectOptions() {
+            const praxisSelect = document.getElementById('select-praxis');
+            if (!praxisSelect) return;
+            const currentValue = praxisSelect.value;
+            praxisSelect.innerHTML = '<option value="">-- Wählen --</option>';
+            PRAXEN.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.code;
+                opt.textContent = p.name;
+                praxisSelect.appendChild(opt);
+            });
+            if (currentValue && PRAXEN.some(p => p.code === currentValue)) {
+                praxisSelect.value = currentValue;
+            }
+        }
+
+        function mergePraxisOverride(praxis) {
+            const code = (praxis.code || '').toUpperCase();
+            if (!code) return;
+            const existing = PRAXEN.find(p => p.code === code);
+            if (existing) {
+                Object.assign(existing, praxis, {code});
+            } else {
+                PRAXEN.push({...praxis, code});
+            }
+        }
+
+        async function loadBackendPraxen() {
+            try {
+                const data = await apiRequest('/api/praxen/overrides');
+                (data.praxen || []).forEach(mergePraxisOverride);
+                syncPraxisSelectOptions();
+            } catch (err) {
+                console.warn('Praxis-Stammdaten konnten nicht geladen werden:', err);
+                showToast('Praxis-Stammdaten konnten nicht geladen werden');
+            }
+        }
+
+        async function savePraxisOverride(praxis) {
+            return apiRequest('/api/praxen/overrides', {
+                method: 'POST',
+                body: JSON.stringify({
+                    code: praxis.code,
+                    name: praxis.name,
+                    preisliste: praxis.preisliste || 0,
+                    telefon: praxis.telefon || '',
+                    email: praxis.email || '',
+                    notizen: praxis.notizen || ''
+                })
+            });
+        }
+
+        function syncManualPositionOptions() {
+            const manualPos = document.getElementById('select-manual-pos');
+            if (!manualPos) return;
+            const currentValue = manualPos.value;
+            manualPos.innerHTML = '<option value="">-- Position wählen --</option>';
+            POSITIONEN.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.nr;
+                opt.textContent = `${p.nr} - ${p.bez}`;
+                manualPos.appendChild(opt);
+            });
+            if (currentValue && POSITIONEN.some(p => p.nr === currentValue)) {
+                manualPos.value = currentValue;
+            }
+        }
+
+        function mergeLeistungOverride(leistung) {
+            const nr = (leistung.nr || '').replace(/^\*/, '');
+            if (!nr) return;
+            const existing = POSITIONEN.find(p => p.nr === nr);
+            if (!existing) return;
+            existing.bez = leistung.bez || existing.bez;
+            existing.kat = leistung.kat || existing.kat;
+            if (Array.isArray(leistung.preise) && leistung.preise.length === 5) {
+                existing.preise = leistung.preise.map(price => Number(price));
+            }
+        }
+
+        async function loadBackendLeistungen() {
+            try {
+                const data = await apiRequest('/api/leistungen/overrides');
+                (data.leistungen || []).forEach(mergeLeistungOverride);
+                syncManualPositionOptions();
+            } catch (err) {
+                console.warn('Leistungsänderungen konnten nicht geladen werden:', err);
+                showToast('Leistungsänderungen konnten nicht geladen werden');
+            }
+        }
+
+        async function saveLeistungOverride(pos) {
+            return apiRequest('/api/leistungen/overrides', {
+                method: 'POST',
+                body: JSON.stringify({
+                    nr: pos.nr,
+                    bez: pos.bez,
+                    kat: pos.kat,
+                    preise: pos.preise
+                })
+            });
         }
 
         // ============ CORE DATA ============
@@ -1373,7 +1497,7 @@
                                         <tr><td colspan="5" class="px-6 py-8 text-center text-slate-400">Noch keine KVAs erstellt</td></tr>
                                         ` : recentKVAs.map(kva => {
                                             const praxisName = PRAXEN.find(p => p.code === kva.praxis)?.name || kva.praxis;
-                                            const posCount = kva.positionen ? kva.positionen.length : 0;
+                                            const posCount = kva.positions ? kva.positions.length : 0;
                                             let statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Korrekt</span>';
                                             if (kva.status === 'korrigiert') statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Korrigiert</span>';
                                             else if (kva.status === 'stark_korrigiert') statusBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Stark korrigiert</span>';
@@ -1592,6 +1716,7 @@
             const grid = document.getElementById('zahnaerzte-grid');
             grid.innerHTML = PRAXEN.map((praxis, idx) => {
                 const kvasCount = state.allKVAs.filter(kva => kva.praxis === praxis.code).length;
+                const preisliste = Number.isInteger(praxis.preisliste) ? praxis.preisliste : 0;
                 return `
                     <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
                         <div class="flex justify-between items-start mb-2">
@@ -1606,11 +1731,11 @@
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Preisliste (1-5)</label>
                                 <select id="praxis-pl-${idx}" value="${praxis.preisliste}" onchange="updatePraxisPreisliste(${idx}, this.value)"
                                     class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="0">Preisliste 1 (Standard)</option>
-                                    <option value="1">Preisliste 2</option>
-                                    <option value="2">Preisliste 3</option>
-                                    <option value="3">Preisliste 4</option>
-                                    <option value="4">Preisliste 5</option>
+                                    <option value="0" ${preisliste === 0 ? 'selected' : ''}>Preisliste 1 (Standard)</option>
+                                    <option value="1" ${preisliste === 1 ? 'selected' : ''}>Preisliste 2</option>
+                                    <option value="2" ${preisliste === 2 ? 'selected' : ''}>Preisliste 3</option>
+                                    <option value="3" ${preisliste === 3 ? 'selected' : ''}>Preisliste 4</option>
+                                    <option value="4" ${preisliste === 4 ? 'selected' : ''}>Preisliste 5</option>
                                 </select>
                             </div>
 
@@ -1650,18 +1775,28 @@
             }).join('');
         }
 
-        function updatePraxisField(idx, field, value) {
+        async function updatePraxisField(idx, field, value) {
             const praxis = PRAXEN[idx];
             if (!praxis) return;
             praxis[field] = value;
-            showToast(`${praxis.name} aktualisiert`);
+            try {
+                await savePraxisOverride(praxis);
+                showToast(`${praxis.name} gespeichert`);
+            } catch (err) {
+                showToast(`Praxis konnte nicht gespeichert werden: ${err.message}`);
+            }
         }
 
-        function updatePraxisPreisliste(idx, value) {
+        async function updatePraxisPreisliste(idx, value) {
             const praxis = PRAXEN[idx];
             if (!praxis) return;
             praxis.preisliste = parseInt(value);
-            showToast(`${praxis.name}: Preisliste ${parseInt(value) + 1} ausgewählt`);
+            try {
+                await savePraxisOverride(praxis);
+                showToast(`${praxis.name}: Preisliste ${parseInt(value) + 1} gespeichert`);
+            } catch (err) {
+                showToast(`Preisliste konnte nicht gespeichert werden: ${err.message}`);
+            }
         }
 
         function navigateToKVAPraxis(praxisCode) {
@@ -1810,25 +1945,37 @@
             renderLeistungen();
         }
 
-        function saveLeistung(idx) {
+        async function saveLeistung(idx) {
             const pos = POSITIONEN[idx];
             if (!pos) return;
 
             const bez = document.getElementById(`leistung-bez-${idx}`)?.value || pos.bez;
             const kat = document.getElementById(`leistung-kat-${idx}`)?.value || pos.kat;
-            const pl1 = parseFloat(document.getElementById(`leistung-pl1-${idx}`)?.value) || pos.preise[0];
-            const pl2 = parseFloat(document.getElementById(`leistung-pl2-${idx}`)?.value) || pos.preise[1];
-            const pl3 = parseFloat(document.getElementById(`leistung-pl3-${idx}`)?.value) || pos.preise[2];
-            const pl4 = parseFloat(document.getElementById(`leistung-pl4-${idx}`)?.value) || pos.preise[3];
-            const pl5 = parseFloat(document.getElementById(`leistung-pl5-${idx}`)?.value) || pos.preise[4];
+            const pl1 = Number(document.getElementById(`leistung-pl1-${idx}`)?.value);
+            const pl2 = Number(document.getElementById(`leistung-pl2-${idx}`)?.value);
+            const pl3 = Number(document.getElementById(`leistung-pl3-${idx}`)?.value);
+            const pl4 = Number(document.getElementById(`leistung-pl4-${idx}`)?.value);
+            const pl5 = Number(document.getElementById(`leistung-pl5-${idx}`)?.value);
+
+            if (![pl1, pl2, pl3, pl4, pl5].every(price => Number.isFinite(price) && price >= 0)) {
+                showToast('Alle Preise müssen gültige positive Zahlen sein');
+                return;
+            }
 
             pos.bez = bez;
             pos.kat = kat;
             pos.preise = [pl1, pl2, pl3, pl4, pl5];
 
-            activeLeistungIdx = null;
-            renderLeistungen();
-            showToast(`${pos.nr} gespeichert`);
+            try {
+                const data = await saveLeistungOverride(pos);
+                mergeLeistungOverride(data.leistung || pos);
+                syncManualPositionOptions();
+                activeLeistungIdx = null;
+                renderLeistungen();
+                showToast(`${pos.nr} gespeichert`);
+            } catch (err) {
+                showToast(`Leistung konnte nicht gespeichert werden: ${err.message}`);
+            }
         }
 
         function setLeistungenFilter(category) {
@@ -1963,24 +2110,12 @@
         }
 
         // ============ INITIALIZATION ============
-        function init() {
+        async function init() {
             // Praxis dropdown
-            const praxisSelect = document.getElementById('select-praxis');
-            PRAXEN.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.code;
-                opt.textContent = p.name;
-                praxisSelect.appendChild(opt);
-            });
+            syncPraxisSelectOptions();
 
             // Manual position dropdown
-            const manualPos = document.getElementById('select-manual-pos');
-            POSITIONEN.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.nr;
-                opt.textContent = `${p.nr} - ${p.bez}`;
-                manualPos.appendChild(opt);
-            });
+            syncManualPositionOptions();
 
             // Teeth schema
             generateTeethSchema();
@@ -2006,9 +2141,15 @@
             document.getElementById('leistungen-search')?.addEventListener('keyup', renderLeistungen);
             document.getElementById('leistungen-sort')?.addEventListener('change', renderLeistungen);
 
+            await Promise.all([
+                loadBackendLearningRules(),
+                loadBackendPraxen(),
+                loadBackendLeistungen(),
+                loadBackendKVAs()
+            ]);
+
             // Navigate to dashboard on start
             navigateTo('dashboard');
-            loadBackendLearningRules();
         }
 
         // Track per-tooth status: { 14: { I: true, G: false, V: false, S: true }, ... }
@@ -2936,7 +3077,7 @@
             showToast('KVA zurückgesetzt');
         }
 
-        function saveKVA() {
+        async function saveKVA() {
             const hasAssignments = Object.keys(state.toothKuerzel).length > 0;
             if (!state.selectedKuerzel && !hasAssignments && state.positions.length === 0) {
                 showToast('Keine Positionen vorhanden');
@@ -2989,9 +3130,23 @@
                 kva.status = 'stark_korrigiert';
             }
 
-            state.allKVAs.push(kva);
-            document.getElementById('kva-nr-display').innerHTML = `KVA-Nr: <span class="font-mono font-semibold text-slate-900">${kvaId}</span>`;
-            showToast('KVA gespeichert: ' + kvaId);
+            try {
+                const data = await apiRequest('/api/kvas', {
+                    method: 'POST',
+                    body: JSON.stringify(kva)
+                });
+                const savedKVA = normalizeKVA(data.kva || kva);
+                const existingIdx = state.allKVAs.findIndex(item => item.id === savedKVA.id);
+                if (existingIdx >= 0) {
+                    state.allKVAs[existingIdx] = savedKVA;
+                } else {
+                    state.allKVAs.push(savedKVA);
+                }
+                document.getElementById('kva-nr-display').innerHTML = `KVA-Nr: <span class="font-mono font-semibold text-slate-900">${savedKVA.id}</span>`;
+                showToast('KVA gespeichert: ' + savedKVA.id);
+            } catch (err) {
+                showToast(`KVA konnte nicht gespeichert werden: ${err.message}`);
+            }
         }
 
         function exportKorrekturen() {
