@@ -59,6 +59,7 @@ AKTIONEN = {
     "entfernen",       # Position wird entfernt (war in der Basis-Logik, gehört nicht rein)
     "menge_aendern",   # Menge einer Position wird geändert
     "preis_aendern",   # Preis einer Position wird geändert
+    "kategorie_aendern",  # Position wechselt zwischen Leistung und Material
 }
 
 
@@ -296,6 +297,11 @@ class LearningStore:
             elif aktion == "preis_aendern":
                 if pos_nr in pos_dict and korr.get("neuer_wert") is not None:
                     pos_dict[pos_nr]["preis"] = korr["neuer_wert"]
+                    korr["angewandt_count"] = korr.get("angewandt_count", 0) + 1
+
+            elif aktion == "kategorie_aendern":
+                if pos_nr in pos_dict and korr.get("neuer_wert") in {"leistung", "material"}:
+                    pos_dict[pos_nr]["kategorie"] = korr["neuer_wert"]
                     korr["angewandt_count"] = korr.get("angewandt_count", 0) + 1
 
         # Zähler speichern

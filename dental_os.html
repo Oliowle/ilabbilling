@@ -2269,19 +2269,28 @@
                 return data.positionen.map(p => {
                     const nr = p.nummer.replace(/^\*/, '');
                     const posInfo = POSITIONEN.find(x => x.nr === nr);
+                    const apiPrice = Number.isFinite(Number(p.preis)) ? Number(p.preis) : 0;
+                    const priceMissing = Boolean(p.price_missing || p.preis === null || typeof p.preis === 'undefined');
+                    const reasons = p.reasons && p.reasons.length ? p.reasons : [`via Abrechnungsintelligenz (${data.praxis_norm || 'Standard'})`];
+                    if (priceMissing) {
+                        reasons.push('Preis fehlt im Praxisprofil; kein lokaler Fallbackpreis verwendet.');
+                    }
                     return {
                         nummer: nr,
                         bezeichnung: posInfo ? posInfo.bez : nr,
                         menge: p.menge,
-                        einzelpreis: p.preis || (posInfo ? posInfo.preise[0] : 0),
-                        kategorie: posInfo ? posInfo.kat : 'leistung',
+                        einzelpreis: apiPrice,
+                        kategorie: p.kategorie || (posInfo ? posInfo.kat : 'leistung'),
                         source: 'api',
                         korrigiert: false,
                         entfernt: false,
-                        reason: (p.reasons && p.reasons.length ? p.reasons : [`via Abrechnungsintelligenz (${data.praxis_norm || 'Standard'})`]),
+                        reason: reasons,
                         ist_pflicht: p.ist_pflicht,
+                        kuerzel: p.kuerzel || '',
+                        kuerzelSources: p.kuerzel_sources || (p.kuerzel ? [p.kuerzel] : []),
+                        priceMissing,
                         confidence: p.confidence || (p.ist_pflicht ? 0.86 : 0.68),
-                        needs_review: Boolean(p.needs_review),
+                        needs_review: Boolean(p.needs_review || priceMissing),
                     };
                 });
             } catch (err) {
@@ -2343,6 +2352,7 @@
                     const korrigiertBadge = pos.korrigiert ? '<span class="text-xs px-1.5 py-0.5 rounded bg-orange-100 text-orange-700">Korrigiert</span>' : '';
                     const manualBadge = pos.source === 'manual' ? '<span class="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700">Manuell</span>' : '';
                     const reviewBadge = pos.needs_review ? '<span class="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">Prüfen</span>' : '';
+                    const priceMissingBadge = pos.priceMissing ? '<span class="text-xs px-1.5 py-0.5 rounded bg-red-100 text-red-700">Preis fehlt</span>' : '';
                     const confidenceBadge = pos.confidence ? `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">${Math.round(pos.confidence * 100)}%</span>` : '';
 
                     const katToggleLabel = pos.kategorie === 'leistung' ? 'Material' : 'Leistung';
@@ -2354,7 +2364,7 @@
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2">
                                         <span class="mono text-xs text-slate-400">${pos.nummer}</span>
-                                        ${korrigiertBadge}${manualBadge}${reviewBadge}${confidenceBadge}
+                                        ${korrigiertBadge}${manualBadge}${reviewBadge}${priceMissingBadge}${confidenceBadge}
                                     </div>
                                     <div class="text-sm font-medium text-slate-900 truncate">${pos.bezeichnung}</div>
                                     <div class="flex gap-2 mt-1">
@@ -2457,6 +2467,22 @@
             }
         }
 
+        function resolveKuerzelForPosition(pos) {
+            const sources = (pos.kuerzelSources || []).filter(Boolean);
+            if (pos.kuerzel) return pos.kuerzel;
+            if (sources.length === 1) return sources[0];
+            if (state.selectedKuerzel) return state.selectedKuerzel;
+            const assigned = [...new Set(Object.values(state.toothKuerzel).filter(Boolean))];
+            if (assigned.length === 1) return assigned[0];
+            return sources[0] || '';
+        }
+
+        function buildCorrectionExplanation(pos, text) {
+            const sources = (pos.kuerzelSources || []).filter(Boolean);
+            if (sources.length <= 1) return text;
+            return `${text} Quellen: ${sources.join(', ')}.`;
+        }
+
         function sendCorrectionToAPI(kuerzel, position, aktion, neuerWert, alterWert, erklaerung, explicit = false) {
             if (!explicit) return;
             const praxisName = getPraxisName();
@@ -2480,7 +2506,7 @@
                     neuer_wert: neuerWert,
                     alter_wert: alterWert,
                     praxis: praxisName || null,
-                    kasse: kasse || null,
+                    kasse,
                     erklaerung,
                 }),
             }).then(r => r.json()).then(d => {
@@ -2519,6 +2545,15 @@
             document.getElementById(`qty-display-${idx}`).textContent = newQty;
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
             updateTotals();
+            sendCorrectionToAPI(
+                resolveKuerzelForPosition(pos),
+                pos.nummer,
+                'menge_aendern',
+                newQty,
+                oldQty,
+                buildCorrectionExplanation(pos, `Menge ${oldQty} → ${newQty}`),
+                true
+            );
         }
 
         function updatePositionQty(idx, newQty) {
@@ -2555,6 +2590,15 @@
             renderPositions();
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
             showToast(`${pos.nummer} entfernt`);
+            sendCorrectionToAPI(
+                resolveKuerzelForPosition(pos),
+                pos.nummer,
+                'entfernen',
+                null,
+                null,
+                buildCorrectionExplanation(pos, `${pos.nummer} entfernt`),
+                true
+            );
         }
 
         function toggleKategorie(idx) {
@@ -2576,6 +2620,15 @@
             document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
             renderPositions();
             showToast(`${pos.nummer}: ${oldKat} → ${pos.kategorie}`);
+            sendCorrectionToAPI(
+                resolveKuerzelForPosition(pos),
+                pos.nummer,
+                'kategorie_aendern',
+                pos.kategorie,
+                oldKat,
+                buildCorrectionExplanation(pos, `Kategorie ${oldKat} → ${pos.kategorie}`),
+                true
+            );
         }
 
         function saveLernregel(idx) {
@@ -2591,7 +2644,7 @@
                 id: Date.now(),
                 posNr: pos.nummer,
                 posBez: pos.bezeichnung,
-                kuerzel: state.selectedKuerzel || Object.values(state.toothKuerzel)[0] || '',
+                kuerzel: resolveKuerzelForPosition(pos),
                 praxis: document.getElementById('select-praxis').value,
                 versicherung: state.versicherung,
                 typ: typeEl ? typeEl.value : 'info',
@@ -2603,13 +2656,15 @@
             state.lernregeln.push(regel);
             pos.lernnotiz = textEl.value.trim();
 
-            if (typeEl && ['menge', 'nicht_noetig', 'fehlt'].includes(typeEl.value)) {
+            if (typeEl && ['kategorie', 'menge', 'nicht_noetig', 'fehlt'].includes(typeEl.value)) {
                 const actionMap = {
+                    kategorie: 'kategorie_aendern',
                     menge: 'menge_aendern',
                     nicht_noetig: 'entfernen',
                     fehlt: 'hinzufuegen',
                 };
-                sendCorrectionToAPI(regel.kuerzel, pos.nummer, actionMap[typeEl.value], pos.menge, null, regel.text, true);
+                const newValue = typeEl.value === 'kategorie' ? pos.kategorie : pos.menge;
+                sendCorrectionToAPI(regel.kuerzel, pos.nummer, actionMap[typeEl.value], newValue, null, regel.text, true);
             }
 
             updateLernregelnLog();

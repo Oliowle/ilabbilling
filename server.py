@@ -25,7 +25,7 @@ import os
 import json
 import re
 from datetime import datetime
-from typing import Optional, List
+from typing import Any, Optional, List
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -62,8 +62,8 @@ class KorrekturRequest(BaseModel):
     kuerzel: str
     position: str
     aktion: str
-    neuer_wert: Optional[float] = None
-    alter_wert: Optional[float] = None
+    neuer_wert: Optional[Any] = None
+    alter_wert: Optional[Any] = None
     praxis: Optional[str] = None
     kasse: Optional[bool] = None
     erklaerung: str = ""
@@ -91,8 +91,10 @@ def validate_korrektur_request(req: KorrekturRequest):
     kuerzel = KUERZEL_ALIAS.get(kuerzel, kuerzel)
     if kuerzel not in KNOWN_KUERZEL:
         raise HTTPException(status_code=400, detail=f"Unbekanntes Kürzel: {kuerzel}")
-    if req.aktion not in {"hinzufuegen", "entfernen", "menge_aendern", "preis_aendern"}:
+    if req.aktion not in {"hinzufuegen", "entfernen", "menge_aendern", "preis_aendern", "kategorie_aendern"}:
         raise HTTPException(status_code=400, detail=f"Unbekannte Aktion: {req.aktion}")
+    if req.aktion == "kategorie_aendern" and req.neuer_wert not in {"leistung", "material"}:
+        raise HTTPException(status_code=400, detail="Kategorie muss 'leistung' oder 'material' sein")
     return kuerzel, normalize_position_number(req.position)
 
 
@@ -147,7 +149,11 @@ def api_generate(req: GenerateRequest):
             preis_details[num] = {"preis": preis, "quelle": quelle}
             if preis is not None and pos.get("preis") is None:
                 pos["preis"] = preis
+            pos["price_missing"] = pos.get("preis") is None
             pos.setdefault("reasons", []).append(f"Preisquelle: {quelle or 'kein Preisprofil'}")
+    else:
+        for pos in result["positionen"]:
+            pos["price_missing"] = pos.get("preis") is None
 
     total = sum(
         (p.get("preis") or 0) * p.get("menge", 1)

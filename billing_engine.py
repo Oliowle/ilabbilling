@@ -863,16 +863,25 @@ def generate_invoice(
                 gen_pos[num]["menge"] += rp["menge"]
                 if rp["ist_pflicht"]:
                     gen_pos[num]["ist_pflicht"] = 1
+                if rp.get("kategorie") in {"leistung", "material"}:
+                    gen_pos[num]["kategorie"] = rp["kategorie"]
+                gen_pos[num].setdefault("kuerzel_sources", [])
+                if kuerzel not in gen_pos[num]["kuerzel_sources"]:
+                    gen_pos[num]["kuerzel_sources"].append(kuerzel)
                 gen_pos[num].setdefault("reasons", []).append(reason)
             else:
                 gen_pos[num] = {
                     "nummer": num,
                     "menge": rp["menge"],
                     "ist_pflicht": rp["ist_pflicht"],
+                    "kuerzel": kuerzel,
+                    "kuerzel_sources": [kuerzel],
                     "confidence": 0.86 if rp["ist_pflicht"] else 0.68,
                     "needs_review": not bool(rp["ist_pflicht"]),
                     "reasons": [reason],
                 }
+                if rp.get("kategorie") in {"leistung", "material"}:
+                    gen_pos[num]["kategorie"] = rp["kategorie"]
 
     apply_praxis_model_profile(gen_pos, parsed, praxis=praxis, abdruck=abdruck, tooth_counts=tooth_counts)
     apply_role_quantity_overrides(gen_pos, tooth_counts)
