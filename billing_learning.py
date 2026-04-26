@@ -279,6 +279,7 @@ class LearningStore:
         if status not in {"vorgeschlagen", "aktiv", "deaktiviert", "ersetzt"}:
             raise ValueError(f"Unbekannter Status: {status}")
 
+        effective_status = "deaktiviert" if test_mode and status == "aktiv" else status
         korrektur = {
             "id": self._next_id(),
             "datum": datetime.now().isoformat(timespec="seconds"),
@@ -290,14 +291,16 @@ class LearningStore:
             "alter_wert": alter_wert,
             "neuer_wert": neuer_wert,
             "erklaerung": erklaerung,
-            "status": status,
-            "aktiv": status == "aktiv",
+            "status": effective_status,
+            "aktiv": effective_status == "aktiv",
             "test_mode": bool(test_mode),
             "quelle": quelle,
             "created_by": created_by,
             "scope": self._build_scope(praxis, kasse),
             "angewandt_count": 0,
         }
+        if test_mode and status == "aktiv":
+            korrektur["deaktiviert_grund"] = "Automatisch deaktiviert: Testmodus"
 
         # Prüfe ob es eine identische aktive Korrektur gibt → ersetzen
         for i, existing in enumerate(self.korrekturen):
