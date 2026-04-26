@@ -2483,6 +2483,14 @@
             return `${text} Quellen: ${sources.join(', ')}.`;
         }
 
+        function updateCorrectionCounters() {
+            const count = state.korrektionen.length;
+            const statEl = document.getElementById('stat-korrekturen');
+            const logCountEl = document.getElementById('korrektur-count');
+            if (statEl) statEl.textContent = count;
+            if (logCountEl) logCountEl.textContent = `${count} Änderung${count !== 1 ? 'en' : ''}`;
+        }
+
         function sendCorrectionToAPI(kuerzel, position, aktion, neuerWert, alterWert, erklaerung, explicit = false) {
             if (!explicit) return;
             const praxisName = getPraxisName();
@@ -2543,7 +2551,7 @@
             });
 
             document.getElementById(`qty-display-${idx}`).textContent = newQty;
-            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+            updateCorrectionCounters();
             updateTotals();
             sendCorrectionToAPI(
                 resolveKuerzelForPosition(pos),
@@ -2572,7 +2580,7 @@
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
             updateTotals();
-            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+            updateCorrectionCounters();
         }
 
         function removePosition(idx) {
@@ -2588,7 +2596,7 @@
             });
             activePositionIdx = null;
             renderPositions();
-            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+            updateCorrectionCounters();
             showToast(`${pos.nummer} entfernt`);
             sendCorrectionToAPI(
                 resolveKuerzelForPosition(pos),
@@ -2617,7 +2625,7 @@
                 timestamp: new Date().toLocaleTimeString('de-DE')
             });
 
-            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+            updateCorrectionCounters();
             renderPositions();
             showToast(`${pos.nummer}: ${oldKat} → ${pos.kategorie}`);
             sendCorrectionToAPI(
@@ -2759,7 +2767,7 @@
 
             document.getElementById('select-manual-pos').value = '';
             document.getElementById('input-manual-qty').value = '1';
-            document.getElementById('stat-korrektionen').textContent = state.korrektionen.length;
+            updateCorrectionCounters();
             renderPositions();
             showToast(`${pos.nr} hinzugefügt (${qty}×)`);
         }
@@ -2843,7 +2851,7 @@
             });
             updateTeethCount();
             renderPositions();
-            document.getElementById('stat-korrektionen').textContent = '0';
+            updateCorrectionCounters();
             document.getElementById('kva-nr-display').innerHTML = 'KVA-Nr: <span class="font-mono font-semibold text-slate-900">---</span>';
             showToast('KVA zurückgesetzt');
         }
