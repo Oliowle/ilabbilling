@@ -201,6 +201,9 @@ def apply_suggestions(suggestions, store_path: Path):
                 neuer_wert=s.get("neuer_wert"),
                 alter_wert=s.get("alter_wert"),
                 erklaerung=s["erklaerung"],
+                status="vorgeschlagen",
+                quelle="auto_learn",
+                created_by="auto_learn",
             )
             angewandt += 1
         except ValueError:

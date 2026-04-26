@@ -67,6 +67,13 @@ class KorrekturRequest(BaseModel):
     praxis: Optional[str] = None
     kasse: Optional[bool] = None
     erklaerung: str = ""
+    status: str = "aktiv"
+    test_mode: bool = False
+    created_by: str = "ui"
+
+class KorrekturStatusRequest(BaseModel):
+    status: str
+    grund: str = ""
 
 
 def normalize_position_number(position: str) -> str:
@@ -93,9 +100,36 @@ def validate_korrektur_request(req: KorrekturRequest):
         raise HTTPException(status_code=400, detail=f"Unbekanntes Kürzel: {kuerzel}")
     if req.aktion not in {"hinzufuegen", "entfernen", "menge_aendern", "preis_aendern", "kategorie_aendern"}:
         raise HTTPException(status_code=400, detail=f"Unbekannte Aktion: {req.aktion}")
+    if req.status not in {"vorgeschlagen", "aktiv", "deaktiviert", "ersetzt"}:
+        raise HTTPException(status_code=400, detail=f"Unbekannter Status: {req.status}")
+    if req.aktion in {"menge_aendern", "hinzufuegen"}:
+        try:
+            if req.neuer_wert is not None and float(req.neuer_wert) <= 0:
+                raise HTTPException(status_code=400, detail="Menge muss größer als 0 sein")
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="Menge muss numerisch sein")
+    if req.aktion == "preis_aendern":
+        try:
+            if req.neuer_wert is not None and float(req.neuer_wert) < 0:
+                raise HTTPException(status_code=400, detail="Preis darf nicht negativ sein")
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="Preis muss numerisch sein")
     if req.aktion == "kategorie_aendern" and req.neuer_wert not in {"leistung", "material"}:
         raise HTTPException(status_code=400, detail="Kategorie muss 'leistung' oder 'material' sein")
     return kuerzel, normalize_position_number(req.position)
+
+
+def validate_generate_request(req: GenerateRequest):
+    if not (req.arbeitsart or "").strip():
+        raise HTTPException(status_code=400, detail="Arbeitsart darf nicht leer sein")
+
+
+def api_envelope(data: dict) -> dict:
+    return {
+        "api_version": app.version,
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        **data,
+    }
 
 
 # ─── FastAPI App ──────────────────────────────────────────────────────────────
@@ -128,6 +162,7 @@ def api_generate(req: GenerateRequest):
         POST /api/generate
         {"arbeitsart": "11,21 ZKV; 25 ZBR", "praxis": "Röder"}
     """
+    validate_generate_request(req)
     praxis_norm = price_loader.normalize_praxis(req.praxis) if req.praxis else None
     praxis_preise = price_loader.get_praxis_prices(praxis_norm) if praxis_norm else None
 
@@ -160,12 +195,16 @@ def api_generate(req: GenerateRequest):
         for p in result["positionen"]
     )
 
-    return {
+    return api_envelope({
         **result,
         "praxis_norm": praxis_norm,
         "preis_details": preis_details,
         "total": round(total, 2),
-    }
+        "validation": {
+            "price_missing_count": sum(1 for p in result["positionen"] if p.get("price_missing")),
+            "needs_review_count": sum(1 for p in result["positionen"] if p.get("needs_review")),
+        },
+    })
 
 
 @app.post("/api/korrektur")
@@ -182,14 +221,39 @@ def api_korrektur(req: KorrekturRequest):
         praxis=praxis_norm,
         kasse=req.kasse,
         erklaerung=req.erklaerung,
+        status=req.status,
+        test_mode=req.test_mode,
+        quelle="api",
+        created_by=req.created_by,
     )
-    return {"status": "ok", "korrektur": korrektur}
+    return api_envelope({"status": "ok", "korrektur": korrektur})
 
 
 @app.get("/api/korrekturen")
 def api_korrekturen(kuerzel: Optional[str] = None):
     """Liste aktive Korrekturen."""
     return learning_store.list_active(kuerzel)
+
+
+@app.get("/api/korrekturen/all")
+def api_korrekturen_all(kuerzel: Optional[str] = None, include_tests: bool = True):
+    """Liste alle Lernregeln inklusive deaktivierter Regeln."""
+    return api_envelope({
+        "korrekturen": learning_store.list_all(kuerzel=kuerzel, include_tests=include_tests),
+        "stats": learning_store.stats(),
+    })
+
+
+@app.post("/api/korrekturen/{korrektur_id}/status")
+def api_korrektur_status(korrektur_id: int, req: KorrekturStatusRequest):
+    """Aktiviere, deaktiviere oder markiere eine Lernregel."""
+    try:
+        ok = learning_store.set_status(korrektur_id, req.status, req.grund)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    if not ok:
+        raise HTTPException(status_code=404, detail=f"Korrektur {korrektur_id} nicht gefunden")
+    return api_envelope({"status": "ok", "korrektur_id": korrektur_id, "neuer_status": req.status})
 
 
 @app.get("/api/stats")

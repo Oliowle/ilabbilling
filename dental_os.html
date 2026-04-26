@@ -595,8 +595,30 @@
             positions: [],
             korrektionen: [],
             lernregeln: [],
+            backendLernregeln: [],
             allKVAs: []
         };
+
+        function getApiBase() {
+            return location.protocol === 'file:' ? 'http://localhost:8000' : '/billing';
+        }
+
+        async function apiRequest(path, options = {}) {
+            const resp = await fetch(`${getApiBase()}${path}`, {
+                headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+                ...options,
+            });
+            const data = await resp.json().catch(() => ({}));
+            if (!resp.ok) {
+                throw new Error(data.detail || `API ${resp.status}`);
+            }
+            return data;
+        }
+
+        function isCorrectionTestMode() {
+            const params = new URLSearchParams(location.search);
+            return params.get('test_mode') === '1' || params.get('billing_test') === '1';
+        }
 
         // ============ CORE DATA ============
         const POSITIONEN = [
@@ -1986,6 +2008,7 @@
 
             // Navigate to dashboard on start
             navigateTo('dashboard');
+            loadBackendLearningRules();
         }
 
         // Track per-tooth status: { 14: { I: true, G: false, V: false, S: true }, ... }
@@ -2251,10 +2274,8 @@
         async function resolveFromAPI(arbeitsart, praxisName, kasse, gb) {
             try {
                 const abdruck = document.getElementById('select-workflow').value === 'abdruck';
-                const apiBase = location.protocol === 'file:' ? 'http://localhost:8000' : '/billing';
-                const resp = await fetch(`${apiBase}/api/generate`, {
+                const data = await apiRequest('/api/generate', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         arbeitsart,
                         praxis: praxisName || null,
@@ -2263,8 +2284,6 @@
                         abdruck,
                     }),
                 });
-                if (!resp.ok) throw new Error(`API ${resp.status}`);
-                const data = await resp.json();
 
                 return data.positionen.map(p => {
                     const nr = p.nummer.replace(/^\*/, '');
@@ -2491,7 +2510,33 @@
             if (logCountEl) logCountEl.textContent = `${count} Änderung${count !== 1 ? 'en' : ''}`;
         }
 
-        function sendCorrectionToAPI(kuerzel, position, aktion, neuerWert, alterWert, erklaerung, explicit = false) {
+        async function loadBackendLearningRules() {
+            try {
+                const data = await apiRequest('/api/korrekturen/all?include_tests=false');
+                state.backendLernregeln = data.korrekturen || [];
+                updateLernregelnLog();
+            } catch (err) {
+                console.warn('Lernregeln konnten nicht geladen werden:', err.message);
+            }
+        }
+
+        async function setBackendRuleStatus(id, status) {
+            const grund = status === 'deaktiviert'
+                ? 'In der DENTAL-OS-Review deaktiviert'
+                : 'In der DENTAL-OS-Review aktiviert';
+            try {
+                await apiRequest(`/api/korrekturen/${id}/status`, {
+                    method: 'POST',
+                    body: JSON.stringify({ status, grund }),
+                });
+                showToast(status === 'aktiv' ? 'Lernregel aktiviert' : 'Lernregel deaktiviert');
+                await loadBackendLearningRules();
+            } catch (err) {
+                showToast(err.message || 'Lernregel konnte nicht geändert werden');
+            }
+        }
+
+        async function sendCorrectionToAPI(kuerzel, position, aktion, neuerWert, alterWert, erklaerung, explicit = false) {
             if (!explicit) return;
             const praxisName = getPraxisName();
             const kasse = state.versicherung === 'kasse';
@@ -2503,11 +2548,10 @@
             if (!window.confirm(`Diese Änderung dauerhaft als Lernregel für ${resolvedKuerzel} speichern?`)) {
                 return;
             }
-            const apiBase = location.protocol === 'file:' ? 'http://localhost:8000' : '/billing';
-            fetch(`${apiBase}/api/korrektur`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            try {
+                const d = await apiRequest('/api/korrektur', {
+                    method: 'POST',
+                    body: JSON.stringify({
                     kuerzel: resolvedKuerzel,
                     position,
                     aktion,
@@ -2516,18 +2560,22 @@
                     praxis: praxisName || null,
                     kasse,
                     erklaerung,
+                    status: 'aktiv',
+                    test_mode: isCorrectionTestMode(),
+                    created_by: 'ui',
                 }),
-            }).then(r => r.json()).then(d => {
+                });
                 if (d.status === 'ok') {
                     showToast('Lernregel dauerhaft gespeichert');
                     console.log('Korrektur gespeichert:', d.korrektur?.id);
+                    await loadBackendLearningRules();
                 } else {
                     showToast(d.detail || 'Lernregel wurde abgelehnt');
                 }
-            }).catch(e => {
-                showToast('Korrektur-API Fehler');
+            } catch (e) {
+                showToast(e.message || 'Korrektur-API Fehler');
                 console.warn('Korrektur-API Fehler:', e);
-            });
+            }
         }
 
         function adjustQty(idx, delta) {
@@ -2676,7 +2724,6 @@
             }
 
             updateLernregelnLog();
-            document.getElementById('lernregeln-count').textContent = `(${state.lernregeln.length})`;
             switchLogTab('learn');
             showToast('Lernregel gespeichert');
         }
@@ -2707,20 +2754,43 @@
         function updateLernregelnLog() {
             const logEl = document.getElementById('lernregeln-log');
             if (!logEl) return;
-            if (state.lernregeln.length === 0) {
+            const localRules = state.lernregeln || [];
+            const backendRules = state.backendLernregeln || [];
+            document.getElementById('lernregeln-count').textContent = `(${backendRules.filter(r => r.status === 'aktiv').length})`;
+            if (localRules.length === 0 && backendRules.length === 0) {
                 logEl.innerHTML = '<p class="text-xs text-slate-400 text-center py-2">Noch keine Lernregeln</p>';
                 return;
             }
             const typLabels = {
-                kategorie: '🏷️ Kategorie',
-                menge: '🔢 Menge',
-                nicht_noetig: '❌ Nicht nötig',
-                fehlt: '➕ Position fehlt',
-                bedingung: '⚙️ Bedingung',
-                praxis_spezifisch: '🏥 Praxis-spez.',
-                sonstiges: '📝 Sonstiges'
+                kategorie: 'Kategorie',
+                menge: 'Menge',
+                nicht_noetig: 'Nicht nötig',
+                fehlt: 'Position fehlt',
+                bedingung: 'Bedingung',
+                praxis_spezifisch: 'Praxis-spez.',
+                sonstiges: 'Sonstiges'
             };
-            logEl.innerHTML = state.lernregeln.slice().reverse().map(r => `
+            const backendHtml = backendRules.slice().reverse().map(r => {
+                const isActive = r.status === 'aktiv';
+                const statusClass = isActive ? 'border-emerald-300 bg-emerald-50' : 'border-slate-300 bg-slate-50';
+                const actionLabel = isActive ? 'Deaktivieren' : 'Aktivieren';
+                const nextStatus = isActive ? 'deaktiviert' : 'aktiv';
+                const scope = r.scope || (r.praxis ? 'praxis' : 'global');
+                return `
+                <div class="korrektur-log-entry ${statusClass}">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="font-semibold">#${r.id} ${r.position}</span>
+                        <span class="text-slate-700">${r.aktion}</span>
+                        <span class="text-slate-400 text-[10px] ml-auto">${r.kuerzel} · ${r.status}</span>
+                    </div>
+                    <div class="text-slate-600 mt-0.5">${r.alter_wert ?? '-'} → ${r.neuer_wert ?? '-'} · ${scope}</div>
+                    <div class="text-slate-500 mt-0.5">${r.erklaerung || 'Keine Erklärung'}</div>
+                    <button onclick="setBackendRuleStatus(${r.id}, '${nextStatus}')" class="mt-1 px-2 py-1 rounded bg-white border border-slate-200 text-[10px] font-semibold text-slate-600 hover:bg-slate-100">
+                        ${actionLabel}
+                    </button>
+                </div>`;
+            }).join('');
+            const localHtml = localRules.slice().reverse().map(r => `
                 <div class="korrektur-log-entry border-amber-300 bg-amber-50">
                     <div class="flex items-center gap-1.5 flex-wrap">
                         <span class="font-semibold">${r.posNr}</span>
@@ -2731,6 +2801,7 @@
                     ${r.praxis ? `<div class="text-slate-400 text-[10px] mt-0.5">Praxis: ${r.praxis}</div>` : ''}
                 </div>
             `).join('');
+            logEl.innerHTML = backendHtml + localHtml;
         }
 
         function addManualPosition() {
@@ -2770,6 +2841,15 @@
             updateCorrectionCounters();
             renderPositions();
             showToast(`${pos.nr} hinzugefügt (${qty}×)`);
+            sendCorrectionToAPI(
+                state.selectedKuerzel || Object.values(state.toothKuerzel)[0] || '',
+                pos.nr,
+                'hinzufuegen',
+                qty,
+                null,
+                `${pos.nr} manuell hinzugefügt`,
+                true
+            );
         }
 
         function updateKorrekturLog() {

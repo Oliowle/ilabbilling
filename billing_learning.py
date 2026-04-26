@@ -43,6 +43,7 @@ Verwendung:
 
 import json
 import os
+import sqlite3
 from datetime import datetime
 from typing import List, Dict, Optional
 from pathlib import Path
@@ -92,7 +93,11 @@ class LearningStore:
 
     def __init__(self, filepath: str = "korrekturen.json"):
         self.filepath = Path(filepath)
+        self.db_path = self.filepath.with_suffix(".sqlite3")
         self.data = self._load()
+        self._normalize_existing()
+        self._init_db()
+        self._sync_sqlite()
 
     def _load(self) -> Dict:
         """Lade Korrekturen aus JSON, oder erstelle neue Datei."""
@@ -105,11 +110,110 @@ class LearningStore:
             "korrekturen": [],
         }
 
-    def _save(self):
+    def _normalize_existing(self):
+        """Ergänze neue Audit-Felder, ohne alte JSON-Daten zu verändern."""
+        changed = False
+        for korrektur in self.korrekturen:
+            if "status" not in korrektur:
+                korrektur["status"] = "aktiv" if korrektur.get("aktiv", True) else "deaktiviert"
+                changed = True
+            if "aktiv" not in korrektur:
+                korrektur["aktiv"] = korrektur.get("status") == "aktiv"
+                changed = True
+            if "test_mode" not in korrektur:
+                korrektur["test_mode"] = False
+                changed = True
+            if "quelle" not in korrektur:
+                korrektur["quelle"] = "migration"
+                changed = True
+            if "created_by" not in korrektur:
+                korrektur["created_by"] = "system"
+                changed = True
+            if "scope" not in korrektur:
+                korrektur["scope"] = self._build_scope(korrektur.get("praxis"), korrektur.get("kasse"))
+                changed = True
+        if changed:
+            self._save(sync_sqlite=False)
+
+    def _init_db(self):
+        """Bereite SQLite als robustere Persistenzschicht vor."""
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS korrekturen (
+                    id INTEGER PRIMARY KEY,
+                    datum TEXT NOT NULL,
+                    kuerzel TEXT NOT NULL,
+                    praxis TEXT,
+                    kasse INTEGER,
+                    position TEXT NOT NULL,
+                    aktion TEXT NOT NULL,
+                    alter_wert TEXT,
+                    neuer_wert TEXT,
+                    erklaerung TEXT,
+                    status TEXT NOT NULL,
+                    aktiv INTEGER NOT NULL,
+                    test_mode INTEGER NOT NULL DEFAULT 0,
+                    quelle TEXT,
+                    created_by TEXT,
+                    deaktiviert_grund TEXT,
+                    ersetzt_durch INTEGER,
+                    angewandt_count INTEGER NOT NULL DEFAULT 0,
+                    payload_json TEXT NOT NULL
+                )
+                """
+            )
+            conn.commit()
+
+    def _sync_sqlite(self):
+        """Spiegele JSON-Korrekturen nach SQLite, bis SQLite die Quelle wird."""
+        if not hasattr(self, "db_path"):
+            return
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("DELETE FROM korrekturen")
+            for k in self.korrekturen:
+                conn.execute(
+                    """
+                    INSERT OR REPLACE INTO korrekturen (
+                        id, datum, kuerzel, praxis, kasse, position, aktion,
+                        alter_wert, neuer_wert, erklaerung, status, aktiv,
+                        test_mode, quelle, created_by, deaktiviert_grund,
+                        ersetzt_durch, angewandt_count, payload_json
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        k.get("id"),
+                        k.get("datum"),
+                        k.get("kuerzel"),
+                        k.get("praxis"),
+                        None if k.get("kasse") is None else int(bool(k.get("kasse"))),
+                        k.get("position"),
+                        k.get("aktion"),
+                        json.dumps(k.get("alter_wert"), ensure_ascii=False),
+                        json.dumps(k.get("neuer_wert"), ensure_ascii=False),
+                        k.get("erklaerung", ""),
+                        k.get("status", "aktiv"),
+                        int(self._is_active(k)),
+                        int(bool(k.get("test_mode", False))),
+                        k.get("quelle"),
+                        k.get("created_by"),
+                        k.get("deaktiviert_grund"),
+                        k.get("ersetzt_durch"),
+                        k.get("angewandt_count", 0),
+                        json.dumps(k, ensure_ascii=False),
+                    ),
+                )
+            conn.commit()
+
+    def _save(self, sync_sqlite: bool = True):
         """Speichere Korrekturen als JSON."""
         self.data["letzte_aenderung"] = datetime.now().isoformat(timespec="seconds")
+        self.filepath.parent.mkdir(parents=True, exist_ok=True)
         with open(self.filepath, "w", encoding="utf-8") as f:
             json.dump(self.data, f, ensure_ascii=False, indent=2)
+        if sync_sqlite:
+            self._sync_sqlite()
 
     @property
     def korrekturen(self) -> List[Dict]:
@@ -119,6 +223,22 @@ class LearningStore:
         if not self.korrekturen:
             return 1
         return max(k.get("id", 0) for k in self.korrekturen) + 1
+
+    @staticmethod
+    def _build_scope(praxis: Optional[str], kasse: Optional[bool]) -> str:
+        parts = []
+        parts.append("praxis" if praxis else "global")
+        if kasse is True:
+            parts.append("kasse")
+        elif kasse is False:
+            parts.append("privat")
+        else:
+            parts.append("alle-versicherungen")
+        return "+".join(parts)
+
+    @staticmethod
+    def _is_active(korrektur: Dict) -> bool:
+        return korrektur.get("aktiv", True) and korrektur.get("status", "aktiv") == "aktiv"
 
     # ────────────────────────────────────────────────────────────────────
     # KORREKTUR HINZUFÜGEN
@@ -134,6 +254,10 @@ class LearningStore:
         praxis: Optional[str] = None,
         kasse: Optional[bool] = None,
         erklaerung: str = "",
+        status: str = "aktiv",
+        test_mode: bool = False,
+        quelle: str = "ui",
+        created_by: str = "oliver",
     ) -> Dict:
         """Speichere eine neue Korrektur.
 
@@ -152,6 +276,8 @@ class LearningStore:
         """
         if aktion not in AKTIONEN:
             raise ValueError(f"Unbekannte Aktion: {aktion}. Erlaubt: {AKTIONEN}")
+        if status not in {"vorgeschlagen", "aktiv", "deaktiviert", "ersetzt"}:
+            raise ValueError(f"Unbekannter Status: {status}")
 
         korrektur = {
             "id": self._next_id(),
@@ -164,13 +290,18 @@ class LearningStore:
             "alter_wert": alter_wert,
             "neuer_wert": neuer_wert,
             "erklaerung": erklaerung,
-            "aktiv": True,
+            "status": status,
+            "aktiv": status == "aktiv",
+            "test_mode": bool(test_mode),
+            "quelle": quelle,
+            "created_by": created_by,
+            "scope": self._build_scope(praxis, kasse),
             "angewandt_count": 0,
         }
 
         # Prüfe ob es eine identische aktive Korrektur gibt → ersetzen
         for i, existing in enumerate(self.korrekturen):
-            if (existing.get("aktiv")
+            if (self._is_active(existing)
                     and existing["kuerzel"] == kuerzel
                     and existing["position"] == position
                     and existing["aktion"] == aktion
@@ -178,6 +309,7 @@ class LearningStore:
                     and existing.get("kasse") == kasse):
                 # Deaktiviere alte, behalte aber im Log
                 self.korrekturen[i]["aktiv"] = False
+                self.korrekturen[i]["status"] = "ersetzt"
                 self.korrekturen[i]["ersetzt_durch"] = korrektur["id"]
                 break
 
@@ -207,7 +339,7 @@ class LearningStore:
         """
         matches = []
         for k in self.korrekturen:
-            if not k.get("aktiv", True):
+            if not self._is_active(k):
                 continue
             if k["kuerzel"] != kuerzel:
                 continue
@@ -313,22 +445,43 @@ class LearningStore:
     # VERWALTUNG
     # ────────────────────────────────────────────────────────────────────
 
-    def deactivate(self, korrektur_id: int):
-        """Deaktiviere eine Korrektur (bleibt im Log)."""
+    def set_status(self, korrektur_id: int, status: str, grund: str = ""):
+        """Setze den Review-Status einer Korrektur."""
+        if status not in {"vorgeschlagen", "aktiv", "deaktiviert", "ersetzt"}:
+            raise ValueError(f"Unbekannter Status: {status}")
         for k in self.korrekturen:
             if k["id"] == korrektur_id:
-                k["aktiv"] = False
+                k["status"] = status
+                k["aktiv"] = status == "aktiv"
+                if grund:
+                    k["deaktiviert_grund" if status == "deaktiviert" else "status_grund"] = grund
+                k["status_geaendert_am"] = datetime.now().isoformat(timespec="seconds")
                 self._save()
                 return True
         return False
+
+    def deactivate(self, korrektur_id: int, grund: str = ""):
+        """Deaktiviere eine Korrektur (bleibt im Log)."""
+        return self.set_status(korrektur_id, "deaktiviert", grund)
 
     def list_active(self, kuerzel: Optional[str] = None) -> List[Dict]:
         """Liste alle aktiven Korrekturen (optional gefiltert)."""
         result = []
         for k in self.korrekturen:
-            if not k.get("aktiv", True):
+            if not self._is_active(k):
                 continue
             if kuerzel and k["kuerzel"] != kuerzel:
+                continue
+            result.append(k)
+        return result
+
+    def list_all(self, kuerzel: Optional[str] = None, include_tests: bool = True) -> List[Dict]:
+        """Liste alle Korrekturen inklusive Review-Status."""
+        result = []
+        for k in self.korrekturen:
+            if kuerzel and k["kuerzel"] != kuerzel:
+                continue
+            if not include_tests and k.get("test_mode"):
                 continue
             result.append(k)
         return result
@@ -336,14 +489,19 @@ class LearningStore:
     def stats(self) -> Dict:
         """Statistiken über gespeicherte Korrekturen."""
         aktive = [k for k in self.korrekturen if k.get("aktiv", True)]
-        inaktive = [k for k in self.korrekturen if not k.get("aktiv", True)]
+        aktive = [k for k in self.korrekturen if self._is_active(k)]
+        inaktive = [k for k in self.korrekturen if not self._is_active(k)]
         by_aktion = {}
         by_kuerzel = {}
+        by_status = {}
         for k in aktive:
             a = k["aktion"]
             by_aktion[a] = by_aktion.get(a, 0) + 1
             kz = k["kuerzel"]
             by_kuerzel[kz] = by_kuerzel.get(kz, 0) + 1
+        for k in self.korrekturen:
+            status = k.get("status", "aktiv")
+            by_status[status] = by_status.get(status, 0) + 1
 
         total_angewandt = sum(k.get("angewandt_count", 0) for k in aktive)
 
@@ -353,7 +511,10 @@ class LearningStore:
             "inaktiv": len(inaktive),
             "nach_aktion": by_aktion,
             "nach_kuerzel": by_kuerzel,
+            "nach_status": by_status,
             "gesamt_angewandt": total_angewandt,
+            "test_regeln": sum(1 for k in self.korrekturen if k.get("test_mode")),
+            "sqlite_spiegel": str(self.db_path),
         }
 
     def export_for_engine_update(self) -> List[Dict]:
@@ -365,7 +526,7 @@ class LearningStore:
         """
         kandidaten = []
         for k in self.korrekturen:
-            if not k.get("aktiv", True):
+            if not self._is_active(k):
                 continue
             if k.get("praxis") is not None:
                 continue  # Praxis-spezifisch → bleibt hier
